@@ -9,8 +9,8 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  // baseUrl = "https://3dprinter-web-api.benhalverson.workers.dev";
-  baseUrl = "http://localhost:8787";
+  baseUrl = "https://3dprinter-web-api.benhalverson.workers.dev";
+  // baseUrl = "http://localhost:8787";
   getProducts() {
     return this.http.get<ProductResponse>(`${this.baseUrl}/products`);
   }
