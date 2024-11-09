@@ -3,20 +3,21 @@ import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { ProductService } from '../product.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-product',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.css',
 })
 export class AddProductComponent {
   productForm: FormGroup;
 
-  constructor(private readonly fb: FormBuilder, private readonly http: HttpClient) {
+  constructor(private readonly fb: FormBuilder, private readonly productService: ProductService, private readonly toastr: ToastrService) {
     this.productForm = this.fb.group({
-      // name: ['', Validators.required, Validators.minLength(3)],
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
       image: [''],
@@ -28,15 +29,34 @@ export class AddProductComponent {
   }
 
   async onSubmit() {
-    console.log(this.productForm.value);
-    if(this.productForm.valid) {
-      const formData = this.productForm.value;
+    if (this.productForm.valid) {
+      const formData = {
+        ...this.productForm.value,
+        price: parseFloat(this.productForm.value.price) || 0,
+      };
+
       try {
-       const response = await firstValueFrom(this.http.post('http://localhost:8787/add-product', formData));
-       console.log('Response', response);
+        const response = await firstValueFrom(this.productService.createProduct(formData));
+        console.log('Response:', response);
+
+        this.toastr.success('Product added successfully!');
+
+        // Reset the form
+        this.productForm.reset({
+          name: '',
+          description: '',
+          image: '',
+          stl: '',
+          price: 0,
+          filamentType: 'PLA',
+          color: '#000000',
+        });
       } catch (error) {
         console.error('Failed to add data', error);
+        this.toastr.error('Failed to add product.');
       }
+    } else {
+      console.warn('Form is invalid');
     }
   }
 }

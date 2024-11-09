@@ -15,7 +15,10 @@ export class ProductComponent implements OnInit {
 
   data: Observable<any> = of([]);
   ngOnInit(): void {
-    this.data = this.product.getProducts()
+    try {
+      this.data = this.product.getProducts();
+    } catch (error) {
+      console.error('Failed to load data', error);
+    }
   }
 }
-
