@@ -1,6 +1,94 @@
-<div>
-  <p>{{productDetails.name}}</p>
-  <p>{{productDetails.description}}</p>
-  <p>{{productDetails.filamentType}}</p>
+<div class="max-w-xl p-6 mx-auto mt-10 bg-white rounded-lg shadow-md">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Product Details</h2>
+    <button
+      (click)="isEditing = !isEditing"
+      class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+    >
+      {{ isEditing ? "Cancel" : "Edit" }}
+    </button>
+  </div>
 
+  @if(!isEditing) {
+  <div class="space-y-4">
+    <p class="text-lg font-semibold text-gray-700">
+      Name: <span class="text-gray-900">{{ productDetails.name }}</span>
+    </p>
+    <p class="text-lg font-semibold text-gray-700">
+      Description:
+      <span class="text-gray-900">{{ productDetails.description }}</span>
+    </p>
+    <p class="text-lg font-semibold text-gray-700">
+      FilamentType:
+      <span class="text-gray-900">{{ productDetails.filamentType }}</span>
+    </p>
+  </div>
+  } @if(isEditing) {
+  <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="space-y-4">
+    <div class="space-y-4">
+      <label class="block">
+        <span class="text-gray-700">Name</span>
+        <input
+          type="text"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          formControlName="name"
+        />
+        @if(productForm.get('name')?.invalid &&
+        productForm.get('name')?.touched) {
+
+        <span class="text-sm text-red-500"
+          >Name is required and should not exceed 100 characters.</span
+        >
+        }
+      </label>
+      <label class="block">
+        <span class="text-gray-700">STL Link</span>
+        <input
+          type="text"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          formControlName="stl"
+        />
+        @if(productForm.get('stl')?.invalid &&
+        productForm.get('stl')?.touched) {
+
+        <span class="text-sm text-red-500"
+          >STL is required</span
+        >
+        }
+      </label>
+      <label class="block">
+        <span class="text-gray-700">Description</span>
+        <textarea
+          rows="4"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          formControlName="description"
+        ></textarea>
+        @if(productForm.get('description')?.invalid &&
+        productForm.get('description')?.touched) {
+
+        <span class="text-sm text-red-500"
+          >Description is requred.</span
+        >
+        }
+      </label>
+      <div class="flex justify-end mt-4 space-x-4">
+        <button
+          type="button"
+          class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+          (click)="saveChanges()"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
+          (click)="isEditing = false"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+
+  }
 </div>
