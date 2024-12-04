@@ -7,11 +7,10 @@ import { ProductService } from '../product.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-add-product',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, ],
-  templateUrl: './add-product.component.html',
-  styleUrl: './add-product.component.css',
+    selector: 'app-add-product',
+    imports: [ReactiveFormsModule, CommonModule,],
+    templateUrl: './add-product.component.html',
+    styleUrl: './add-product.component.css'
 })
 export class AddProductComponent {
   productForm: FormGroup;

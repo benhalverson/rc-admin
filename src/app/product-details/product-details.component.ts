@@ -3,11 +3,10 @@ import { Product, ProductResponse, ProductService } from '../product.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-product-details',
-  standalone: true,
-  imports: [],
-  templateUrl: './product-details.component.html',
-  styleUrl: './product-details.component.css'
+    selector: 'app-product-details',
+    imports: [],
+    templateUrl: './product-details.component.html',
+    styleUrl: './product-details.component.css'
 })
 export class ProductDetailsComponent {
 

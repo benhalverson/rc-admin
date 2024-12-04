@@ -5,11 +5,10 @@ import { AsyncPipe, NgFor, } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-product',
-  standalone: true,
-  imports: [RouterLink, NgFor, AsyncPipe],
-  templateUrl: './product.component.html',
-  styleUrl: './product.component.css',
+    selector: 'app-product',
+    imports: [RouterLink, NgFor, AsyncPipe],
+    templateUrl: './product.component.html',
+    styleUrl: './product.component.css'
 })
 export class ProductComponent implements OnInit {
   constructor(private readonly product: ProductService) {}
