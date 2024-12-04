@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../product.service';
 import { Observable, of } from 'rxjs';
-import { CommonModule, NgFor, NgForOf } from '@angular/common';
+import { AsyncPipe, NgFor, } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule],
+  imports: [RouterLink, NgFor, AsyncPipe],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css',
 })

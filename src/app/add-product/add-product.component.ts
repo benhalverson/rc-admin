@@ -36,9 +36,7 @@ export class AddProductComponent {
       };
 
       try {
-        const response = await firstValueFrom(this.productService.createProduct(formData));
-        console.log('Response:', response);
-
+        await firstValueFrom(this.productService.createProduct(formData));
         this.toastr.success('Product added successfully!');
 
         // Reset the form
