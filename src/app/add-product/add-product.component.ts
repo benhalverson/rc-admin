@@ -3,7 +3,7 @@ import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { ProductService } from '../product.service';
+import { Product, ProductService } from '../product.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -29,7 +29,7 @@ export class AddProductComponent {
 
   async onSubmit() {
     if (this.productForm.valid) {
-      const formData = {
+      const formData: Product = {
         ...this.productForm.value,
         price: parseFloat(this.productForm.value.price) || 0,
       };
@@ -38,7 +38,6 @@ export class AddProductComponent {
         await firstValueFrom(this.productService.createProduct(formData));
         this.toastr.success('Product added successfully!');
 
-        // Reset the form
         this.productForm.reset({
           name: '',
           description: '',
