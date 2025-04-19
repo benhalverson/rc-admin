@@ -37,16 +37,16 @@ export class LoginComponent {
         ...this.loginForm.value,
       };
       try {
-         await firstValueFrom(this.auth.signin(formData)).then((response: any) => {
-          this.toastr.success(`${response.message}`);
-         }).catch((error) => {
-          this.toastr.error(`Failed to login. ${error.error.error}`);
-         });
+         const response: LoginResponse = await firstValueFrom(this.auth.signin(formData))
+         this.toastr.success(`${response.message}`)
          this.router.navigate(['/add-product']);
-
       } catch (error: any) {
-        this.toastr.error(`Failed to login. ${error.details}`);
+        this.toastr.error(`Failed to login. ${error.error.error || error.error.details}`);
       }
     }
   }
+}
+
+interface LoginResponse {
+  message: string;
 }
