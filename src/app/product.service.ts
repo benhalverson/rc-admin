@@ -9,10 +9,10 @@ import { environment } from '../environments/environment';
 export class ProductService {
   baseUrl = environment.baseurl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProducts(): Observable<ProductResponse> {
-    return this.http.get<ProductResponse>(`${this.baseUrl}/products`);
+    return this.http.get<ProductResponse>(`${this.baseUrl}/products` );
   }
 
   getProductById(id: number): Observable<ProductResponse> {
@@ -20,11 +20,15 @@ export class ProductService {
   }
 
   updateProduct(product: Product): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/update-product`, product);
+    return this.http.put<void>(`${this.baseUrl}/update-product`, product, {
+      withCredentials: true,
+    });
   }
 
   createProduct(product: Product): Observable<ProductResponse> {
-    return this.http.post<ProductResponse>(`${this.baseUrl}/add-product`, product);
+    return this.http.post<ProductResponse>(`${this.baseUrl}/add-product`, product, {
+      withCredentials: true,
+    });
   }
 }
 
