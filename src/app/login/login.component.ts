@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../auth.service';
+import { AuthService, MyFormData } from '../auth.service';
 import {
   FormBuilder,
   FormGroup,
@@ -7,7 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
@@ -33,11 +33,11 @@ export class LoginComponent {
 
   async onSubmit() {
     if (this.loginForm.valid) {
-      const formData = {
+      const formData: MyFormData = {
         ...this.loginForm.value,
       };
       try {
-         const response: LoginResponse = await firstValueFrom(this.auth.signin(formData))
+         const response: LoginResponse = await firstValueFrom<any>(this.auth.signin(formData));
          this.toastr.success(`${response.message}`)
          this.router.navigate(['/add-product']);
       } catch (error: any) {

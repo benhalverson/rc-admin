@@ -1,6 +1,7 @@
 import { Injectable} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class AuthService {
 
   constructor(private readonly http: HttpClient) { }
 
-  signin(formData: FormData) {
+  signin(formData: MyFormData): Observable<any> {
     return this.http.post(
       `${environment.baseurl}/signin`,
       { email: formData.email, password: formData.password },
@@ -21,7 +22,7 @@ export class AuthService {
   }
 }
 
-export interface FormData {
+export interface MyFormData {
   email: string;
   password: string;
 }
