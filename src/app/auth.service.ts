@@ -11,8 +11,9 @@ export class AuthService {
   constructor(private readonly http: HttpClient) { }
 
   signin(formData: MyFormData): Observable<any> {
+    console.log('environment', environment);
     return this.http.post(
-      `${environment.baseurl}/signin`,
+      `${environment.baseurl}/auth/signin`,
       { email: formData.email, password: formData.password },
       {
         headers: { 'Content-Type': 'application/json' },
