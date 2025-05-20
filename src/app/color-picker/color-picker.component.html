@@ -1,0 +1,36 @@
+<fieldset aria-label="Choose a color" class="mt-2">
+  <div class="flex items-center space-x-3">
+    <label
+      *ngFor="let option of colorOptions()"
+      class="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
+      [class.ring-2]="model === option.hexColor"
+      [class.ring-offset-1]="model === option.hexColor"
+      [class.ring-blue-500]="model === option.hexColor"
+    >
+      <input
+        type="radio"
+        class="sr-only"
+        [value]="option.hexColor"
+        [checked]="model === option.hexColor"
+        (change)="selectColor(option.hexColor)"
+        name="color"
+      />
+      <span
+        class="w-8 h-8 border border-black rounded-full border-opacity-10"
+        [style.backgroundColor]="`#${option.hexColor}`"
+        aria-hidden="true"
+      ></span>
+      <span class="sr-only">{{ option.colorTag }}</span>
+
+      <span
+        *ngIf="model === option.hexColor"
+        class="absolute inset-0 rounded-full ring-2 ring-offset-2"
+        aria-hidden="true"
+      ></span>
+    </label>
+  </div>
+</fieldset>
+
+<ng-template [ngIf]="isLoading()">
+  <div>Loading...</div>
+</ng-template>

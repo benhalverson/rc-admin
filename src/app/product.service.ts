@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
+import { FilamentColorsResponse } from './types/filament';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,14 @@ export class ProductService {
 
   getProducts(): Observable<ProductResponse> {
     return this.http.get<ProductResponse>(`${this.baseUrl}/products` );
+  }
+
+  getColors(filamentType: 'PLA' | 'PETG'): Observable<FilamentColorsResponse> {
+
+    console.log('Fetching colors for filament type:', filamentType);
+    return this.http.get<FilamentColorsResponse>(`${this.baseUrl}/colors`, {
+      params: { filamentType },
+    });
   }
 
   getProductById(id: number): Observable<ProductResponse> {
@@ -42,6 +51,7 @@ export interface Product {
   image: string;
   stl: string;
   price: number;
-  filamentType: string;
+  filamentType: 'PLA' | 'PETG';
   color: string;
 }
+

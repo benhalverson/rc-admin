@@ -9,7 +9,7 @@
     </button>
   </div>
 
-  @if(!isEditing) {
+  @if (!isEditing && productDetails) {
   <div class="space-y-4">
     <p class="text-lg font-semibold text-gray-700">
       Name: <span class="text-gray-900">{{ productDetails.name }}</span>
@@ -19,76 +19,113 @@
       <span class="text-gray-900">{{ productDetails.description }}</span>
     </p>
     <p class="text-lg font-semibold text-gray-700">
-      FilamentType:
+      Filament Type:
       <span class="text-gray-900">{{ productDetails.filamentType }}</span>
     </p>
+    <p class="text-lg font-semibold text-gray-700">
+      Color:
+      <span class="text-gray-900">{{ productDetails.color }}</span>
+    </p>
+    <p class="text-lg font-semibold text-gray-700">
+      Price:
+      <span class="text-gray-900">\${{ productDetails.price }}</span>
+    </p>
+    <p class="text-lg font-semibold text-gray-700">
+      STL:
+      <span class="text-gray-900 break-all">{{ productDetails.stl }}</span>
+    </p>
+    <p class="text-lg font-semibold text-gray-700">
+      Image:
+      <span class="text-gray-900 break-all">{{ productDetails.image }}</span>
+    </p>
   </div>
-  } @if(isEditing) {
+  } @if (isEditing && productForm) {
   <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="space-y-4">
-    <div class="space-y-4">
-      <label class="block">
-        <span class="text-gray-700">Name</span>
-        <input
-          type="text"
-          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          formControlName="name"
-        />
-        @if(productForm.get('name')?.invalid &&
-        productForm.get('name')?.touched) {
+    <label class="block">
+      <span class="text-gray-700">Name</span>
+      <input
+        type="text"
+        formControlName="name"
+        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+      />
+    </label>
 
-        <span class="text-sm text-red-500"
-          >Name is required and should not exceed 100 characters.</span
-        >
-        }
-      </label>
-      <label class="block">
-        <span class="text-gray-700">STL Link</span>
-        <input
-          type="text"
-          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          formControlName="stl"
-        />
-        @if(productForm.get('stl')?.invalid &&
-        productForm.get('stl')?.touched) {
+    <label class="block">
+      <span class="text-gray-700">Description</span>
+      <textarea
+        formControlName="description"
+        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+        rows="3"
+      ></textarea>
+    </label>
 
-        <span class="text-sm text-red-500"
-          >STL is required</span
-        >
-        }
-      </label>
-      <label class="block">
-        <span class="text-gray-700">Description</span>
-        <textarea
-          rows="4"
-          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          formControlName="description"
-        ></textarea>
-        @if(productForm.get('description')?.invalid &&
-        productForm.get('description')?.touched) {
+    <label class="block">
+      <span class="text-gray-700">Image URL</span>
+      <input
+        type="text"
+        formControlName="image"
+        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+      />
+    </label>
 
-        <span class="text-sm text-red-500"
-          >Description is requred.</span
-        >
-        }
-      </label>
-      <div class="flex justify-end mt-4 space-x-4">
-        <button
-          type="button"
-          class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
-          (click)="saveChanges()"
-        >
-          Save
-        </button>
-        <button
-          type="button"
-          class="px-4 py-2 text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
-          (click)="isEditing = false"
-        >
-          Cancel
-        </button>
-      </div>
+    <label class="block">
+      <span class="text-gray-700">STL File URL</span>
+      <input
+        type="text"
+        formControlName="stl"
+        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+      />
+    </label>
+
+    <label class="block">
+      <span class="text-gray-700">Price</span>
+      <input
+        type="number"
+        formControlName="price"
+        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+      />
+    </label>
+
+    <label class="block">
+      <span class="text-gray-700">Filament Type</span>
+      <select
+        formControlName="filamentType"
+        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+      >
+        <option value="PLA">PLA</option>
+        <option value="PETG">PETG</option>
+      </select>
+    </label>
+
+    <div class="flex flex-col">
+      <p>Loaded {{ colorOptions().length || 0 }} colors</p>
+
+      <label class="text-gray-700">Color</label>
+      <app-color-picker
+        [filamentType]="productForm.get('filamentType')?.value"
+        [colorOptions]="filteredColorOptions"
+        [isLoading]="isLoading"
+        [model]="colorControl.value"
+        (modelChange)="colorControl.setValue($event)"
+      ></app-color-picker>
+    </div>
+
+    <div class="flex justify-end mt-4 space-x-4">
+      <button
+        type="submit"
+        class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+        [disabled]="productForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
+        (click)="isEditing = false"
+      >
+        Cancel
+      </button>
     </div>
   </form>
-
   }
 </div>

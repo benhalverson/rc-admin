@@ -1,21 +1,40 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, effect, signal } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { Product, ProductService } from '../product.service';
 import { ToastrService } from 'ngx-toastr';
+import { ColorPickerComponent } from '../color-picker/color-picker.component';
+import { Filament } from '../types/filament';
 
 @Component({
-    selector: 'app-add-product',
-    imports: [ReactiveFormsModule, CommonModule,],
-    templateUrl: './add-product.component.html',
-    styleUrl: './add-product.component.css'
+  selector: 'app-add-product',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, ColorPickerComponent],
+  templateUrl: './add-product.component.html',
 })
 export class AddProductComponent {
   productForm: FormGroup;
+  colorControl: FormControl<string | null>;
+  colorOptions = signal<Filament[]>([]);
+  isLoading = signal(false);
 
-  constructor(private readonly fb: FormBuilder, private readonly productService: ProductService, private readonly toastr: ToastrService) {
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly fb: FormBuilder,
+    private readonly productService: ProductService,
+    private readonly toastr: ToastrService
+  ) {
+    this.colorControl = new FormControl<string | null>(null, Validators.required);
+
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
@@ -23,10 +42,13 @@ export class AddProductComponent {
       stl: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
       filamentType: ['PLA', Validators.required],
-      color: ['#000000', Validators.required],
+      color: this.colorControl,
     });
-  }
 
+    const initialColors = this.route.snapshot.data['colorOptions'] || [];
+    this.colorOptions.set(initialColors);
+
+  }
   async onSubmit() {
     if (this.productForm.valid) {
       const formData: Product = {
@@ -37,7 +59,6 @@ export class AddProductComponent {
       try {
         await firstValueFrom(this.productService.createProduct(formData));
         this.toastr.success('Product added successfully!');
-
         this.productForm.reset({
           name: '',
           description: '',
@@ -45,14 +66,13 @@ export class AddProductComponent {
           stl: '',
           price: 0,
           filamentType: 'PLA',
-          color: '#000000',
+          color: null,
         });
       } catch (error) {
-        console.error('Failed to add data', error);
+        console.error('Failed to add product', error);
         this.toastr.error('Failed to add product.');
       }
-    } else {
-      console.warn('Form is invalid');
     }
   }
 }
+
