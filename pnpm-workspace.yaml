@@ -1,0 +1,11 @@
+ignoredBuiltDependencies:
+  - better-sqlite3
+  - sharp
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - better-sqlite3
+  - esbuild
+  - lmdb
+  - msgpackr-extract
+  - sharp
+  - workerd
