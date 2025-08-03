@@ -18,7 +18,6 @@ export class ProductService {
 
   getColors(filamentType: 'PLA' | 'PETG'): Observable<FilamentColorsResponse> {
 
-    console.log('Fetching colors for filament type:', filamentType);
     return this.http.get<FilamentColorsResponse>(`${this.baseUrl}/colors`, {
       params: { filamentType },
     });
