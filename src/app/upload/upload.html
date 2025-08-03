@@ -1,0 +1,4 @@
+<div [formGroup]="uploadForm" class="space-y-4">
+  <input type="file" (change)="onFileSelected($event)" />
+  <button type="button" (click)="onUpload()">Upload</button>
+</div>

@@ -76,11 +76,9 @@ export class ProductDetailsComponent {
 
   updateFilteredColorOptions() {
     const selectedFilamentType = this.productForm?.get('filamentType')?.value;
-    console.log('Selected filament type:', selectedFilamentType);
     const filtered = this.colorOptions().filter(
       (option) => option.filament === selectedFilamentType
     );
-    console.log('Filtered color options:', filtered);
     this.filteredColorOptions.set(filtered);
   }
 

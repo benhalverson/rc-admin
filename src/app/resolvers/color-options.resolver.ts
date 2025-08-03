@@ -19,7 +19,6 @@ export const colorOptionsResolver = async () => {
 
   const res = await fetch(url.toString());
   const data: FilamentColorsResponse = await res.json();
-  console.log('Color options:', data);
 
   return data
 };

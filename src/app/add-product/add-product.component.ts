@@ -14,12 +14,14 @@ import { Product, ProductService } from '../product.service';
 import { ToastrService } from 'ngx-toastr';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
 import { Filament } from '../types/filament';
+import { Upload } from '../upload/upload';
 
 @Component({
   selector: 'app-add-product',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, ColorPickerComponent],
+  imports: [ReactiveFormsModule, CommonModule, ColorPickerComponent, Upload],
   templateUrl: './add-product.component.html',
+
 })
 export class AddProductComponent {
   productForm: FormGroup;
@@ -49,6 +51,12 @@ export class AddProductComponent {
     this.colorOptions.set(initialColors);
 
   }
+
+  onStlUploaded(url: string) {
+    console.log('STL file uploaded:', url);
+    this.productForm.get('stl')?.setValue(url);
+  }
+
   async onSubmit() {
     if (this.productForm.valid) {
       const formData: Product = {
