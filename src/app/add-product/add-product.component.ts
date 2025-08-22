@@ -57,6 +57,12 @@ export class AddProductComponent {
     this.productForm.get('stl')?.setValue(url);
   }
 
+  onPngUpload(url: string) {
+    console.log('Png file uploaded:', url);
+    this.productForm.get('image')?.setValue(url);
+  }
+
+
   async onSubmit() {
     if (this.productForm.valid) {
       const formData: Product = {
