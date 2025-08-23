@@ -52,5 +52,6 @@ export interface Product {
   price: number;
   filamentType: 'PLA' | 'PETG';
   color: string;
+  imageGallery?: string[];
 }
 

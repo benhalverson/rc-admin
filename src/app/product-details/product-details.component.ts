@@ -20,11 +20,13 @@ import {
 import { ToastrService } from 'ngx-toastr';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
 import { Filament } from '../types/filament';
+import { CommonModule } from '@angular/common';
+import { Upload } from '../upload/upload';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [ReactiveFormsModule, ColorPickerComponent],
+  imports: [ReactiveFormsModule, ColorPickerComponent, CommonModule, Upload],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.css',
 })
@@ -36,6 +38,7 @@ export class ProductDetailsComponent {
   colorOptions = signal<Filament[]>([]);
   isLoading = signal(false);
   filteredColorOptions = signal<Filament[]>([]);
+  imageGallery = signal<string[]>([]);
 
   private destroy$ = new Subject<void>();
 
@@ -105,6 +108,9 @@ export class ProductDetailsComponent {
       Validators.required
     );
 
+    // Initialize imageGallery signal with product's gallery or empty array
+    this.imageGallery.set(product.imageGallery || []);
+
     this.productForm = this.fb.group({
       name: [
         product.name || '',
@@ -116,6 +122,7 @@ export class ProductDetailsComponent {
       price: [product.price || 0, [Validators.required, Validators.min(0)]],
       filamentType: [product.filamentType || 'PLA', Validators.required],
       color: this.colorControl, // 🎯 wire color control into form
+      imageGallery: [product.imageGallery || []],
     });
   }
 
@@ -128,6 +135,7 @@ export class ProductDetailsComponent {
       ...this.productDetails!,
       ...this.productForm.value,
       color: this.colorControl.value,
+      imageGallery: this.imageGallery(),
     };
 
     this.productService
@@ -145,6 +153,21 @@ export class ProductDetailsComponent {
         takeUntil(this.destroy$)
       )
       .subscribe();
+  }
+
+  onGalleryImageUpload(url: string) {
+    console.log('Gallery image uploaded:', url);
+    const currentGallery = this.imageGallery();
+    const updatedGallery = [...currentGallery, url];
+    this.imageGallery.set(updatedGallery);
+    this.productForm.get('imageGallery')?.setValue(updatedGallery);
+  }
+
+  removeGalleryImage(index: number) {
+    const currentGallery = this.imageGallery();
+    const updatedGallery = currentGallery.filter((_, i) => i !== index);
+    this.imageGallery.set(updatedGallery);
+    this.productForm.get('imageGallery')?.setValue(updatedGallery);
   }
 
   ngOnDestroy() {

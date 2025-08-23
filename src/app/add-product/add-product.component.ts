@@ -28,6 +28,7 @@ export class AddProductComponent {
   colorControl: FormControl<string | null>;
   colorOptions = signal<Filament[]>([]);
   isLoading = signal(false);
+  imageGallery = signal<string[]>([]);
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -45,6 +46,7 @@ export class AddProductComponent {
       price: [0, [Validators.required, Validators.min(0)]],
       filamentType: ['PLA', Validators.required],
       color: this.colorControl,
+      imageGallery: [[]],
     });
 
     const initialColors = this.route.snapshot.data['colorOptions'] || [];
@@ -60,6 +62,21 @@ export class AddProductComponent {
   onPngUpload(url: string) {
     console.log('Png file uploaded:', url);
     this.productForm.get('image')?.setValue(url);
+  }
+
+  onGalleryImageUpload(url: string) {
+    console.log('Gallery image uploaded:', url);
+    const currentGallery = this.imageGallery();
+    const updatedGallery = [...currentGallery, url];
+    this.imageGallery.set(updatedGallery);
+    this.productForm.get('imageGallery')?.setValue(updatedGallery);
+  }
+
+  removeGalleryImage(index: number) {
+    const currentGallery = this.imageGallery();
+    const updatedGallery = currentGallery.filter((_, i) => i !== index);
+    this.imageGallery.set(updatedGallery);
+    this.productForm.get('imageGallery')?.setValue(updatedGallery);
   }
 
 
@@ -81,7 +98,9 @@ export class AddProductComponent {
           price: 0,
           filamentType: 'PLA',
           color: null,
+          imageGallery: [],
         });
+        this.imageGallery.set([]);
       } catch (error) {
         console.error('Failed to add product', error);
         this.toastr.error('Failed to add product.');

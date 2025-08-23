@@ -60,6 +60,27 @@
         <app-upload (uploaded)="onPngUpload($event)" />
     </div>
 
+    <!-- Image Gallery -->
+    <div class="flex flex-col">
+      <label class="mb-2 text-sm font-semibold text-gray-700">Image Gallery:</label>
+      <div class="flex flex-col space-y-2">
+        <app-upload (uploaded)="onGalleryImageUpload($event)" />
+        <div *ngIf="imageGallery().length > 0" class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
+          <div *ngFor="let image of imageGallery(); let i = index" class="relative group">
+            <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
+            <button
+              type="button"
+              (click)="removeGalleryImage(i)"
+              class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
+              title="Remove image"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- STL File URL -->
     <div class="flex flex-col">
