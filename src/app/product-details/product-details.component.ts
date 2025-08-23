@@ -50,6 +50,22 @@ export class ProductDetailsComponent {
     private readonly toastr: ToastrService
   ) {}
 
+  get safeImageGallery(): string[] {
+    if (!this.productDetails?.imageGallery) {
+      return [];
+    }
+
+    if (typeof this.productDetails.imageGallery === 'string') {
+      try {
+        return JSON.parse(this.productDetails.imageGallery);
+      } catch {
+        return [];
+      }
+    }
+
+    return Array.isArray(this.productDetails.imageGallery) ? this.productDetails.imageGallery : [];
+  }
+
   ngOnInit() {
     this.route.params
       .pipe(
@@ -57,6 +73,27 @@ export class ProductDetailsComponent {
           this.productService.getProductById(params['id'])
         ),
         tap((product) => {
+          console.log('Raw product from backend:', product);
+          console.log('imageGallery before processing:', product.imageGallery, typeof product.imageGallery);
+
+          // Parse imageGallery if it's a string
+          if (product.imageGallery && typeof product.imageGallery === 'string') {
+            try {
+              product.imageGallery = JSON.parse(product.imageGallery);
+              console.log('Successfully parsed imageGallery:', product.imageGallery);
+            } catch (error) {
+              console.error('Failed to parse imageGallery:', error);
+              product.imageGallery = [];
+            }
+          }
+
+          // Ensure imageGallery is always an array
+          if (!Array.isArray(product.imageGallery)) {
+            product.imageGallery = [];
+          }
+
+          console.log('Final imageGallery:', product.imageGallery, typeof product.imageGallery);
+
           this.productDetails = product;
           this.initForm(product);
 
@@ -168,6 +205,19 @@ export class ProductDetailsComponent {
     const updatedGallery = currentGallery.filter((_, i) => i !== index);
     this.imageGallery.set(updatedGallery);
     this.productForm.get('imageGallery')?.setValue(updatedGallery);
+  }
+
+  onImageLoad(imageUrl: string) {
+    console.log('Image loaded successfully:', imageUrl);
+  }
+
+  onImageError(event: any, imageUrl: string) {
+    console.error('Image failed to load:', imageUrl);
+    console.error('Error event:', event);
+    // Try to provide fallback or debugging info
+    const img = event.target as HTMLImageElement;
+    console.error('Image natural dimensions:', img.naturalWidth, img.naturalHeight);
+    console.error('Image current src:', img.src);
   }
 
   ngOnDestroy() {

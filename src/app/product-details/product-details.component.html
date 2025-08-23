@@ -40,11 +40,31 @@
     </p>
 
     <!-- Image Gallery Display -->
-    <div *ngIf="productDetails.imageGallery && productDetails.imageGallery.length > 0">
-      <p class="text-lg font-semibold text-gray-700 mb-2">Image Gallery:</p>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div *ngFor="let image of productDetails.imageGallery; let i = index">
-          <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="w-full h-32 object-cover rounded-lg shadow-md">
+    <div *ngIf="safeImageGallery.length > 0">
+      <p class="mb-2 text-lg font-semibold text-gray-700">Image Gallery ({{ safeImageGallery.length }} images):</p>
+
+      <!-- Debug section -->
+      <div class="p-4 mb-4 border border-yellow-200 rounded bg-yellow-50">
+        <p class="mb-2 text-sm font-semibold">Debug Information:</p>
+        <p class="text-xs text-gray-600">Raw imageGallery: {{ productDetails.imageGallery }}</p>
+        <p class="text-xs text-gray-600">Type: {{ typeof productDetails.imageGallery }}</p>
+        <p class="text-xs text-gray-600">Safe array length: {{ safeImageGallery.length }}</p>
+        <div *ngFor="let image of safeImageGallery; let i = index" class="mb-2">
+          <p class="text-xs text-gray-600">Image {{ i + 1 }}: {{ image }}</p>
+          <p class="text-xs text-gray-600">Length: {{ image.length }} characters</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div *ngFor="let image of safeImageGallery; let i = index" class="border-2 border-gray-200 rounded-lg">
+          <img
+            [src]="image"
+            [alt]="'Gallery image ' + (i + 1)"
+            class="object-cover w-full h-32 rounded-lg shadow-md"
+            (error)="onImageError($event, image)"
+            (load)="onImageLoad(image)"
+          >
+          <p class="p-1 text-xs text-gray-600 break-all">{{ image }}</p>
         </div>
       </div>
     </div>
@@ -122,16 +142,17 @@
 
     <!-- Image Gallery Editing -->
     <div class="flex flex-col">
-      <label class="text-gray-700 mb-2">Image Gallery</label>
+      <label class="mb-2 text-gray-700">Image Gallery</label>
       <div class="flex flex-col space-y-2">
         <app-upload (uploaded)="onGalleryImageUpload($event)" />
-        <div *ngIf="imageGallery().length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+        <pre>Image gallery: {{ imageGallery() | json }}</pre>
+        <div *ngIf="imageGallery().length > 0" class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
           <div *ngFor="let image of imageGallery(); let i = index" class="relative group">
-            <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="w-full h-32 object-cover rounded-lg shadow-md">
+            <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
             <button
               type="button"
               (click)="removeGalleryImage(i)"
-              class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
               title="Remove image"
             >
               ×

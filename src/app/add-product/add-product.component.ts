@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, signal } from '@angular/core';
+import { Component, effect, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -23,7 +23,7 @@ import { Upload } from '../upload/upload';
   templateUrl: './add-product.component.html',
 
 })
-export class AddProductComponent {
+export class AddProductComponent implements OnInit {
   productForm: FormGroup;
   colorControl: FormControl<string | null>;
   colorOptions = signal<Filament[]>([]);
@@ -52,6 +52,10 @@ export class AddProductComponent {
     const initialColors = this.route.snapshot.data['colorOptions'] || [];
     this.colorOptions.set(initialColors);
 
+  }
+
+  ngOnInit(){
+      console.log('imageGallery', this.productForm)
   }
 
   onStlUploaded(url: string) {
