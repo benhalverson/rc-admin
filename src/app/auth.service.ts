@@ -62,7 +62,6 @@ export class AuthService {
   }
 
   signin(formData: MyFormData): Observable<any> {
-    console.log('environment', environment);
     this.authStore.setLoading(true);
     this.authStore.setError(null);
 
@@ -71,12 +70,10 @@ export class AuthService {
       { email: formData.email, password: formData.password }
     ).pipe(
       switchMap((response: AuthResponse) => {
-        console.log('Signin successful, fetching user profile...');
         // After successful signin, fetch the user profile to get complete user data
         return this.http.get<User>(`${environment.baseurl}/profile`).pipe(
           tap({
             next: (profileResponse: User) => {
-              console.log('Profile fetched:', profileResponse);
               this.authStore.setAuthenticated(true, profileResponse);
               this.authStore.setLoading(false);
 
@@ -88,7 +85,6 @@ export class AuthService {
             }
           }),
           catchError((profileError) => {
-            console.log('Profile fetch failed, using basic user data:', profileError);
             // Fallback to basic user data if profile fetch fails
             const basicUser: User = { email: formData.email };
             this.authStore.setAuthenticated(true, basicUser);
@@ -103,7 +99,6 @@ export class AuthService {
         );
       }),
       catchError((error) => {
-        console.log('Signin failed:', error);
         this.authStore.setError(error.error?.message || 'Login failed');
         this.authStore.setLoading(false);
 
@@ -159,7 +154,6 @@ export class AuthService {
   }
 
   private checkAuthStatus(): void {
-    console.log('Checking auth status...');
     this.authStore.setLoading(true);
 
     // Check authentication status by calling the protected /profile endpoint
@@ -167,7 +161,6 @@ export class AuthService {
     this.http.get<User>(`${environment.baseurl}/profile`).pipe(
       tap({
         next: (response: User) => {
-          console.log('Auth check successful:', response);
           // If the request succeeds, user is authenticated
           this.authStore.setAuthenticated(true, response);
           this.authStore.setLoading(false);
@@ -179,7 +172,6 @@ export class AuthService {
           }
         },
         error: (error) => {
-          console.log('Auth check failed:', error);
           // If the request fails, user is not authenticated
           this.authStore.setAuthenticated(false);
           this.authStore.setLoading(false);
@@ -192,7 +184,6 @@ export class AuthService {
         }
       }),
       catchError((error) => {
-        console.log('Auth check error:', error);
         this.authStore.setAuthenticated(false);
         this.authStore.setLoading(false);
 

@@ -48,23 +48,19 @@ export class AddProductComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('imageGallery', this.productForm);
     // Initialize with PLA colors
     this.productService.getColors('PLA').subscribe();
   }
 
   onStlUploaded(url: string) {
-    console.log('STL file uploaded:', url);
     this.productForm.get('stl')?.setValue(url);
   }
 
   onPngUpload(url: string) {
-    console.log('Png file uploaded:', url);
     this.productForm.get('image')?.setValue(url);
   }
 
   onGalleryImageUpload(url: string) {
-    console.log('Gallery image uploaded:', url);
     const currentGallery = this.imageGallery();
     const updatedGallery = [...currentGallery, url];
     this.imageGallery.set(updatedGallery);

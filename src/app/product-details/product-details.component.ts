@@ -73,14 +73,10 @@ export class ProductDetailsComponent {
           this.productService.getProductById(params['id'])
         ),
         tap((product) => {
-          console.log('Raw product from backend:', product);
-          console.log('imageGallery before processing:', product.imageGallery, typeof product.imageGallery);
-
           // Parse imageGallery if it's a string
           if (product.imageGallery && typeof product.imageGallery === 'string') {
             try {
               product.imageGallery = JSON.parse(product.imageGallery);
-              console.log('Successfully parsed imageGallery:', product.imageGallery);
             } catch (error) {
               console.error('Failed to parse imageGallery:', error);
               product.imageGallery = [];
@@ -91,8 +87,6 @@ export class ProductDetailsComponent {
           if (!Array.isArray(product.imageGallery)) {
             product.imageGallery = [];
           }
-
-          console.log('Final imageGallery:', product.imageGallery, typeof product.imageGallery);
 
           this.productDetails = product;
           this.initForm(product);
@@ -105,7 +99,6 @@ export class ProductDetailsComponent {
           this.productForm
             .get('filamentType')
             ?.valueChanges.subscribe((filamentType) => {
-              console.log('Filament type changed:', filamentType);
               this.fetchColorsByFilamentType(filamentType);
             });
         }),
@@ -128,8 +121,6 @@ export class ProductDetailsComponent {
       const colorsResponse = await firstValueFrom(
         this.productService.getColors(filamentType)
       );
-      console.log('Fetched colors response:', colorsResponse);
-
 
       this.colorOptions.set(colorsResponse.filaments); // ✅ not .colors, use .filaments
     } catch (error) {
@@ -193,7 +184,6 @@ export class ProductDetailsComponent {
   }
 
   onGalleryImageUpload(url: string) {
-    console.log('Gallery image uploaded:', url);
     const currentGallery = this.imageGallery();
     const updatedGallery = [...currentGallery, url];
     this.imageGallery.set(updatedGallery);
@@ -208,7 +198,7 @@ export class ProductDetailsComponent {
   }
 
   onImageLoad(imageUrl: string) {
-    console.log('Image loaded successfully:', imageUrl);
+    // Image loaded successfully
   }
 
   onImageError(event: any, imageUrl: string) {
