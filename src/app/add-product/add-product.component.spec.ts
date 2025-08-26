@@ -290,11 +290,15 @@ describe('AddProductComponent', () => {
     });
 
     it('should handle submission error', async () => {
+      // Spy on console.error to prevent error logging during test
+      spyOn(console, 'error');
+
       productService.createProduct.and.returnValue(throwError(() => new Error('Server error')));
 
       await component.onSubmit();
 
       expect(toastrService.error).toHaveBeenCalledWith('Failed to add product.');
+      expect(console.error).toHaveBeenCalledWith('Failed to add product', jasmine.any(Error));
     });
 
     it('should not submit invalid form', async () => {

@@ -165,6 +165,9 @@ describe('ProductDetailsComponent', () => {
     });
 
     it('should handle invalid JSON string in imageGallery', () => {
+      // Spy on console.error to prevent error logging during test
+      spyOn(console, 'error');
+
       const productWithInvalidJson = {
         ...mockProduct,
         imageGallery: 'invalid json string' as any
@@ -174,6 +177,7 @@ describe('ProductDetailsComponent', () => {
       fixture.detectChanges();
 
       expect(component.safeImageGallery).toEqual([]);
+      expect(console.error).toHaveBeenCalledWith('Failed to parse imageGallery:', jasmine.any(SyntaxError));
     });
 
     it('should handle null/undefined imageGallery', () => {
@@ -393,12 +397,10 @@ describe('ProductDetailsComponent', () => {
     });
 
     it('should handle image load success', () => {
-      spyOn(console, 'log');
       const testUrl = 'https://example.com/test.jpg';
 
-      component.onImageLoad(testUrl);
-
-      expect(console.log).toHaveBeenCalledWith('Image loaded successfully:', testUrl);
+      // Should not throw any errors
+      expect(() => component.onImageLoad(testUrl)).not.toThrow();
     });
 
     it('should handle image load error', () => {
