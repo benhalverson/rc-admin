@@ -3,10 +3,9 @@ export interface FilamentColorsResponse {
 }
 
 export interface Filament {
-  filament: FilamentType;
+  filament: string;
   hexColor: string;
   colorTag: string;
-  profile: string;
 }
 
 export enum FilamentType {

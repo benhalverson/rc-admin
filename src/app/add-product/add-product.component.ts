@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, effect, OnInit, signal, inject, computed } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -21,21 +21,18 @@ import { Upload } from '../upload/upload';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, ColorPickerComponent, Upload],
   templateUrl: './add-product.component.html',
-
 })
 export class AddProductComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
+  private readonly productService = inject(ProductService);
+  private readonly toastr = inject(ToastrService);
+
   productForm: FormGroup;
   colorControl: FormControl<string | null>;
-  colorOptions = signal<Filament[]>([]);
-  isLoading = signal(false);
   imageGallery = signal<string[]>([]);
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly fb: FormBuilder,
-    private readonly productService: ProductService,
-    private readonly toastr: ToastrService
-  ) {
+  constructor() {
     this.colorControl = new FormControl<string | null>(null, Validators.required);
 
     this.productForm = this.fb.group({
@@ -48,14 +45,12 @@ export class AddProductComponent implements OnInit {
       color: this.colorControl,
       imageGallery: [[]],
     });
-
-    const initialColors = this.route.snapshot.data['colorOptions'] || [];
-    this.colorOptions.set(initialColors);
-
   }
 
-  ngOnInit(){
-      console.log('imageGallery', this.productForm)
+  ngOnInit() {
+    console.log('imageGallery', this.productForm);
+    // Initialize with PLA colors
+    this.productService.getColors('PLA').subscribe();
   }
 
   onStlUploaded(url: string) {

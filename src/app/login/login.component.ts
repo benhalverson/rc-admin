@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,8 +19,11 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  private returnUrl: string = '/';
+
   constructor(
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
     private readonly auth: AuthService,
     private readonly fb: FormBuilder,
     private readonly toastr: ToastrService
@@ -29,6 +32,9 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
+
+    // Get the return URL from query params or default to '/'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   async onSubmit() {
@@ -38,10 +44,11 @@ export class LoginComponent {
       };
       try {
          const response: LoginResponse = await firstValueFrom<any>(this.auth.signin(formData));
-         this.toastr.success(`${response.message}`)
-         this.router.navigate(['/add-product']);
+         this.toastr.success(`${response.message || 'Login successful'}`);
+         // Redirect to the originally requested URL or home
+         this.router.navigateByUrl(this.returnUrl);
       } catch (error: any) {
-        this.toastr.error(`Failed to login. ${error.error.error || error.error.details}`);
+        this.toastr.error(`Failed to login. ${error.error?.error || error.error?.details || 'Unknown error'}`);
       }
     }
   }

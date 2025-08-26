@@ -133,8 +133,6 @@
       <label class="text-gray-700">Color</label>
       <app-color-picker
         [filamentType]="productForm.get('filamentType')?.value"
-        [colorOptions]="filteredColorOptions"
-        [isLoading]="isLoading"
         [model]="colorControl.value"
         (modelChange)="colorControl.setValue($event)"
       ></app-color-picker>

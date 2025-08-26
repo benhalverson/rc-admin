@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ColorPickerComponent } from './color-picker.component';
 
@@ -8,7 +10,7 @@ describe('ColorPickerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ColorPickerComponent]
+      imports: [ColorPickerComponent, HttpClientTestingModule, RouterTestingModule]
     })
     .compileComponents();
 

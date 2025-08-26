@@ -150,8 +150,6 @@
       >
  <app-color-picker
   [filamentType]="productForm.get('filamentType')?.value"
-  [colorOptions]="colorOptions"
-  [isLoading]="isLoading"
   [model]="colorControl.value"
   (modelChange)="colorControl.setValue($event)"
 ></app-color-picker>

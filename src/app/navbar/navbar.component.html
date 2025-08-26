@@ -7,22 +7,40 @@
       >Home</a
     >
     <ul class="space-x-6 hidden: md:flex">
-      <li>
-        <a
-          routerLink="/add-product"
-          routerLinkActive="router-link-active"
-          class="text-white hover:text-yellow-300"
-          >Add Product</a
-        >
-      </li>
-      <li>
-        <a
-          routerLink="/signin"
-          routerLinkActive="router-link-active"
-          class="text-white hover:text-yellow-300"
-          >Sign-in</a
-        >
-      </li>
+      <!-- Show Add Product only when authenticated -->
+      @if (authStore.isAuthenticated()) {
+        <li>
+          <a
+            routerLink="/add-product"
+            routerLinkActive="router-link-active"
+            class="text-white hover:text-yellow-300"
+            >Add Product</a
+          >
+        </li>
+      }
+
+      <!-- Show Sign-in only when not authenticated -->
+      @if (!authStore.isAuthenticated()) {
+        <li>
+          <a
+            routerLink="/signin"
+            routerLinkActive="router-link-active"
+            class="text-white hover:text-yellow-300"
+            >Sign-in</a
+          >
+        </li>
+      }
+
+      <!-- Show Logout only when authenticated -->
+      @if (authStore.isAuthenticated()) {
+        <li>
+          <button
+            (click)="logout()"
+            class="text-white hover:text-yellow-300"
+            >Logout</button
+          >
+        </li>
+      }
     </ul>
 
     <button (click)="toggleMobileMenu()">
@@ -51,12 +69,35 @@
         class="block text-white hover:text-yellow-300"
         >Home</a
       >
-      <a
-        [routerLink]="['/add-product']"
-        routerLinkActive="text-yellow-300"
-        class="block text-white hover:text-yellow-300"
-        >Add Product</a
-      >
+
+      <!-- Mobile menu: Show Add Product only when authenticated -->
+      @if (authStore.isAuthenticated()) {
+        <a
+          [routerLink]="['/add-product']"
+          routerLinkActive="text-yellow-300"
+          class="block text-white hover:text-yellow-300"
+          >Add Product</a
+        >
+      }
+
+      <!-- Mobile menu: Show Sign-in only when not authenticated -->
+      @if (!authStore.isAuthenticated()) {
+        <a
+          [routerLink]="['/signin']"
+          routerLinkActive="text-yellow-300"
+          class="block text-white hover:text-yellow-300"
+          >Sign-in</a
+        >
+      }
+
+      <!-- Mobile menu: Show Logout only when authenticated -->
+      @if (authStore.isAuthenticated()) {
+        <button
+          (click)="logout()"
+          class="block text-white hover:text-yellow-300"
+          >Logout</button
+        >
+      }
     </li>
   </ul>
 </nav>
