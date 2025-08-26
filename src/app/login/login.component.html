@@ -4,14 +4,17 @@
     (ngSubmit)="onSubmit()"
     class="p-8 space-y-6 bg-white rounded-lg shadow-md"
   >
-    <!-- product name -->
+    <!-- email input -->
     <div class="flex flex-col">
-      <label for="name" class="mb-2 text-sm font-semibold text-gray-700"
+      <label for="email" class="mb-2 text-sm font-semibold text-gray-700"
         >Email</label
       >
       <input
+        id="email"
         type="email"
         formControlName="email"
+        data-cy="email-input"
+        required
         class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
       />
       <div
@@ -22,16 +25,19 @@
       >
         <small>Email is required.</small>
       </div>
-
-      <!-- product description -->
     </div>
+
+    <!-- password input -->
     <div class="flex flex-col">
-      <label for="description" class="mb-2 text-sm font-semibold text-gray-700"
-        >Password: </label
+      <label for="password" class="mb-2 text-sm font-semibold text-gray-700"
+        >Password</label
       >
       <input
+        id="password"
         type="password"
         formControlName="password"
+        data-cy="password-input"
+        required
         class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
       />
       <div
@@ -45,6 +51,14 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="loginForm.invalid">Login</button>
+    <!-- submit button -->
+    <button
+      type="submit"
+      [disabled]="loginForm.invalid"
+      data-cy="login-button"
+      class="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+    >
+      Sign in
+    </button>
   </form>
 </div>
