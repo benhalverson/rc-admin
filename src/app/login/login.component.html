@@ -17,14 +17,11 @@
         required
         class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
       />
-      <div
-        *ngIf="
-          loginForm.get('email')?.invalid && loginForm.get('email')?.touched
-        "
-        class="mt-1 text-sm text-red-500"
-      >
-        <small>Email is required.</small>
-      </div>
+      @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+        <div class="mt-1 text-sm text-red-500">
+          <small>Email is required.</small>
+        </div>
+      }
     </div>
 
     <!-- password input -->
@@ -40,15 +37,11 @@
         required
         class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
       />
-      <div
-        *ngIf="
-          loginForm.get('password')?.invalid &&
-          loginForm.get('password')?.touched
-        "
-        class="mt-1 text-sm text-red-500"
-      >
-        <small>Password is required</small>
-      </div>
+      @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+        <div class="mt-1 text-sm text-red-500">
+          <small>Password is required</small>
+        </div>
+      }
     </div>
 
     <!-- submit button -->

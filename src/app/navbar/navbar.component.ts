@@ -24,12 +24,12 @@ export class NavbarComponent {
   async logout() {
     try {
       await firstValueFrom(this.authService.logout());
-      this.router.navigate(['/']);
+      this.router.navigate(['/signin']);
       this.isMobileMenuOpen = false; // Close mobile menu on logout
     } catch (error) {
       console.error('Logout failed:', error);
-      // Still navigate to home even if logout request fails
-      this.router.navigate(['/']);
+      // Still navigate to signin even if logout request fails
+      this.router.navigate(['/signin']);
       this.isMobileMenuOpen = false;
     }
   }

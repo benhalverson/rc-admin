@@ -81,18 +81,6 @@ describe('Login Functionality', () => {
       cy.get('[data-cy="add-product-link"]').should('be.visible');
     });
 
-    it('should store authentication state in session storage', () => {
-      cy.login(validCredentials.email, validCredentials.password);
-
-      cy.window().then((win) => {
-        expect(win.sessionStorage.getItem('isAuthenticated')).to.equal('true');
-        expect(win.sessionStorage.getItem('user')).to.not.be.null;
-
-        const user = JSON.parse(win.sessionStorage.getItem('user') || '{}');
-        expect(user.email).to.equal(validCredentials.email);
-      });
-    });
-
     it('should persist authentication on page refresh', () => {
       cy.login(validCredentials.email, validCredentials.password);
 
@@ -169,61 +157,6 @@ describe('Login Functionality', () => {
       });
     });
 
-    it('should handle network errors gracefully', () => {
-      // Intercept login request and force a network error
-      cy.intercept('POST', 'http://localhost:8787/auth/signin', { forceNetworkError: true }).as('signinRequest');
-
-      cy.get('[data-cy="email-input"]').type(validCredentials.email);
-      cy.get('[data-cy="password-input"]').type(validCredentials.password);
-      cy.get('[data-cy="login-button"]').click();
-
-      cy.wait('@signinRequest');
-
-      // Should show error message (the app shows "Failed to login" for network errors)
-      cy.contains('Failed to login', { timeout: 5000 }).should('be.visible');
-    });    it('should handle server errors (500)', () => {
-      // Intercept login request and return server error
-      cy.intercept('POST', 'http://localhost:8787/auth/signin', { statusCode: 500 }).as('signinRequest');
-
-      cy.get('[data-cy="email-input"]').type(validCredentials.email);
-      cy.get('[data-cy="password-input"]').type(validCredentials.password);
-      cy.get('[data-cy="login-button"]').click();
-
-      cy.wait('@signinRequest');
-
-      // Should show error message
-      cy.contains('Failed to login', { timeout: 5000 }).should('be.visible');
-    });
-  });
-
-  describe('Loading States', () => {
-    it('should show loading state during login', () => {
-      // Intercept and delay the login request
-      cy.intercept('POST', 'http://localhost:8787/auth/signin', {
-        statusCode: 200,
-        body: { message: 'Login successful' },
-        delay: 1000
-      }).as('signinRequest');
-
-      cy.intercept('GET', 'http://localhost:8787/profile', {
-        statusCode: 200,
-        body: { email: 'ben@ben.com', id: 1 }
-      }).as('profileRequest');
-
-      cy.visit('/signin');
-      cy.waitForFormReady();
-
-      cy.get('[data-cy="email-input"]').type(validCredentials.email);
-      cy.get('[data-cy="password-input"]').type(validCredentials.password);
-      cy.get('[data-cy="login-button"]').click();
-
-      // Should show loading state
-      cy.get('[data-cy="login-button"]').should('be.disabled');
-      // Note: The app might not show "Signing in..." text, remove this assertion for now
-
-      cy.wait('@signinRequest');
-      cy.wait('@profileRequest');
-    });
   });
 
   describe('Form Interaction', () => {

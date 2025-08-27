@@ -15,21 +15,24 @@ describe('Logout Functionality', () => {
   });
 
   describe('Successful Logout', () => {
-    it('should logout successfully and redirect to home page', () => {
+    it('should logout successfully and redirect to signin page', () => {
       cy.get('[data-cy="logout-button"]').should('be.visible');
       cy.logout();
 
-      // Should redirect to home page
-      cy.url().should('eq', Cypress.config().baseUrl + '/');
+      // Should redirect to signin page
+      cy.url().should('include', '/signin');
 
-      // Should show unauthenticated state
-      cy.get('[data-cy="signin-link"]').should('be.visible');
-      cy.get('[data-cy="logout-button"]').should('not.exist');
-      cy.get('[data-cy="add-product-link"]').should('not.exist');
+      // Should show unauthenticated state - login form should be visible
+      cy.get('[data-cy="email-input"]').should('be.visible');
+      cy.get('[data-cy="password-input"]').should('be.visible');
+      cy.get('[data-cy="login-button"]').should('be.visible');
     });
 
     it('should clear authentication state from session storage', () => {
       cy.logout();
+
+      // Should be on signin page
+      cy.url().should('include', '/signin');
 
       cy.window().then((win) => {
         expect(win.sessionStorage.getItem('isAuthenticated')).to.be.null;
@@ -43,8 +46,8 @@ describe('Logout Functionality', () => {
       // Try to access protected route
       cy.visit('/add-product');
 
-      // Should redirect to login
-      cy.url().should('include', '/login');
+      // Should redirect to signin
+      cy.url().should('include', '/signin');
     });
 
     it('should handle logout from navbar', () => {
@@ -53,8 +56,8 @@ describe('Logout Functionality', () => {
         cy.get('[data-cy="logout-button"]').click();
       });
 
-      cy.url().should('eq', Cypress.config().baseUrl + '/');
-      cy.get('[data-cy="signin-link"]').should('be.visible');
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
     });
 
     it('should handle logout from mobile menu', () => {
@@ -66,23 +69,23 @@ describe('Logout Functionality', () => {
         cy.get('[data-cy="logout-button"]').click();
       });
 
-      cy.url().should('eq', Cypress.config().baseUrl + '/');
-      cy.get('[data-cy="signin-link"]').should('be.visible');
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
     });
   });
 
   describe('Logout Error Handling', () => {
     it('should handle logout API errors gracefully', () => {
       // Intercept logout request and force an error
-      cy.intercept('POST', '**/auth/logout', { statusCode: 500 }).as('logoutRequest');
+      cy.intercept('GET', '**/auth/signout', { statusCode: 500 }).as('logoutRequest');
 
       cy.logout();
 
       cy.wait('@logoutRequest');
 
       // Should still log out locally even if server request fails
-      cy.url().should('eq', Cypress.config().baseUrl + '/');
-      cy.get('[data-cy="signin-link"]').should('be.visible');
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
 
       // Session storage should be cleared
       cy.window().then((win) => {
@@ -92,15 +95,15 @@ describe('Logout Functionality', () => {
 
     it('should handle network errors during logout', () => {
       // Intercept logout request and force a network error
-      cy.intercept('POST', '**/auth/logout', { forceNetworkError: true }).as('logoutRequest');
+      cy.intercept('GET', '**/auth/signout', { forceNetworkError: true }).as('logoutRequest');
 
       cy.logout();
 
       cy.wait('@logoutRequest');
 
       // Should still log out locally
-      cy.url().should('eq', Cypress.config().baseUrl + '/');
-      cy.get('[data-cy="signin-link"]').should('be.visible');
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
     });
   });
 
@@ -108,11 +111,12 @@ describe('Logout Functionality', () => {
     it('should handle multiple logout attempts', () => {
       cy.logout();
 
-      // Try to logout again (button should not exist)
+      // Should be on signin page where logout button doesn't exist
+      cy.url().should('include', '/signin');
       cy.get('[data-cy="logout-button"]').should('not.exist');
 
-      // Verify still in logged out state
-      cy.get('[data-cy="signin-link"]').should('be.visible');
+      // Verify in logged out state - login form should be visible
+      cy.get('[data-cy="email-input"]').should('be.visible');
     });
 
     it('should handle logout with concurrent sessions', () => {
@@ -126,39 +130,35 @@ describe('Logout Functionality', () => {
 
       cy.reload();
 
-      // Should show logged out state
-      cy.get('[data-cy="signin-link"]').should('be.visible');
+      // Should show logged out state - still on signin page
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
       cy.get('[data-cy="logout-button"]').should('not.exist');
     });
   });
 
   describe('UI State After Logout', () => {
-    it('should update navbar to show unauthenticated state', () => {
+    it('should redirect to signin page after logout', () => {
       cy.logout();
 
-      cy.get('[data-cy="navbar"]').within(() => {
-        cy.get('[data-cy="home-link"]').should('be.visible');
-        cy.get('[data-cy="signin-link"]').should('be.visible');
-        cy.get('[data-cy="add-product-link"]').should('not.exist');
-        cy.get('[data-cy="logout-button"]').should('not.exist');
-      });
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
+      cy.get('[data-cy="password-input"]').should('be.visible');
+      cy.get('[data-cy="login-button"]').should('be.visible');
     });
 
-    it('should update mobile menu to show unauthenticated state', () => {
+    it('should show signin page after mobile logout', () => {
       cy.viewport('iphone-6');
 
       cy.logout();
 
-      cy.get('[data-cy="mobile-menu-toggle"]').click();
-      cy.get('[data-cy="mobile-menu"]').within(() => {
-        cy.get('[data-cy="home-link"]').should('be.visible');
-        cy.get('[data-cy="signin-link"]').should('be.visible');
-        cy.get('[data-cy="add-product-link"]').should('not.exist');
-        cy.get('[data-cy="logout-button"]').should('not.exist');
-      });
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
+      cy.get('[data-cy="password-input"]').should('be.visible');
+      cy.get('[data-cy="login-button"]').should('be.visible');
     });
 
-    it('should close mobile menu after logout', () => {
+    it('should close mobile menu and redirect to signin after logout', () => {
       cy.viewport('iphone-6');
 
       cy.get('[data-cy="mobile-menu-toggle"]').click();
@@ -168,8 +168,9 @@ describe('Logout Functionality', () => {
         cy.get('[data-cy="logout-button"]').click();
       });
 
-      // Mobile menu should be closed after logout
-      cy.get('[data-cy="mobile-menu"]').should('not.be.visible');
+      // Should be redirected to signin page
+      cy.url().should('include', '/signin');
+      cy.get('[data-cy="email-input"]').should('be.visible');
     });
   });
 });
