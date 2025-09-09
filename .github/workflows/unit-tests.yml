@@ -47,4 +47,4 @@ jobs:
         env:
           CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
           CI: 'true'
-        run: pnpm test -- --watch=false --browsers=ChromeHeadless --no-progress
+        run: pnpm test:ci

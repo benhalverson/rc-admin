@@ -8,6 +8,7 @@
     "build": "ng build && npm run process",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
     "serve:ssr:rc-admin": "node dist/rc-admin/server/server.mjs",
     "process": "node ./tools/copy-files.mjs && node ./tools/alter-polyfills.mjs",
     "deploy": "npm run build && wrangler pages deploy dist/cloudflare",
