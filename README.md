@@ -1,5 +1,7 @@
 # RcAdmin
 
+![unit-tests](https://github.com/benhalverson/rc-admin/actions/workflows/unit-tests.yml/badge.svg)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.0.
 
 ## Development server
