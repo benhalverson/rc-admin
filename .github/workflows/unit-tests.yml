@@ -18,7 +18,7 @@ jobs:
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
           run_install: false
 
       - name: Setup Node.js
@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         env:
           CYPRESS_INSTALL_BINARY: '0'
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-optional
 
       - name: Setup Chrome
         id: chrome
@@ -43,7 +43,7 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Run unit tests (no Cypress)
+      - name: Run unit tests
         env:
           CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
           CI: 'true'
