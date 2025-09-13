@@ -1,9 +1,6 @@
 name: unit-tests
 
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
     branches:
       - '**'
