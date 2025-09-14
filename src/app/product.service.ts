@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -12,6 +12,8 @@ export class ProductService {
   private http = inject(HttpClient);
   baseUrl = environment.baseurl;
 
+
+
   // Signals for managing state
   private productsSignal = signal<ProductResponse[]>([]);
   private productsLoadingSignal = signal(false);
@@ -24,6 +26,10 @@ export class ProductService {
   colors = computed(() => this.colorsSignal());
   colorsLoading = computed(() => this.colorsLoadingSignal());
 
+  readonly productsResource = httpResource<ProductResponse[]>(() => {
+    return `${this.baseUrl}/products`;
+  });
+  /** @deprecated use productsResource instead */
   getProducts(): Observable<ProductResponse[]> {
     this.productsLoadingSignal.set(true);
     return this.http.get<ProductResponse[]>(`${this.baseUrl}/products`).pipe(

@@ -1,3 +1,24 @@
-<ul *ngFor="let item of data | async">
-  <li><a [routerLink]="['/product', item.id]" routerLinkActive="router-link-active">{{item.name}}</a> </li>
-</ul>
+@if(products.hasValue()) {
+  <div class="container px-4 py-8 mx-auto">
+    <h1 class="mb-8 text-3xl font-bold text-gray-900">Products</h1>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      @for(product of products.value(); track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+      }
+    </div>
+  </div>
+} @else if (products.error()) {
+  <div class="container px-4 py-8 mx-auto">
+    <div class="px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded">
+      <strong class="font-bold">Error!</strong>
+      <span class="block sm:inline"> Error loading products: {{products.error()}}</span>
+    </div>
+  </div>
+} @else if (products.isLoading()) {
+  <div class="container px-4 py-8 mx-auto">
+    <div class="flex items-center justify-center">
+      <div class="w-12 h-12 border-b-2 border-blue-600 rounded-full animate-spin"></div>
+      <span class="ml-3 text-gray-600">Loading products...</span>
+    </div>
+  </div>
+}

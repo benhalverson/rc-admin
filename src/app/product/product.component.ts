@@ -1,24 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ProductService } from '../product.service';
-import { Observable, of } from 'rxjs';
-import { AsyncPipe, NgFor, } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ProductCardComponent } from '../product-card/product-card.component';
 
 @Component({
     selector: 'app-product',
-    imports: [RouterLink, NgFor, AsyncPipe],
+    imports: [ProductCardComponent],
     templateUrl: './product.component.html',
     styleUrl: './product.component.css'
 })
-export class ProductComponent implements OnInit {
-  constructor(private readonly product: ProductService) {}
-
-  data: Observable<any> = of([]);
-  ngOnInit(): void {
-    try {
-      this.data = this.product.getProducts();
-    } catch (error) {
-      console.error('Failed to load data', error);
-    }
-  }
+export class ProductComponent {
+  service = inject(ProductService);
+  products = this.service.productsResource;
 }

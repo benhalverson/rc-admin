@@ -1,0 +1,48 @@
+<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+  <!-- Product Image -->
+  <div class="relative h-48 w-full">
+    <img
+      [src]="product().image"
+      [alt]="product().name"
+      (error)="onImageError($event)"
+      class="w-full h-full object-cover object-center"
+    />
+    <div class="absolute top-2 right-2 bg-white bg-opacity-90 px-2 py-1 rounded-md">
+      <span class="text-sm font-semibold text-gray-700">{{ product().price | currency }}</span>
+    </div>
+  </div>
+
+  <!-- Product Content -->
+  <div class="p-4">
+    <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+      {{ product().name }}
+    </h3>
+
+    <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+      {{ product().description }}
+    </p>
+
+    <!-- Product Details -->
+    <div class="flex items-center justify-between mb-3">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        {{ product().filamentType }}
+      </span>
+      <div class="flex items-center">
+        <div
+          class="w-4 h-4 rounded-full border border-gray-300 mr-2"
+          [style.background-color]="product().color"
+          [title]="product().color"
+        ></div>
+        <span class="text-xs text-gray-500">{{ product().color }}</span>
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <a
+      [routerLink]="['/product', product().id]"
+      class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-md transition-colors duration-200 font-medium"
+    >
+      View Details
+    </a>
+  </div>
+</div>
