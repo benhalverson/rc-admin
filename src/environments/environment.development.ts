@@ -1,6 +1,6 @@
-import { Environment } from './environment.interface';
+import type { Environment } from './environment.interface';
 
 export const environment: Environment = {
-  baseurl: 'http://localhost:8787',
-  production: false
+	baseurl: 'http://localhost:8787',
+	production: false,
 };

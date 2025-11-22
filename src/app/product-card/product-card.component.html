@@ -1,24 +1,23 @@
-<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+<div class="overflow-hidden transition-shadow duration-300 bg-white rounded-lg shadow-md hover:shadow-lg">
   <!-- Product Image -->
-  <div class="relative h-48 w-full">
+  <div class="relative w-full h-48">
     <img
       [src]="product().image"
       [alt]="product().name"
-      (error)="onImageError($event)"
-      class="w-full h-full object-cover object-center"
+      class="object-cover object-center w-full h-full"
     />
-    <div class="absolute top-2 right-2 bg-white bg-opacity-90 px-2 py-1 rounded-md">
+    <div class="absolute px-2 py-1 bg-white rounded-md top-2 right-2 bg-opacity-90">
       <span class="text-sm font-semibold text-gray-700">{{ product().price | currency }}</span>
     </div>
   </div>
 
   <!-- Product Content -->
   <div class="p-4">
-    <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+    <h3 class="mb-2 text-lg font-semibold text-gray-900 line-clamp-1">
       {{ product().name }}
     </h3>
 
-    <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+    <p class="mb-3 text-sm text-gray-600 line-clamp-2">
       {{ product().description }}
     </p>
 
@@ -29,7 +28,7 @@
       </span>
       <div class="flex items-center">
         <div
-          class="w-4 h-4 rounded-full border border-gray-300 mr-2"
+          class="w-4 h-4 mr-2 border border-gray-300 rounded-full"
           [style.background-color]="product().color"
           [title]="product().color"
         ></div>
@@ -40,7 +39,7 @@
     <!-- Action Button -->
     <a
       [routerLink]="['/product', product().id]"
-      class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-md transition-colors duration-200 font-medium"
+      class="block w-full px-4 py-2 font-medium text-center text-white transition-colors duration-200 bg-blue-600 rounded-md hover:bg-blue-700"
     >
       View Details
     </a>

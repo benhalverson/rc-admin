@@ -1,59 +1,55 @@
-import { Component } from '@angular/core';
-import { AuthService, MyFormData } from '../auth.service';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
+import { Component } from '@angular/core';
+import {
+	FormBuilder,
+	FormGroup,
+	ReactiveFormsModule,
+	Validators,
+} from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Router, ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { AuthService, MyFormData } from '../auth.service';
 
 @Component({
-  selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+	selector: 'app-login',
+	imports: [ReactiveFormsModule, CommonModule],
+	templateUrl: './login.component.html',
+	styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  private returnUrl: string = '/';
+	loginForm: FormGroup;
+	private returnUrl: string = '/';
 
-  constructor(
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
-    private readonly auth: AuthService,
-    private readonly fb: FormBuilder,
-    private readonly toastr: ToastrService
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-    });
+	constructor(
+		private readonly router: Router,
+		private readonly route: ActivatedRoute,
+		private readonly auth: AuthService,
+		private readonly fb: FormBuilder,
+		private readonly toastr: ToastrService,
+	) {
+		this.loginForm = this.fb.group({
+			email: ['', [Validators.required, Validators.email]],
+			password: ['', Validators.required],
+		});
 
-    // Get the return URL from query params or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-  }
+		// Get the return URL from query params or default to '/'
+		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+	}
 
-  async onSubmit() {
-    if (this.loginForm.valid) {
-      const formData: MyFormData = {
-        ...this.loginForm.value,
-      };
-      try {
-         const response: LoginResponse = await firstValueFrom<any>(this.auth.signin(formData));
-         this.toastr.success(`${response.message || 'Login successful'}`);
-         // Redirect to the originally requested URL or home
-         this.router.navigateByUrl(this.returnUrl);
-      } catch (error: any) {
-        this.toastr.error(`Failed to login. ${error.error?.error || error.error?.details || 'Unknown error'}`);
-      }
-    }
-  }
-}
-
-interface LoginResponse {
-  message: string;
+	async onSubmit() {
+		if (!this.loginForm.valid) return;
+		const formData: MyFormData = { ...this.loginForm.value };
+		try {
+			const result = await firstValueFrom(this.auth.signin(formData));
+			const message = (result as { message?: string } | undefined)?.message;
+			this.toastr.success(message || 'Login successful');
+			this.router.navigateByUrl(this.returnUrl);
+		} catch (error: unknown) {
+			const err = error as { error?: { error?: string; details?: string } };
+			this.toastr.error(
+				`Failed to login. ${err.error?.error || err.error?.details || 'Unknown error'}`,
+			);
+		}
+	}
 }
