@@ -70,6 +70,12 @@ export class ProductService {
 		);
 	}
 
+	deleteProduct(id: number): Observable<DeleteProductResponse> {
+		return this.http.delete<DeleteProductResponse>(
+			`${this.baseUrl}/delete-product/${id}`,
+		);
+	}
+
 	// Method to manually refresh products
 	refreshProducts(): void {
 		this.getProducts().subscribe();
@@ -89,4 +95,9 @@ export interface Product {
 	filamentType: 'PLA' | 'PETG';
 	color: string;
 	imageGallery?: string[];
+}
+
+export interface DeleteProductResponse {
+	success: boolean;
+	message: string;
 }
