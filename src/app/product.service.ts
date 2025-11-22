@@ -1,7 +1,7 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { computed, Injectable, inject, signal } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import type { FilamentColorsResponse } from './types/filament';
 
