@@ -48,11 +48,9 @@ export class ProductService {
 				params: { filamentType },
 			})
 			.pipe(
-				map((colors) => {
-					const arr = Array.isArray(colors) ? colors : [];
-					this.colorsSignal.set(arr);
+				tap((colors) => {
+					this.colorsSignal.set(colors);
 					this.colorsLoadingSignal.set(false);
-					return arr;
 				}),
 			);
 	}
