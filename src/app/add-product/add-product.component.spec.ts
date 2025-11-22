@@ -7,6 +7,7 @@ import { provideToastr, ToastrService } from 'ngx-toastr';
 import { of, throwError } from 'rxjs';
 import { type ProductResponse, ProductService } from '../product.service';
 import type { FilamentColorsResponse } from '../types/filament';
+import { Profile, Provider } from '../types/filament';
 import { AddProductComponent } from './add-product.component';
 
 describe('AddProductComponent', () => {
@@ -30,13 +31,38 @@ describe('AddProductComponent', () => {
 	let _mockProductService: jasmine.SpyObj<ProductService>;
 	let _mockToastr: jasmine.SpyObj<ToastrService>;
 
-	const mockColors: FilamentColorsResponse = {
-		filaments: [
-			{ filament: 'PLA', hexColor: '#FF0000', colorTag: 'red' },
-			{ filament: 'PLA', hexColor: '#00FF00', colorTag: 'green' },
-			{ filament: 'PETG', hexColor: '#0000FF', colorTag: 'blue' },
-		],
-	};
+	const mockColors: FilamentColorsResponse[] = [
+		{
+			name: 'Red PLA',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PLA',
+			profile: Profile.Pla,
+			hexValue: 'FF0000',
+			publicId: 'red-pla',
+		},
+		{
+			name: 'Green PLA',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PLA',
+			profile: Profile.Pla,
+			hexValue: '00FF00',
+			publicId: 'green-pla',
+		},
+		{
+			name: 'Blue PETG',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PETG',
+			profile: Profile.Petg,
+			hexValue: '0000FF',
+			publicId: 'blue-petg',
+		},
+	];
 
 	// Mock signals for the service
 	const mockColorsSignal = jasmine

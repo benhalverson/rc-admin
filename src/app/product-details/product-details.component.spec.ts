@@ -11,7 +11,8 @@ import { provideToastr, ToastrService } from 'ngx-toastr';
 import { of, Subject, throwError } from 'rxjs';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
 import { type ProductResponse, ProductService } from '../product.service';
-import type { Filament } from '../types/filament';
+import type { FilamentColorsResponse } from '../types/filament';
+import { Profile, Provider } from '../types/filament';
 import { Upload } from '../upload/upload';
 import { ProductDetailsComponent } from './product-details.component';
 
@@ -37,10 +38,37 @@ describe('ProductDetailsComponent', () => {
 		],
 	};
 
-	const mockFilaments: Filament[] = [
-		{ filament: 'PLA', hexColor: '#ff0000', colorTag: 'red' },
-		{ filament: 'PLA', hexColor: '#0000ff', colorTag: 'blue' },
-		{ filament: 'PETG', hexColor: '#00ff00', colorTag: 'green' },
+	const mockFilaments: FilamentColorsResponse[] = [
+		{
+			name: 'Red PLA',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PLA',
+			profile: Profile.Pla,
+			hexValue: 'ff0000',
+			publicId: 'red-pla',
+		},
+		{
+			name: 'Blue PLA',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PLA',
+			profile: Profile.Pla,
+			hexValue: '0000ff',
+			publicId: 'blue-pla',
+		},
+		{
+			name: 'Green PETG',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PETG',
+			profile: Profile.Petg,
+			hexValue: '00ff00',
+			publicId: 'green-petg',
+		},
 	];
 
 	const mockColorsSignal = signal(mockFilaments);
@@ -109,7 +137,7 @@ describe('ProductDetailsComponent', () => {
 
 		// Setup spies to accept any parameter type
 		productService.getProductById.and.returnValue(of(mockProduct));
-		productService.getColors.and.returnValue(of({ filaments: mockFilaments }));
+		productService.getColors.and.returnValue(of(mockFilaments));
 		productService.updateProduct.and.returnValue(of(undefined));
 	});
 
@@ -225,7 +253,7 @@ describe('ProductDetailsComponent', () => {
 
 			const filtered = component.filteredColorOptions();
 			expect(filtered.length).toBe(2); // Only PLA colors
-			expect(filtered.every((color) => color.filament === 'PLA')).toBe(true);
+			expect(filtered.every((color) => color.color === 'PLA')).toBe(true);
 		});
 
 		it('should update filtered colors when filament type changes', () => {
@@ -234,7 +262,7 @@ describe('ProductDetailsComponent', () => {
 
 			const filtered = component.filteredColorOptions();
 			expect(filtered.length).toBe(1); // Only PETG color
-			expect(filtered[0].filament).toBe('PETG');
+			expect(filtered[0].color).toBe('PETG');
 		});
 
 		it('should fetch colors when filament type changes', async () => {

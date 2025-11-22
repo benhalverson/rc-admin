@@ -3,11 +3,12 @@ import {
 	Component,
 	computed,
 	EventEmitter,
-	effect,
 	Input,
 	inject,
+	type OnChanges,
 	type OnInit,
 	Output,
+	type SimpleChanges,
 } from '@angular/core';
 import { ProductService } from '../product.service';
 
@@ -17,7 +18,7 @@ import { ProductService } from '../product.service';
 	imports: [CommonModule],
 	templateUrl: './color-picker.component.html',
 })
-export class ColorPickerComponent implements OnInit {
+export class ColorPickerComponent implements OnInit, OnChanges {
 	private productService = inject(ProductService);
 
 	@Input({ required: true }) filamentType!: 'PLA' | 'PETG';
@@ -25,23 +26,23 @@ export class ColorPickerComponent implements OnInit {
 	@Output() modelChange = new EventEmitter<string>();
 
 	// Use computed signals from the product service
-	colorOptions = computed(() => this.productService.colors().filaments);
+	colorOptions = computed(() => this.productService.colors());
 	isLoading = computed(() => this.productService.colorsLoading());
 
-	constructor() {
-		// Effect to watch for filament type changes
-		effect(() => {
-			if (this.filamentType) {
-				this.productService.getColors(this.filamentType).subscribe();
-			}
-		});
+	ngOnInit() {
+		if (this.filamentType) {
+			this.fetchColors();
+		}
 	}
 
-	ngOnInit() {
-		// Load colors for the initial filament type
-		if (this.filamentType) {
-			this.productService.getColors(this.filamentType).subscribe();
+	ngOnChanges(changes: SimpleChanges) {
+		if (changes['filamentType'] && !changes['filamentType'].firstChange) {
+			this.fetchColors();
 		}
+	}
+
+	private fetchColors() {
+		this.productService.getColors(this.filamentType).subscribe();
 	}
 
 	selectColor(color: string) {
