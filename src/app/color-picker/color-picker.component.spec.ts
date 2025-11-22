@@ -15,16 +15,19 @@ describe('ColorPickerComponent', () => {
 			'getColors',
 		]);
 
-		// Mock the colors and colorsLoading computed signals
-		(productServiceSpy as any).colors = () => ({
-			filaments: [
-				{ filament: 'PLA', hexColor: '#FF0000', colorTag: 'red' },
-				{ filament: 'PLA', hexColor: '#0000FF', colorTag: 'blue' },
-				{ filament: 'PLA', hexColor: '#00FF00', colorTag: 'green' },
-			],
+		// Mock the colors and colorsLoading computed signals without using any
+		Object.defineProperty(productServiceSpy, 'colors', {
+			value: (() => ({
+				filaments: [
+					{ filament: 'PLA', hexColor: '#FF0000', colorTag: 'red' },
+					{ filament: 'PLA', hexColor: '#0000FF', colorTag: 'blue' },
+					{ filament: 'PLA', hexColor: '#00FF00', colorTag: 'green' },
+				],
+			})) as unknown,
 		});
-
-		(productServiceSpy as any).colorsLoading = () => false;
+		Object.defineProperty(productServiceSpy, 'colorsLoading', {
+			value: (() => false) as unknown,
+		});
 
 		await TestBed.configureTestingModule({
 			imports: [

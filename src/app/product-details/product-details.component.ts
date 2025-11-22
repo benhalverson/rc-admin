@@ -72,7 +72,7 @@ export class ProductDetailsComponent {
 		this.route.params
 			.pipe(
 				switchMap((params: Params) =>
-					this.productService.getProductById(params['id']),
+					this.productService.getProductById(Number(params['id'])),
 				),
 				tap((product) => {
 					// Parse imageGallery if it's a string

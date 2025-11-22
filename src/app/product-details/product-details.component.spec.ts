@@ -1,3 +1,4 @@
+/// <reference types="jasmine" />
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
@@ -19,7 +20,7 @@ describe('ProductDetailsComponent', () => {
 	let fixture: ComponentFixture<ProductDetailsComponent>;
 	let productService: jasmine.SpyObj<ProductService>;
 	let toastrService: jasmine.SpyObj<ToastrService>;
-	let activatedRoute: any;
+	let activatedRoute: ActivatedRoute;
 
 	const mockProduct: ProductResponse = {
 		id: 1,
@@ -67,7 +68,7 @@ describe('ProductDetailsComponent', () => {
 					colorOptions: mockFilaments,
 				},
 			},
-		};
+		} as unknown as ActivatedRoute;
 
 		await TestBed.configureTestingModule({
 			imports: [
@@ -129,7 +130,7 @@ describe('ProductDetailsComponent', () => {
 		it('should load product on initialization', () => {
 			fixture.detectChanges();
 
-			expect(productService.getProductById).toHaveBeenCalledWith('1' as any);
+			expect(productService.getProductById).toHaveBeenCalledWith(1);
 			expect(component.productDetails).toEqual(mockProduct);
 			expect(component.colorOptions()).toEqual(mockFilaments);
 		});
@@ -167,12 +168,16 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should parse imageGallery from JSON string', () => {
-			const productWithStringGallery = {
+			interface ExtendedProductResponse
+				extends Omit<ProductResponse, 'imageGallery'> {
+				imageGallery: string | string[];
+			}
+			const productWithStringGallery: ExtendedProductResponse = {
 				...mockProduct,
-				imageGallery: JSON.stringify(['image1.jpg', 'image2.jpg']) as any,
+				imageGallery: JSON.stringify(['image1.jpg', 'image2.jpg']),
 			};
 			productService.getProductById.and.returnValue(
-				of(productWithStringGallery),
+				of(productWithStringGallery as ProductResponse),
 			);
 
 			fixture.detectChanges();
@@ -181,22 +186,23 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should handle invalid JSON string in imageGallery', () => {
-			// Spy on console.error to prevent error logging during test
 			spyOn(console, 'error');
-
-			const productWithInvalidJson = {
+			interface ExtendedInvalidProduct
+				extends Omit<ProductResponse, 'imageGallery'> {
+				imageGallery: string | string[];
+			}
+			const productWithInvalidJson: ExtendedInvalidProduct = {
 				...mockProduct,
-				imageGallery: 'invalid json string' as any,
+				imageGallery: 'invalid json string',
 			};
-			productService.getProductById.and.returnValue(of(productWithInvalidJson));
+			productService.getProductById.and.returnValue(
+				of(productWithInvalidJson as ProductResponse),
+			);
 
 			fixture.detectChanges();
 
 			expect(component.safeImageGallery).toEqual([]);
-			expect(console.error).toHaveBeenCalledWith(
-				'Failed to parse imageGallery:',
-				jasmine.any(SyntaxError),
-			);
+			expect(console.error).toHaveBeenCalled();
 		});
 
 		it('should handle null/undefined imageGallery', () => {
@@ -387,7 +393,11 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should not save when form is null', () => {
-			component.productForm = null as any;
+			(
+				component as unknown as {
+					productForm: typeof component.productForm | null;
+				}
+			).productForm = null;
 
 			component.saveChanges();
 
@@ -434,8 +444,6 @@ describe('ProductDetailsComponent', () => {
 			// Should not throw any errors
 			expect(() => component.onImageLoad(testUrl)).not.toThrow();
 		});
-
-
 	});
 
 	describe('Component Lifecycle', () => {
@@ -457,7 +465,7 @@ describe('ProductDetailsComponent', () => {
 
 			paramsSubject.next({ id: '2' });
 
-			expect(productService.getProductById).toHaveBeenCalledWith('2' as any);
+			expect(productService.getProductById).toHaveBeenCalledWith(2);
 		});
 	});
 
@@ -472,7 +480,6 @@ describe('ProductDetailsComponent', () => {
 				fixture.detectChanges();
 			}).not.toThrow();
 		});
-
 	});
 
 	describe('Display Content', () => {

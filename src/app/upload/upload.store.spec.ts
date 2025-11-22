@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { UploadStore } from './upload.store';
 
 describe('UploadStore', () => {
-	let store: any;
+	let store: InstanceType<typeof UploadStore>;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({});

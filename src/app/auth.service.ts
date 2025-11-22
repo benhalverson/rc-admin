@@ -121,37 +121,39 @@ export class AuthService {
 			);
 	}
 
-	logout(): Observable<any> {
+	logout(): Observable<AuthResponse> {
 		// Call server signout endpoint to clear the signed cookie
-		return this.http.get(`${environment.baseurl}/auth/signout`).pipe(
-			tap({
-				next: () => {
+		return this.http
+			.get<AuthResponse>(`${environment.baseurl}/auth/signout`)
+			.pipe(
+				tap({
+					next: () => {
+						this.authStore.logout();
+						// Clear sessionStorage on logout
+						if (isPlatformBrowser(this.platformId)) {
+							sessionStorage.removeItem('isAuthenticated');
+							sessionStorage.removeItem('user');
+						}
+					},
+					error: () => {
+						// Even if server logout fails, clear local state
+						this.authStore.logout();
+						if (isPlatformBrowser(this.platformId)) {
+							sessionStorage.removeItem('isAuthenticated');
+							sessionStorage.removeItem('user');
+						}
+					},
+				}),
+				catchError(() => {
+					// Ensure we always clear local state even on error
 					this.authStore.logout();
-					// Clear sessionStorage on logout
 					if (isPlatformBrowser(this.platformId)) {
 						sessionStorage.removeItem('isAuthenticated');
 						sessionStorage.removeItem('user');
 					}
-				},
-				error: () => {
-					// Even if server logout fails, clear local state
-					this.authStore.logout();
-					if (isPlatformBrowser(this.platformId)) {
-						sessionStorage.removeItem('isAuthenticated');
-						sessionStorage.removeItem('user');
-					}
-				},
-			}),
-			catchError(() => {
-				// Ensure we always clear local state even on error
-				this.authStore.logout();
-				if (isPlatformBrowser(this.platformId)) {
-					sessionStorage.removeItem('isAuthenticated');
-					sessionStorage.removeItem('user');
-				}
-				return of(null);
-			}),
-		);
+					return of({ message: 'Logged out locally' });
+				}),
+			);
 	}
 
 	isAuthenticated(): boolean {

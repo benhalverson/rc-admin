@@ -15,7 +15,7 @@ describe('LoginComponent', () => {
 	let authService: jasmine.SpyObj<AuthService>;
 	let toastrService: jasmine.SpyObj<ToastrService>;
 	let router: jasmine.SpyObj<Router>;
-	let activatedRoute: any;
+	let activatedRoute: ActivatedRoute;
 
 	beforeEach(async () => {
 		const authServiceSpy = jasmine.createSpyObj('AuthService', ['signin']);
@@ -88,7 +88,9 @@ describe('LoginComponent', () => {
 			toastrService,
 		);
 
-		expect((newComponent as any).returnUrl).toBe(testReturnUrl);
+		expect((newComponent as unknown as { returnUrl: string }).returnUrl).toBe(
+			testReturnUrl,
+		);
 	});
 
 	it('should use default returnUrl when no query params', () => {
@@ -103,7 +105,9 @@ describe('LoginComponent', () => {
 			toastrService,
 		);
 
-		expect((newComponent as any).returnUrl).toBe('/');
+		expect((newComponent as unknown as { returnUrl: string }).returnUrl).toBe(
+			'/',
+		);
 	});
 
 	it('should submit valid form successfully', async () => {
@@ -193,7 +197,7 @@ describe('LoginComponent', () => {
 
 	it('should handle custom return URL navigation', async () => {
 		// Set custom return URL
-		(component as any).returnUrl = '/products';
+		(component as unknown as { returnUrl: string }).returnUrl = '/products';
 
 		const mockResponse = { message: 'Welcome back!' };
 		authService.signin.and.returnValue(of(mockResponse));

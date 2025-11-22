@@ -11,7 +11,15 @@ describe('Upload Component', () => {
 	let component: Upload;
 	let fixture: ComponentFixture<Upload>;
 	let uploadService: jasmine.SpyObj<UploadService>;
-	let mockUploadStore: any;
+	interface MockUploadStore {
+		setFile: jasmine.Spy<(file: File | null) => void>;
+		setMessage: jasmine.Spy<(msg: string) => void>;
+		reset: jasmine.Spy<() => void>;
+		isFileSelected: jasmine.Spy<() => boolean>;
+		selectedFile: jasmine.Spy<() => File | null>;
+		message: jasmine.Spy<() => string>;
+	}
+	let mockUploadStore: MockUploadStore;
 
 	const mockUploadResponse = {
 		message: 'File uploaded successfully',
@@ -74,9 +82,7 @@ describe('Upload Component', () => {
 			const mockFile = new File(['test content'], 'test.stl', {
 				type: 'application/octet-stream',
 			});
-			const mockEvent = {
-				target: { files: [mockFile] },
-			} as any;
+			const mockEvent = { target: { files: [mockFile] } } as unknown as Event;
 
 			component.onFileSelected(mockEvent);
 
@@ -85,9 +91,7 @@ describe('Upload Component', () => {
 		});
 
 		it('should handle no file selected', () => {
-			const mockEvent = {
-				target: { files: [] },
-			} as any;
+			const mockEvent = { target: { files: [] as File[] } } as unknown as Event;
 
 			component.onFileSelected(mockEvent);
 
@@ -96,9 +100,7 @@ describe('Upload Component', () => {
 		});
 
 		it('should handle null files array', () => {
-			const mockEvent = {
-				target: { files: null },
-			} as any;
+			const mockEvent = { target: { files: null } } as unknown as Event;
 
 			component.onFileSelected(mockEvent);
 
@@ -230,9 +232,7 @@ describe('Upload Component', () => {
 			const mockFile = new File(['test content'], 'test.stl', {
 				type: 'application/octet-stream',
 			});
-			const mockEvent = {
-				target: { files: [mockFile] },
-			} as any;
+			const mockEvent = { target: { files: [mockFile] } } as unknown as Event;
 
 			expect(component.uploadForm.get('file')?.value).toBeNull();
 

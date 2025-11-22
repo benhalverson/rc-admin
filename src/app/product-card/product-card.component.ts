@@ -12,5 +12,4 @@ import type { ProductResponse } from '../product.service';
 })
 export class ProductCardComponent {
 	product = input.required<ProductResponse>();
-
 }

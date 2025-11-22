@@ -11,11 +11,11 @@ describe('AuthService', () => {
 	let service: AuthService;
 	let authStore: InstanceType<typeof AuthStore>;
 	let httpMock: HttpTestingController;
-	let mockSessionStorage: any;
+	let mockSessionStorage: typeof mockStorage;
 
 	// Mock sessionStorage
 	const mockStorage = {
-		store: {} as any,
+		store: {} as Record<string, string>,
 		getItem: jasmine
 			.createSpy('getItem')
 			.and.callFake((key: string) => mockStorage.store[key] || null),
