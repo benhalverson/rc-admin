@@ -1,12 +1,20 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
-import type { ProductResponse } from '../product.service';
+import type {} from 'jasmine';
+import { ToastrService } from 'ngx-toastr';
+import { of } from 'rxjs';
+import { type ProductResponse, ProductService } from '../product.service';
 import { ProductCardComponent } from './product-card.component';
 
 describe('ProductCardComponent', () => {
 	let component: ProductCardComponent;
 	let fixture: ComponentFixture<ProductCardComponent>;
+	let productService: jasmine.SpyObj<ProductService>;
+	let toastrService: jasmine.SpyObj<ToastrService>;
+	const productsResource = {
+		reload: jasmine.createSpy('reload'),
+	};
 
 	const mockProduct: ProductResponse = {
 		id: 1,
@@ -25,8 +33,21 @@ describe('ProductCardComponent', () => {
 	};
 
 	beforeEach(async () => {
+		productService = jasmine.createSpyObj('ProductService', ['deleteProduct'], {
+			productsResource,
+		});
+		productService.deleteProduct.and.returnValue(
+			of({ success: true, message: 'Product deleted successfully' }),
+		);
+
+		toastrService = jasmine.createSpyObj('ToastrService', ['success', 'error']);
+
 		await TestBed.configureTestingModule({
 			imports: [ProductCardComponent, RouterTestingModule],
+			providers: [
+				{ provide: ProductService, useValue: productService },
+				{ provide: ToastrService, useValue: toastrService },
+			],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(ProductCardComponent);
@@ -139,5 +160,18 @@ describe('ProductCardComponent', () => {
 
 		const nameElement = fixture.debugElement.query(By.css('h3'));
 		expect(nameElement.nativeElement.classList).toContain('line-clamp-1');
+	});
+
+	it('should call deleteProduct and reload products when delete button is clicked', () => {
+		const deleteButton = fixture.debugElement.query(By.css('button'));
+		deleteButton.triggerEventHandler('click', null);
+		fixture.detectChanges();
+
+		expect(productService.deleteProduct).toHaveBeenCalledWith(mockProduct.id);
+		expect(productsResource.reload).toHaveBeenCalled();
+		expect(toastrService.success).toHaveBeenCalledWith(
+			'Product deleted successfully',
+			'Success',
+		);
 	});
 });

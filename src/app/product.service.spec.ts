@@ -242,6 +242,27 @@ describe('ProductService', () => {
 		});
 	});
 
+	describe('deleteProduct', () => {
+		it('should delete an existing product', () => {
+			const productId = 1;
+			const deleteResponse = {
+				success: true,
+				message: 'Product deleted successfully',
+			};
+
+			service.deleteProduct(productId).subscribe((response) => {
+				expect(response).toEqual(deleteResponse);
+			});
+
+			const req = httpMock.expectOne(
+				`${environment.baseurl}/delete-product/${productId}`,
+			);
+			expect(req.request.method).toBe('DELETE');
+			expect(req.request.body).toBeNull();
+			req.flush(deleteResponse);
+		});
+	});
+
 	describe('createProduct', () => {
 		it('should create a new product', () => {
 			service.createProduct(mockProduct).subscribe((response) => {
