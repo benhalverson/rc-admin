@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -6,7 +5,7 @@ import { AuthService } from '../auth.service';
 
 @Component({
 	selector: 'app-navbar',
-	imports: [RouterModule, NgIf],
+	imports: [RouterModule],
 	templateUrl: './navbar.component.html',
 	styleUrl: './navbar.component.css',
 })

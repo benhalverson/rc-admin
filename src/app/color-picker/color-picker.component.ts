@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
 	Component,
 	computed,
@@ -15,7 +14,7 @@ import { ProductService } from '../product.service';
 @Component({
 	selector: 'app-color-picker',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './color-picker.component.html',
 })
 export class ColorPickerComponent implements OnInit, OnChanges {

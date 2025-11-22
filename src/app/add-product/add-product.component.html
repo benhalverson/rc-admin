@@ -3,159 +3,167 @@
     [formGroup]="productForm"
     (ngSubmit)="onSubmit()"
     class="p-8 space-y-6 bg-white rounded-lg shadow-md"
-  >
+    >
     <!-- product name -->
     <div class="flex flex-col">
       <label for="name" class="mb-2 text-sm font-semibold text-gray-700"
         >Product Name:</label
-      >
-      <input
-        type="text"
-        formControlName="name"
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
-      />
-      <div
-        *ngIf="
+        >
+        <input
+          type="text"
+          formControlName="name"
+          class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
+          />
+        @if (
           productForm.get('name')?.invalid && productForm.get('name')?.touched
-        "
-        class="mt-1 text-sm text-red-500"
-      >
-        <small>Product name is required (min 3 characters).</small>
-      </div>
-
-      <!-- product description -->
-    </div>
-    <div class="flex flex-col">
-      <label for="description" class="mb-2 text-sm font-semibold text-gray-700"
-        >Product Description:</label
-      >
-      <textarea
-        type="text"
-        formControlName="description"
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
-      ></textarea>
-      <div
-        *ngIf="
-          productForm.get('description')?.invalid &&
-          productForm.get('description')?.touched
-        "
-        class="mt-1 text-sm text-red-500"
-      >
-        <small>Product Description is required</small>
-      </div>
-    </div>
-
-    <div class="flex flex-col">
-      <label for="image" class="mb-2 text-sm font-semibold text-gray-700"
-        >Image URL:</label
-      >
-      <input
-        id="image"
-        formControlName="image"
-        type="text"
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-    <div class="flex flex-col">
-        <app-upload (uploaded)="onPngUpload($event)" />
-    </div>
-
-    <!-- Image Gallery -->
-    <div class="flex flex-col">
-      <label class="mb-2 text-sm font-semibold text-gray-700">Image Gallery:</label>
-      <div class="flex flex-col space-y-2">
-        <app-upload (uploaded)="onGalleryImageUpload($event)" />
-        <div *ngIf="imageGallery().length > 0" class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
-          <div *ngFor="let image of imageGallery(); let i = index" class="relative group">
-            <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
-            <button
-              type="button"
-              (click)="removeGalleryImage(i)"
-              class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
-              title="Remove image"
+          ) {
+          <div
+            class="mt-1 text-sm text-red-500"
             >
-              ×
-            </button>
+            <small>Product name is required (min 3 characters).</small>
           </div>
+        }
+
+        <!-- product description -->
+      </div>
+      <div class="flex flex-col">
+        <label for="description" class="mb-2 text-sm font-semibold text-gray-700"
+          >Product Description:</label
+          >
+          <textarea
+            type="text"
+            formControlName="description"
+            class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
+          ></textarea>
+          @if (
+            productForm.get('description')?.invalid &&
+            productForm.get('description')?.touched
+            ) {
+            <div
+              class="mt-1 text-sm text-red-500"
+              >
+              <small>Product Description is required</small>
+            </div>
+          }
         </div>
-      </div>
-    </div>
+
+        <div class="flex flex-col">
+          <label for="image" class="mb-2 text-sm font-semibold text-gray-700"
+            >Image URL:</label
+            >
+            <input
+              id="image"
+              formControlName="image"
+              type="text"
+              class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+          </div>
+          <div class="flex flex-col">
+            <app-upload (uploaded)="onPngUpload($event)" />
+          </div>
+
+          <!-- Image Gallery -->
+          <div class="flex flex-col">
+            <label class="mb-2 text-sm font-semibold text-gray-700">Image Gallery:</label>
+            <div class="flex flex-col space-y-2">
+              <app-upload (uploaded)="onGalleryImageUpload($event)" />
+              @if (imageGallery().length > 0) {
+                <div class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
+                  @for (image of imageGallery(); track image; let i = $index) {
+                    <div class="relative group">
+                      <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
+                      <button
+                        type="button"
+                        (click)="removeGalleryImage(i)"
+                        class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
+                        title="Remove image"
+                        >
+                        ×
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
 
 
-    <!-- STL File URL -->
-    <div class="flex flex-col">
-      <label for="stl" class="mb-2 text-sm font-semibold text-gray-700"
-        >STL File URL:</label
-      >
-      <input
-        id="stl"
-        formControlName="stl"
-        type="text"
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <div
-        *ngIf="
-          productForm.get('stl')?.invalid && productForm.get('stl')?.touched
-        "
-        class="mt-1 text-sm text-red-500"
-      >
-        STL file URL is required.
-      </div>
+          <!-- STL File URL -->
+          <div class="flex flex-col">
+            <label for="stl" class="mb-2 text-sm font-semibold text-gray-700"
+              >STL File URL:</label
+              >
+              <input
+                id="stl"
+                formControlName="stl"
+                type="text"
+                class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              @if (
+                productForm.get('stl')?.invalid && productForm.get('stl')?.touched
+                ) {
+                <div
+                  class="mt-1 text-sm text-red-500"
+                  >
+                  STL file URL is required.
+                </div>
+              }
 
-    </div>
+            </div>
 
-    <div class="flex flex-col">
-        <app-upload (uploaded)="onStlUploaded($event)" />
-    </div>
+            <div class="flex flex-col">
+              <app-upload (uploaded)="onStlUploaded($event)" />
+            </div>
 
-    <!-- Price -->
-    <div class="flex flex-col">
-      <label for="price" class="mb-2 text-sm font-semibold text-gray-700"
-        >Price:</label
-      >
-      <input
-        id="price"
-        formControlName="price"
-        type="number"
-        min="0"
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <div
-        *ngIf="
-          productForm.get('price')?.invalid && productForm.get('price')?.touched
-        "
-        class="mt-1 text-sm text-red-500"
-      >
-        Price must be greater than or equal to 0.
-      </div>
-    </div>
-    <!-- Filament Type -->
-    <div class="flex flex-col">
-      <label for="filamentType" class="mb-2 text-sm font-semibold text-gray-700"
-        >Filament Type:</label
-      >
-      <select
-        id="filamentType"
-        formControlName="filamentType"
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="PLA">PLA</option>
-        <option value="PETG">PETG</option>
-      </select>
-    </div>
-    <!-- Color Picker -->
-    <div class="flex flex-col">
-      <label for="color" class="mb-2 text-sm font-semibold text-gray-700"
-        >Color:</label
-      >
- <app-color-picker
-  [filamentType]="productForm.get('filamentType')?.value"
-  [model]="colorControl.value"
-  (modelChange)="colorControl.setValue($event)"
-></app-color-picker>
+            <!-- Price -->
+            <div class="flex flex-col">
+              <label for="price" class="mb-2 text-sm font-semibold text-gray-700"
+                >Price:</label
+                >
+                <input
+                  id="price"
+                  formControlName="price"
+                  type="number"
+                  min="0"
+                  class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                @if (
+                  productForm.get('price')?.invalid && productForm.get('price')?.touched
+                  ) {
+                  <div
+                    class="mt-1 text-sm text-red-500"
+                    >
+                    Price must be greater than or equal to 0.
+                  </div>
+                }
+              </div>
+              <!-- Filament Type -->
+              <div class="flex flex-col">
+                <label for="filamentType" class="mb-2 text-sm font-semibold text-gray-700"
+                  >Filament Type:</label
+                  >
+                  <select
+                    id="filamentType"
+                    formControlName="filamentType"
+                    class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                    <option value="PLA">PLA</option>
+                    <option value="PETG">PETG</option>
+                  </select>
+                </div>
+                <!-- Color Picker -->
+                <div class="flex flex-col">
+                  <label for="color" class="mb-2 text-sm font-semibold text-gray-700"
+                    >Color:</label
+                    >
+                    <app-color-picker
+                      [filamentType]="productForm.get('filamentType')?.value"
+                      [model]="colorControl.value"
+                      (modelChange)="colorControl.setValue($event)"
+                    ></app-color-picker>
 
-    </div>
+                  </div>
 
-    <button type="submit" [disabled]="productForm.invalid">Add Product</button>
-  </form>
-</div>
+                  <button type="submit" [disabled]="productForm.invalid">Add Product</button>
+                </form>
+              </div>

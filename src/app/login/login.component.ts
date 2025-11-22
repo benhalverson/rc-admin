@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
 	FormBuilder,
@@ -13,7 +12,7 @@ import { AuthService, MyFormData } from '../auth.service';
 
 @Component({
 	selector: 'app-login',
-	imports: [ReactiveFormsModule, CommonModule],
+	imports: [ReactiveFormsModule],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.css',
 })
