@@ -3,27 +3,27 @@
     <label
       *ngFor="let option of colorOptions()"
       class="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
-      [class.ring-2]="model === option.hexColor"
-      [class.ring-offset-1]="model === option.hexColor"
-      [class.ring-blue-500]="model === option.hexColor"
+      [class.ring-2]="model === option.hexValue"
+      [class.ring-offset-1]="model === option.hexValue"
+      [class.ring-blue-500]="model === option.hexValue"
     >
       <input
         type="radio"
         class="sr-only"
-        [value]="option.hexColor"
-        [checked]="model === option.hexColor"
-        (change)="selectColor(option.hexColor)"
+        [value]="option.hexValue"
+        [checked]="model === option.hexValue"
+        (change)="selectColor(option.hexValue)"
         name="color"
       />
       <span
         class="w-8 h-8 border border-black rounded-full border-opacity-10"
-        [style.backgroundColor]="`#${option.hexColor}`"
+        [style.backgroundColor]="`${option.hexValue}`"
         aria-hidden="true"
       ></span>
-      <span class="sr-only">{{ option.colorTag }}</span>
+      <span class="sr-only">{{ option.color }}</span>
 
       <span
-        *ngIf="model === option.hexColor"
+        *ngIf="model === option.hexValue"
         class="absolute inset-0 rounded-full ring-2 ring-offset-2"
         aria-hidden="true"
       ></span>

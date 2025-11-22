@@ -1,15 +1,5 @@
 import { environment } from '../../environments/environment';
-
-interface FilamentColorsResponse {
-	filaments: Filament[];
-}
-
-interface Filament {
-	filament: string;
-	hexColor: string;
-	colorTag: string;
-	profile: string;
-}
+import { FilamentColorsResponse } from '../types/filament';
 
 export const colorOptionsResolver = async () => {
 	const url = new URL(`${environment.baseurl}/colors`);

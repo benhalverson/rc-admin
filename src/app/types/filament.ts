@@ -1,14 +1,20 @@
 export interface FilamentColorsResponse {
-	filaments: Filament[];
+	name: string;
+	provider: Provider;
+	public: boolean;
+	available: boolean;
+	color: string;
+	profile: Profile;
+	hexValue: string;
+	publicId: string;
 }
 
-export interface Filament {
-	filament: string;
-	hexColor: string;
-	colorTag: string;
+export enum Profile {
+	Petg = 'PETG',
+	Pla = 'PLA',
 }
 
-export enum FilamentType {
-	PLA = 'PLA',
-	PETG = 'PETG',
+export enum Provider {
+	Polymaker = 'Polymaker',
+	Slant3D = 'Slant 3D',
 }

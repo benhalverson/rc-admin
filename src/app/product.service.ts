@@ -3,7 +3,7 @@ import { computed, Injectable, inject, signal } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
-import type { Filament, FilamentColorsResponse } from './types/filament';
+import type { FilamentColorsResponse } from './types/filament';
 
 @Injectable({
 	providedIn: 'root',
@@ -15,14 +15,15 @@ export class ProductService {
 	// Signals for managing state
 	private productsSignal = signal<ProductResponse[]>([]);
 	private productsLoadingSignal = signal(false);
-	private colorsSignal = signal<FilamentColorsResponse>({ filaments: [] });
+	// Store colors as an array so the color picker can iterate over them
+	private colorsSignal = signal<FilamentColorsResponse[]>([]);
 	private colorsLoadingSignal = signal(false);
 
 	// Computed signals for easy access
-	products = computed(() => this.productsSignal());
-	productsLoading = computed(() => this.productsLoadingSignal());
-	colors = computed(() => this.colorsSignal());
-	colorsLoading = computed(() => this.colorsLoadingSignal());
+	products = computed<ProductResponse[]>(() => this.productsSignal());
+	productsLoading = computed<boolean>(() => this.productsLoadingSignal());
+	colors = computed<FilamentColorsResponse[]>(() => this.colorsSignal());
+	colorsLoading = computed<boolean>(() => this.colorsLoadingSignal());
 
 	readonly productsResource = httpResource<ProductResponse[]>(() => {
 		return `${this.baseUrl}/products`;
@@ -38,23 +39,20 @@ export class ProductService {
 		);
 	}
 
-	getColors(filamentType: 'PLA' | 'PETG'): Observable<FilamentColorsResponse> {
+	getColors(
+		filamentType: 'PLA' | 'PETG',
+	): Observable<FilamentColorsResponse[]> {
 		this.colorsLoadingSignal.set(true);
 		return this.http
-			.get<Filament[]>(`${this.baseUrl}/colors`, {
+			.get<FilamentColorsResponse[]>(`${this.baseUrl}/colors`, {
 				params: { filamentType },
 			})
 			.pipe(
-				map((colors: Filament[]) => ({
-					filaments: colors.map((color) => ({
-						filament: color.filament,
-						hexColor: color.hexColor,
-						colorTag: color.colorTag,
-					})),
-				})),
-				tap((colorsResponse) => {
-					this.colorsSignal.set(colorsResponse);
+				map((colors) => {
+					const arr = Array.isArray(colors) ? colors : [];
+					this.colorsSignal.set(arr);
 					this.colorsLoadingSignal.set(false);
+					return arr;
 				}),
 			);
 	}

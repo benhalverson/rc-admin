@@ -20,7 +20,7 @@ import {
 } from 'rxjs';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
 import { Product, ProductService } from '../product.service';
-import type { Filament } from '../types/filament';
+import { FilamentColorsResponse } from '../types/filament';
 import { Upload } from '../upload/upload';
 
 @Component({
@@ -35,9 +35,9 @@ export class ProductDetailsComponent {
 	colorControl = new FormControl<string | null>(null);
 	productDetails: Product | null = null;
 	isEditing = false;
-	colorOptions = signal<Filament[]>([]);
+	colorOptions = signal<FilamentColorsResponse[]>([]);
 	isLoading = signal(false);
-	filteredColorOptions = signal<Filament[]>([]);
+	filteredColorOptions = signal<FilamentColorsResponse[]>([]);
 	imageGallery = signal<string[]>([]);
 
 	destroy$ = new Subject<void>();
@@ -115,7 +115,7 @@ export class ProductDetailsComponent {
 	updateFilteredColorOptions() {
 		const selectedFilamentType = this.productForm?.get('filamentType')?.value;
 		const filtered = this.colorOptions().filter(
-			(option) => option.filament === selectedFilamentType,
+			(option) => option.color === selectedFilamentType,
 		);
 		this.filteredColorOptions.set(filtered);
 	}
@@ -123,11 +123,7 @@ export class ProductDetailsComponent {
 	async fetchColorsByFilamentType(filamentType: 'PLA' | 'PETG') {
 		try {
 			this.isLoading.set(true);
-			const colorsResponse = await firstValueFrom(
-				this.productService.getColors(filamentType),
-			);
-
-			this.colorOptions.set(colorsResponse.filaments); // ✅ not .colors, use .filaments
+			await firstValueFrom(this.productService.getColors(filamentType));
 		} catch (error) {
 			console.error('Failed to fetch colors:', error);
 		} finally {

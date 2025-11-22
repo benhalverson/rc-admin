@@ -9,7 +9,8 @@ import {
 	type ProductResponse,
 	ProductService,
 } from './product.service';
-import type { Filament, FilamentColorsResponse } from './types/filament';
+import type { FilamentColorsResponse } from './types/filament';
+import { Profile, Provider } from './types/filament';
 
 describe('ProductService', () => {
 	let service: ProductService;
@@ -33,14 +34,28 @@ describe('ProductService', () => {
 
 	const mockProductResponse: ProductResponse[] = [mockSingleProductResponse];
 
-	const mockFilamentColorsArray: Filament[] = [
-		{ filament: 'PLA RED', hexColor: '#f91010', colorTag: 'red' },
-		{ filament: 'PLA BLUE', hexColor: '#0db9f2', colorTag: 'blue' },
+	const mockFilamentColorsArray: FilamentColorsResponse[] = [
+		{
+			name: 'Red PLA',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PLA',
+			profile: Profile.Pla,
+			hexValue: 'f91010',
+			publicId: 'red-pla',
+		},
+		{
+			name: 'Blue PLA',
+			provider: Provider.Polymaker,
+			public: true,
+			available: true,
+			color: 'PLA',
+			profile: Profile.Pla,
+			hexValue: '0db9f2',
+			publicId: 'blue-pla',
+		},
 	];
-
-	const mockFilamentColors: FilamentColorsResponse = {
-		filaments: mockFilamentColorsArray,
-	};
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
@@ -96,9 +111,9 @@ describe('ProductService', () => {
 	describe('getColors', () => {
 		it('should retrieve PLA colors from API', () => {
 			service.getColors('PLA').subscribe((response) => {
-				expect(response).toEqual(mockFilamentColors);
-				expect(response.filaments.length).toBe(2);
-				expect(response.filaments[0].filament).toBe('PLA RED');
+				expect(Array.isArray(response)).toBeTrue();
+				expect(response.length).toBe(2);
+				expect(response[0].hexValue).toBe('f91010');
 			});
 
 			const req = httpMock.expectOne(
@@ -110,17 +125,22 @@ describe('ProductService', () => {
 		});
 
 		it('should retrieve PETG colors from API', () => {
-			const petgColorsArray: Filament[] = [
-				{ filament: 'PETG CLEAR', hexColor: '#ffffff', colorTag: 'clear' },
+			const petgColorsArray: FilamentColorsResponse[] = [
+				{
+					name: 'Clear PETG',
+					provider: Provider.Polymaker,
+					public: true,
+					available: true,
+					color: 'PETG',
+					profile: Profile.Petg,
+					hexValue: 'ffffff',
+					publicId: 'clear-petg',
+				},
 			];
 
-			const petgColors: FilamentColorsResponse = {
-				filaments: petgColorsArray,
-			};
-
 			service.getColors('PETG').subscribe((response) => {
-				expect(response).toEqual(petgColors);
-				expect(response.filaments[0].filament).toBe('PETG CLEAR');
+				expect(response.length).toBe(1);
+				expect(response[0].profile).toBe('PETG');
 			});
 
 			const req = httpMock.expectOne(
