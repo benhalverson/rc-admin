@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, type OnInit, signal } from '@angular/core';
 import {
 	FormBuilder,
@@ -16,7 +15,7 @@ import { Upload } from '../upload/upload';
 @Component({
 	selector: 'app-add-product',
 	standalone: true,
-	imports: [ReactiveFormsModule, CommonModule, ColorPickerComponent, Upload],
+	imports: [ReactiveFormsModule, ColorPickerComponent, Upload],
 	templateUrl: './add-product.component.html',
 })
 export class AddProductComponent implements OnInit {

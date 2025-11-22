@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import {
 	type ApplicationConfig,
-	provideZoneChangeDetection,
+	provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -17,7 +17,7 @@ import { credentialsInterceptor } from './interceptors/credentials.interceptor';
 export const appConfig: ApplicationConfig = {
 	providers: [
 		provideHttpClient(withFetch(), withInterceptors([credentialsInterceptor])),
-		provideZoneChangeDetection({ eventCoalescing: true }),
+		provideZonelessChangeDetection(),
 		provideRouter(routes),
 		provideClientHydration(),
 		provideAnimations(), // required animations providers

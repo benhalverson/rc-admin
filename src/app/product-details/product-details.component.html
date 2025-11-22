@@ -2,178 +2,186 @@
   <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-bold text-gray-800">Product Details</h2>
     <button
-      (click)="isEditing = !isEditing"
+      (click)="isEditing.set(!isEditing())"
       class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-    >
-      {{ isEditing ? "Cancel" : "Edit" }}
+      >
+      {{ isEditing()? "Cancel" : "Edit" }}
     </button>
   </div>
 
-  @if (!isEditing && productDetails) {
-  <div class="space-y-4">
-    <p class="text-lg font-semibold text-gray-700">
-      Name: <span class="text-gray-900">{{ productDetails.name }}</span>
-    </p>
-    <p class="text-lg font-semibold text-gray-700">
-      Description:
-      <span class="text-gray-900">{{ productDetails.description }}</span>
-    </p>
-    <p class="text-lg font-semibold text-gray-700">
-      Filament Type:
-      <span class="text-gray-900">{{ productDetails.filamentType }}</span>
-    </p>
-    <p class="text-lg font-semibold text-gray-700">
-      Color:
-      <span class="text-gray-900">{{ productDetails.color }}</span>
-    </p>
-    <p class="text-lg font-semibold text-gray-700">
-      Price:
-      <span class="text-gray-900">\${{ productDetails.price }}</span>
-    </p>
-    <p class="text-lg font-semibold text-gray-700">
-      STL:
-      <span class="text-gray-900 break-all">{{ productDetails.stl }}</span>
-    </p>
-    <p class="text-lg font-semibold text-gray-700">
-      Image:
-      <span class="text-gray-900 break-all">{{ productDetails.image }}</span>
-    </p>
+  @if (!isEditing() && productDetails) {
+    <div class="space-y-4">
+      <p class="text-lg font-semibold text-gray-700">
+        Name: <span class="text-gray-900">{{ productDetails.name }}</span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">
+        Description:
+        <span class="text-gray-900">{{ productDetails.description }}</span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">
+        Filament Type:
+        <span class="text-gray-900">{{ productDetails.filamentType }}</span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">
+        Color:
+        <span class="text-gray-900">{{ productDetails.color }}</span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">
+        Price:
+        <span class="text-gray-900">\${{ productDetails.price }}</span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">
+        STL:
+        <span class="text-gray-900 break-all">{{ productDetails.stl }}</span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">
+        Image:
+        <span class="text-gray-900 break-all">{{ productDetails.image }}</span>
+      </p>
 
-    <!-- Image Gallery Display -->
-    <div *ngIf="safeImageGallery.length > 0">
-      <p class="mb-2 text-lg font-semibold text-gray-700">Image Gallery ({{ safeImageGallery.length }} images):</p>
-
-      <!-- Debug section -->
-      <div class="p-4 mb-4 border border-yellow-200 rounded bg-yellow-50">
-        <p class="mb-2 text-sm font-semibold">Debug Information:</p>
-        <p class="text-xs text-gray-600">Raw imageGallery: {{ productDetails.imageGallery }}</p>
-        <p class="text-xs text-gray-600">Type: {{ typeof productDetails.imageGallery }}</p>
-        <p class="text-xs text-gray-600">Safe array length: {{ safeImageGallery.length }}</p>
-        <div *ngFor="let image of safeImageGallery; let i = index" class="mb-2">
-          <p class="text-xs text-gray-600">Image {{ i + 1 }}: {{ image }}</p>
-          <p class="text-xs text-gray-600">Length: {{ image.length }} characters</p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        <div *ngFor="let image of safeImageGallery; let i = index" class="border-2 border-gray-200 rounded-lg">
-          <img
-            [src]="image"
-            [alt]="'Gallery image ' + (i + 1)"
-            class="object-cover w-full h-32 rounded-lg shadow-md"
-          >
-          <p class="p-1 text-xs text-gray-600 break-all">{{ image }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  } @if (isEditing && productForm) {
-  <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="space-y-4">
-    <label class="block">
-      <span class="text-gray-700">Name</span>
-      <input
-        type="text"
-        formControlName="name"
-        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
-      />
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">Description</span>
-      <textarea
-        formControlName="description"
-        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
-        rows="3"
-      ></textarea>
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">Image URL</span>
-      <input
-        type="text"
-        formControlName="image"
-        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
-      />
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">STL File URL</span>
-      <input
-        type="text"
-        formControlName="stl"
-        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
-      />
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">Price</span>
-      <input
-        type="number"
-        formControlName="price"
-        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
-      />
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">Filament Type</span>
-      <select
-        formControlName="filamentType"
-        class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
-      >
-        <option value="PLA">PLA</option>
-        <option value="PETG">PETG</option>
-      </select>
-    </label>
-
-    <div class="flex flex-col">
-      <p>Loaded {{ colorOptions().length || 0 }} colors</p>
-
-      <label class="text-gray-700">Color</label>
-      <app-color-picker
-        [filamentType]="productForm.get('filamentType')?.value"
-        [model]="colorControl.value"
-        (modelChange)="colorControl.setValue($event)"
-      ></app-color-picker>
-    </div>
-
-    <!-- Image Gallery Editing -->
-    <div class="flex flex-col">
-      <label class="mb-2 text-gray-700">Image Gallery</label>
-      <div class="flex flex-col space-y-2">
-        <app-upload (uploaded)="onGalleryImageUpload($event)" />
-        <pre>Image gallery: {{ imageGallery() | json }}</pre>
-        <div *ngIf="imageGallery().length > 0" class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
-          <div *ngFor="let image of imageGallery(); let i = index" class="relative group">
-            <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
-            <button
-              type="button"
-              (click)="removeGalleryImage(i)"
-              class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
-              title="Remove image"
-            >
-              ×
-            </button>
+      <!-- Image Gallery Display -->
+      @if (safeImageGallery.length > 0) {
+        <div>
+          <p class="mb-2 text-lg font-semibold text-gray-700">Image Gallery ({{ safeImageGallery.length }} images):</p>
+          <!-- Debug section -->
+          <div class="p-4 mb-4 border border-yellow-200 rounded bg-yellow-50">
+            <p class="mb-2 text-sm font-semibold">Debug Information:</p>
+            <p class="text-xs text-gray-600">Raw imageGallery: {{ productDetails.imageGallery }}</p>
+            <p class="text-xs text-gray-600">Type: {{ typeof productDetails.imageGallery }}</p>
+            <p class="text-xs text-gray-600">Safe array length: {{ safeImageGallery.length }}</p>
+            @for (image of safeImageGallery; track image; let i = $index) {
+              <div class="mb-2">
+                <p class="text-xs text-gray-600">Image {{ i + 1 }}: {{ image }}</p>
+                <p class="text-xs text-gray-600">Length: {{ image.length }} characters</p>
+              </div>
+            }
+          </div>
+          <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            @for (image of safeImageGallery; track image; let i = $index) {
+              <div class="border-2 border-gray-200 rounded-lg">
+                <img
+                  [src]="image"
+                  [alt]="'Gallery image ' + (i + 1)"
+                  class="object-cover w-full h-32 rounded-lg shadow-md"
+                  >
+                <p class="p-1 text-xs text-gray-600 break-all">{{ image }}</p>
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
     </div>
+    } @if (isEditing() && productForm) {
+    <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="space-y-4">
+      <label class="block">
+        <span class="text-gray-700">Name</span>
+        <input
+          type="text"
+          formControlName="name"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+          />
+      </label>
 
-    <div class="flex justify-end mt-4 space-x-4">
-      <button
-        type="submit"
-        class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
-        [disabled]="productForm.invalid"
-      >
-        Save
-      </button>
-      <button
-        type="button"
-        class="px-4 py-2 text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
-        (click)="isEditing = false"
-      >
-        Cancel
-      </button>
-    </div>
-  </form>
+      <label class="block">
+        <span class="text-gray-700">Description</span>
+        <textarea
+          formControlName="description"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+          rows="3"
+        ></textarea>
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700">Image URL</span>
+        <input
+          type="text"
+          formControlName="image"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+          />
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700">STL File URL</span>
+        <input
+          type="text"
+          formControlName="stl"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+          />
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700">Price</span>
+        <input
+          type="number"
+          formControlName="price"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+          />
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700">Filament Type</span>
+        <select
+          formControlName="filamentType"
+          class="block w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+          >
+          <option value="PLA">PLA</option>
+          <option value="PETG">PETG</option>
+        </select>
+      </label>
+
+      <div class="flex flex-col">
+        <p>Loaded {{ colorOptions().length || 0 }} colors</p>
+
+        <label class="text-gray-700">Color</label>
+        <app-color-picker
+          [filamentType]="productForm.get('filamentType')?.value"
+          [model]="colorControl.value"
+          (modelChange)="colorControl.setValue($event)"
+        ></app-color-picker>
+      </div>
+
+      <!-- Image Gallery Editing -->
+      <div class="flex flex-col">
+        <label class="mb-2 text-gray-700">Image Gallery</label>
+        <div class="flex flex-col space-y-2">
+          <app-upload (uploaded)="onGalleryImageUpload($event)" />
+          <pre>Image gallery: {{ imageGallery() | json }}</pre>
+          @if (imageGallery().length > 0) {
+            <div class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
+              @for (image of imageGallery(); track image; let i = $index) {
+                <div class="relative group">
+                  <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
+                  <button
+                    type="button"
+                    (click)="removeGalleryImage(i)"
+                    class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
+                    title="Remove image"
+                    >
+                    ×
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4 space-x-4">
+        <button
+          type="submit"
+          class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+          [disabled]="productForm.invalid"
+          >
+          Save
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
+          (click)="isEditing.set(false)"
+          >
+          Cancel
+        </button>
+      </div>
+    </form>
   }
 </div>

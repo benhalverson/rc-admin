@@ -6,106 +6,105 @@
       class="text-lg font-bold text-white hover:text-yellow-300"
       data-cy="home-link"
       >Home</a
-    >
-    <ul class="space-x-6 hidden: md:flex">
-      <!-- Show Add Product only when authenticated -->
-      @if (authStore.isAuthenticated()) {
-        <li>
-          <a
-            routerLink="/add-product"
-            routerLinkActive="router-link-active"
-            class="text-white hover:text-yellow-300"
-            data-cy="add-product-link"
-            >Add Product</a
-          >
-        </li>
-      }
-
-      <!-- Show Sign-in only when not authenticated -->
-      @if (!authStore.isAuthenticated()) {
-        <li>
-          <a
-            routerLink="/signin"
-            routerLinkActive="router-link-active"
-            class="text-white hover:text-yellow-300"
-            data-cy="signin-link"
-            >Sign-in</a
-          >
-        </li>
-      }
-
-      <!-- Show Logout only when authenticated -->
-      @if (authStore.isAuthenticated()) {
-        <li>
-          <button
-            (click)="logout()"
-            class="text-white hover:text-yellow-300"
-            data-cy="logout-button"
-            >Logout</button
-          >
-        </li>
-      }
-    </ul>
-
-    <button (click)="toggleMobileMenu()" data-cy="mobile-menu-toggle">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16m-7 6h7"
-        />
-      </svg>
-    </button>
-  </div>
+      <ul class="space-x-6 hidden: md:flex">
+        <!-- Show Add Product only when authenticated -->
+        @if (authStore.isAuthenticated()) {
+          <li>
+            <a
+              routerLink="/add-product"
+              routerLinkActive="router-link-active"
+              class="text-white hover:text-yellow-300"
+              data-cy="add-product-link"
+              >Add Product</a
+              >
+            </li>
+          }
 
-  <ul *ngIf="isMobileMenuOpen" class="mt-4 space-y-2 md:hidden" data-cy="mobile-menu">
-    <li>
-      <a
-        [routerLink]="['/']"
-        routerLinkActive="text-yellow-300"
-        class="block text-white hover:text-yellow-300"
-        data-cy="mobile-home-link"
-        >Home</a
-      >
+          <!-- Show Sign-in only when not authenticated -->
+          @if (!authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/signin"
+                routerLinkActive="router-link-active"
+                class="text-white hover:text-yellow-300"
+                data-cy="signin-link"
+                >Sign-in</a
+                >
+              </li>
+            }
 
-      <!-- Mobile menu: Show Add Product only when authenticated -->
-      @if (authStore.isAuthenticated()) {
-        <a
-          [routerLink]="['/add-product']"
-          routerLinkActive="text-yellow-300"
-          class="block text-white hover:text-yellow-300"
-          data-cy="mobile-add-product-link"
-          >Add Product</a
-        >
-      }
+            <!-- Show Logout only when authenticated -->
+            @if (authStore.isAuthenticated()) {
+              <li>
+                <button
+                  (click)="logout()"
+                  class="text-white hover:text-yellow-300"
+                  data-cy="logout-button"
+                  >Logout</button
+                  >
+                </li>
+              }
+            </ul>
 
-      <!-- Mobile menu: Show Sign-in only when not authenticated -->
-      @if (!authStore.isAuthenticated()) {
-        <a
-          [routerLink]="['/signin']"
-          routerLinkActive="text-yellow-300"
-          class="block text-white hover:text-yellow-300"
-          data-cy="mobile-signin-link"
-          >Sign-in</a
-        >
-      }
+            <button (click)="toggleMobileMenu()" data-cy="mobile-menu-toggle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                  />
+              </svg>
+            </button>
+          </div>
 
-      <!-- Mobile menu: Show Logout only when authenticated -->
-      @if (authStore.isAuthenticated()) {
-        <button
-          (click)="logout()"
-          class="block text-white hover:text-yellow-300"
-          data-cy="mobile-logout-button"
-          >Logout</button
-        >
-      }
-    </li>
-  </ul>
-</nav>
+          @if (isMobileMenuOpen) {
+            <ul class="mt-4 space-y-2 md:hidden" data-cy="mobile-menu">
+              <li>
+                <a
+                  [routerLink]="['/']"
+                  routerLinkActive="text-yellow-300"
+                  class="block text-white hover:text-yellow-300"
+                  data-cy="mobile-home-link"
+                  >Home</a
+                  >
+                  <!-- Mobile menu: Show Add Product only when authenticated -->
+                  @if (authStore.isAuthenticated()) {
+                    <a
+                      [routerLink]="['/add-product']"
+                      routerLinkActive="text-yellow-300"
+                      class="block text-white hover:text-yellow-300"
+                      data-cy="mobile-add-product-link"
+                      >Add Product</a
+                      >
+                    }
+                    <!-- Mobile menu: Show Sign-in only when not authenticated -->
+                    @if (!authStore.isAuthenticated()) {
+                      <a
+                        [routerLink]="['/signin']"
+                        routerLinkActive="text-yellow-300"
+                        class="block text-white hover:text-yellow-300"
+                        data-cy="mobile-signin-link"
+                        >Sign-in</a
+                        >
+                      }
+                      <!-- Mobile menu: Show Logout only when authenticated -->
+                      @if (authStore.isAuthenticated()) {
+                        <button
+                          (click)="logout()"
+                          class="block text-white hover:text-yellow-300"
+                          data-cy="mobile-logout-button"
+                          >Logout</button
+                          >
+                        }
+                      </li>
+                    </ul>
+                  }
+                </nav>

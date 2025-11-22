@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
 	FormBuilder,
 	FormControl,
@@ -29,12 +29,13 @@ import { Upload } from '../upload/upload';
 	imports: [ReactiveFormsModule, ColorPickerComponent, CommonModule, Upload],
 	templateUrl: './product-details.component.html',
 	styleUrl: './product-details.component.css',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductDetailsComponent {
 	productForm!: FormGroup;
 	colorControl = new FormControl<string | null>(null);
 	productDetails: Product | null = null;
-	isEditing = false;
+	isEditing = signal(false);
 	colorOptions = signal<FilamentColorsResponse[]>([]);
 	isLoading = signal(false);
 	filteredColorOptions = signal<FilamentColorsResponse[]>([]);
@@ -74,8 +75,8 @@ export class ProductDetailsComponent {
 				switchMap((params: Params) =>
 					this.productService.getProductById(Number(params['id'])),
 				),
-				tap((product) => {
-					// Parse imageGallery if it's a string
+				tap((product: Product) => {
+					// Existing logic...
 					if (
 						product.imageGallery &&
 						typeof product.imageGallery === 'string'
@@ -88,7 +89,6 @@ export class ProductDetailsComponent {
 						}
 					}
 
-					// Ensure imageGallery is always an array
 					if (!Array.isArray(product.imageGallery)) {
 						product.imageGallery = [];
 					}
@@ -98,14 +98,17 @@ export class ProductDetailsComponent {
 
 					const initialColors = this.route.snapshot.data['colorOptions'];
 					this.colorOptions.set(initialColors);
-
 					this.updateFilteredColorOptions();
 
 					this.productForm
 						.get('filamentType')
-						?.valueChanges.subscribe((filamentType) => {
-							this.fetchColorsByFilamentType(filamentType);
-						});
+						?.valueChanges.subscribe((ft) =>
+							this.fetchColorsByFilamentType(ft),
+						);
+				}),
+				catchError((error) => {
+					console.error('Failed to load product:', error);
+					return of(null);
 				}),
 				takeUntil(this.destroy$),
 			)
@@ -172,7 +175,7 @@ export class ProductDetailsComponent {
 			.pipe(
 				tap(() => {
 					this.productDetails = updatedProduct;
-					this.isEditing = false;
+					this.isEditing.set(false);
 					this.toastr.success('Product updated successfully');
 				}),
 				catchError((error) => {

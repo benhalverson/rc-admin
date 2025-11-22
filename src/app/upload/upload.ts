@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import {
 	FormBuilder,
@@ -11,7 +10,7 @@ import { UploadStore } from './upload.store';
 
 @Component({
 	selector: 'app-upload',
-	imports: [CommonModule, ReactiveFormsModule],
+	imports: [ReactiveFormsModule],
 	templateUrl: './upload.html',
 	styleUrl: './upload.css',
 })
