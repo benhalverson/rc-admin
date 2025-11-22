@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Filament } from '../types/filament';
 import { ProductService } from '../product.service';
 
 @Component({
@@ -17,7 +16,7 @@ export class ColorPickerComponent implements OnInit {
   @Output() modelChange = new EventEmitter<string>();
 
   // Use computed signals from the product service
-  colorOptions = computed(() => this.productService.colors().filaments);
+  colorOptions = computed(() => this.productService.colors()?.filaments ?? []);
   isLoading = computed(() => this.productService.colorsLoading());
 
   constructor() {

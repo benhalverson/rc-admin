@@ -1,8 +1,10 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
-import { ProductResponse } from '../product.service';
+import { ProductDeleteResponse, ProductResponse, ProductService } from '../product.service';
+import { catchError, tap, EMPTY, finalize } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-card',
@@ -13,9 +15,30 @@ import { ProductResponse } from '../product.service';
 })
 export class ProductCardComponent {
   product = input.required<ProductResponse>();
-
-  onImageError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y5ZmFmYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0iQXJpYWwiIGZpbGw9IiM2YjcyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+  service = inject(ProductService);
+  toastService = inject(ToastrService);
+  products = this.service.productsResource;
+  
+  delete() {
+    return this.service.deleteProduct({ id: this.product().id } as ProductResponse)
+      .pipe(
+        tap((data) => {
+          const response = data as unknown as ProductDeleteResponse;
+          this.toastService.success(`${response.message}`, 'Success');
+        }),
+        finalize(() => {
+          this.products.reload();
+        }),
+        catchError((error) => {
+          if (error instanceof Error) {
+            this.toastService.error(`Error deleting product: ${error.message}`, 'Error');
+          } else {
+            this.toastService.error('Error deleting product', 'Error');
+          }
+          return EMPTY;
+        })
+      )
+      .subscribe();
   }
 }
+

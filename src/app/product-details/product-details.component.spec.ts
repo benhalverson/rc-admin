@@ -396,28 +396,7 @@ describe('ProductDetailsComponent', () => {
       expect(component.productForm.get('imageGallery')?.value).toEqual(['image1.jpg', 'image3.jpg']);
     });
 
-    it('should handle image load success', () => {
-      const testUrl = 'https://example.com/test.jpg';
-
-      // Should not throw any errors
-      expect(() => component.onImageLoad(testUrl)).not.toThrow();
-    });
-
-    it('should handle image load error', () => {
-      spyOn(console, 'error');
-      const mockEvent = {
-        target: {
-          naturalWidth: 0,
-          naturalHeight: 0,
-          src: 'https://example.com/broken.jpg'
-        }
-      };
-      const testUrl = 'https://example.com/broken.jpg';
-
-      component.onImageError(mockEvent, testUrl);
-
-      expect(console.error).toHaveBeenCalledWith('Image failed to load:', testUrl);
-    });
+   
   });
 
   describe('Component Lifecycle', () => {

@@ -3,12 +3,14 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
-import { FilamentColorsResponse, Filament } from './types/filament';
+import type { FilamentResponse, FilamentColorsResponse } from './types/filament';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
+
+  // constructor(private readonly http: HttpClient) {}
   private http = inject(HttpClient);
   baseUrl = environment.baseurl;
 
@@ -17,7 +19,7 @@ export class ProductService {
   // Signals for managing state
   private productsSignal = signal<ProductResponse[]>([]);
   private productsLoadingSignal = signal(false);
-  private colorsSignal = signal<FilamentColorsResponse>({ filaments: [] });
+  private colorsSignal = signal<FilamentColorsResponse | null>(null);
   private colorsLoadingSignal = signal(false);
 
   // Computed signals for easy access
@@ -29,31 +31,27 @@ export class ProductService {
   readonly productsResource = httpResource<ProductResponse[]>(() => {
     return `${this.baseUrl}/products`;
   });
-  /** @deprecated use productsResource instead */
-  getProducts(): Observable<ProductResponse[]> {
-    this.productsLoadingSignal.set(true);
-    return this.http.get<ProductResponse[]>(`${this.baseUrl}/products`).pipe(
-      tap(products => {
-        this.productsSignal.set(products);
-        this.productsLoadingSignal.set(false);
-      })
-    );
+
+  reload() {
+    return this.productsResource.reload();
   }
 
   getColors(filamentType: 'PLA' | 'PETG'): Observable<FilamentColorsResponse> {
     this.colorsLoadingSignal.set(true);
-    return this.http.get<Filament[]>(`${this.baseUrl}/colors`, {
+    // The backend returns an array of `FilamentResponse` objects.
+    return this.http.get<FilamentResponse[]>(`${this.baseUrl}/colors`, {
       params: { filamentType },
     }).pipe(
-      map((colors: Filament[]) => ({
-        filaments: colors.map(color => ({
-          filament: color.filament,
-          hexColor: color.hexColor,
-          colorTag: color.colorTag
+      map((colors) => ({
+        filaments: colors.map(c => ({
+          // Map the backend response to the client-facing Filament shape
+          filament: c.profile || '',
+          hexColor: c.hexValue?.startsWith('#') ? c.hexValue : `#${c.hexValue}`,
+          colorTag: c.color || c.name || ''
         }))
       })),
-      tap(colorsResponse => {
-        this.colorsSignal.set(colorsResponse);
+      tap((colorResponses: FilamentColorsResponse)=> {
+        this.colorsSignal.set(colorResponses);
         this.colorsLoadingSignal.set(false);
       })
     );
@@ -67,14 +65,14 @@ export class ProductService {
     return this.http.put<void>(`${this.baseUrl}/update-product`, product);
   }
 
+  deleteProduct(product: ProductResponse): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/delete-product/${product.id}`);
+  }
+
   createProduct(product: Product): Observable<ProductResponse> {
     return this.http.post<ProductResponse>(`${this.baseUrl}/add-product`, product);
   }
 
-  // Method to manually refresh products
-  refreshProducts(): void {
-    this.getProducts().subscribe();
-  }
 }
 
 export interface ProductResponse extends Product {
@@ -92,3 +90,7 @@ export interface Product {
   imageGallery?: string[];
 }
 
+export interface ProductDeleteResponse {
+  success: boolean,
+  message: string;
+}

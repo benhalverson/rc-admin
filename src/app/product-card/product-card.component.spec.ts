@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ToastrModule } from 'ngx-toastr';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
 
 import { ProductCardComponent } from './product-card.component';
-import { ProductResponse } from '../product.service';
+import { ProductResponse, ProductService } from '../product.service';
 
 describe('ProductCardComponent', () => {
   let component: ProductCardComponent;
@@ -24,7 +25,7 @@ describe('ProductCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProductCardComponent, RouterTestingModule]
+      imports: [ProductCardComponent, RouterTestingModule, HttpClientTestingModule, ToastrModule.forRoot()],
     })
     .compileComponents();
 
@@ -70,13 +71,12 @@ describe('ProductCardComponent', () => {
 
     expect(linkElement).toBeTruthy();
     expect(linkElement.nativeElement.textContent.trim()).toBe('View Details');
-  });  it('should handle image error by setting fallback image', () => {
+  });
+
+  it('should render the provided image src', () => {
     const imageElement = fixture.debugElement.query(By.css('img'));
-    const mockEvent = { target: imageElement.nativeElement } as any;
 
-    component.onImageError(mockEvent);
-
-    expect(imageElement.nativeElement.src).toContain('data:image/svg+xml');
+    expect(imageElement.nativeElement.src).toContain('https://example.com/test-image.jpg');
   });
 
   it('should apply hover classes for transitions', () => {

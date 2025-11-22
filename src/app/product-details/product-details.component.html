@@ -61,8 +61,6 @@
             [src]="image"
             [alt]="'Gallery image ' + (i + 1)"
             class="object-cover w-full h-32 rounded-lg shadow-md"
-            (error)="onImageError($event, image)"
-            (load)="onImageLoad(image)"
           >
           <p class="p-1 text-xs text-gray-600 break-all">{{ image }}</p>
         </div>

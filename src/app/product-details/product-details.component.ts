@@ -197,19 +197,6 @@ export class ProductDetailsComponent {
     this.productForm.get('imageGallery')?.setValue(updatedGallery);
   }
 
-  onImageLoad(imageUrl: string) {
-    // Image loaded successfully
-  }
-
-  onImageError(event: any, imageUrl: string) {
-    console.error('Image failed to load:', imageUrl);
-    console.error('Error event:', event);
-    // Try to provide fallback or debugging info
-    const img = event.target as HTMLImageElement;
-    console.error('Image natural dimensions:', img.naturalWidth, img.naturalHeight);
-    console.error('Image current src:', img.src);
-  }
-
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

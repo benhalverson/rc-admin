@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ProductService } from '../product.service';
+import { ProductResponse, ProductService } from '../product.service';
 import { ProductCardComponent } from '../product-card/product-card.component';
 
 @Component({

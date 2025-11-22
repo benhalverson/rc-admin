@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ProductService, Product, ProductResponse } from './product.service';
 import { environment } from '../environments/environment';
-import { FilamentColorsResponse, Filament } from './types/filament';
+import type { FilamentResponse, FilamentColorsResponse } from './types/filament';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -26,23 +27,32 @@ describe('ProductService', () => {
 
   const mockProductResponse: ProductResponse[] = [mockSingleProductResponse];
 
-  const mockFilamentColorsArray: Filament[] = [
-    { filament: 'PLA RED', hexColor: '#f91010', colorTag: 'red' },
-    { filament: 'PLA BLUE', hexColor: '#0db9f2', colorTag: 'blue' }
+  // Backend-shaped response (what the API returns)
+  const mockFilamentColorsArray: FilamentResponse[] = [
+    { name: 'PLA RED', provider: 'Provider A', public: true, available: true, color: 'red', profile: 'PLA RED', hexValue: '#f91010', publicId: '1' },
+    { name: 'PLA BLUE', provider: 'Provider A', public: true, available: true, color: 'blue', profile: 'PLA BLUE', hexValue: '#0db9f2', publicId: '2' }
   ];
 
+  // Expected client-facing shape after mapping
   const mockFilamentColors: FilamentColorsResponse = {
-    filaments: mockFilamentColorsArray
+    filaments: [
+      { filament: 'PLA RED', hexColor: '#f91010', colorTag: 'red' },
+      { filament: 'PLA BLUE', hexColor: '#0db9f2', colorTag: 'blue' }
+    ]
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProductService]
+      providers: [ProductService,
+        // provideHttpClient(),
+        // provideHttpClientTesting()
+      ]
     });
     service = TestBed.inject(ProductService);
     httpMock = TestBed.inject(HttpTestingController);
   });
+
 
   afterEach(() => {
     httpMock.verify();
@@ -55,31 +65,6 @@ describe('ProductService', () => {
 
     it('should have correct baseUrl', () => {
       expect(service.baseUrl).toBe(environment.baseurl);
-    });
-  });
-
-  describe('getProducts', () => {
-    it('should retrieve products from API', () => {
-      service.getProducts().subscribe(response => {
-        expect(response).toEqual(mockProductResponse);
-      });
-
-      const req = httpMock.expectOne(`${environment.baseurl}/products`);
-      expect(req.request.method).toBe('GET');
-      req.flush(mockProductResponse);
-    });
-
-    it('should handle getProducts error', () => {
-      service.getProducts().subscribe({
-        next: () => fail('Expected an error'),
-        error: (error) => {
-          expect(error.status).toBe(500);
-          expect(error.statusText).toBe('Internal Server Error');
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.baseurl}/products`);
-      req.flush({ error: 'Server error' }, { status: 500, statusText: 'Internal Server Error' });
     });
   });
 
@@ -98,12 +83,12 @@ describe('ProductService', () => {
     });
 
     it('should retrieve PETG colors from API', () => {
-      const petgColorsArray: Filament[] = [
-        { filament: 'PETG CLEAR', hexColor: '#ffffff', colorTag: 'clear' }
+      const petgBackendArray: FilamentResponse[] = [
+        { name: 'PETG CLEAR', provider: 'Provider B', public: true, available: true, color: 'clear', profile: 'PETG CLEAR', hexValue: '#ffffff', publicId: '3' }
       ];
 
       const petgColors: FilamentColorsResponse = {
-        filaments: petgColorsArray
+        filaments: [ { filament: 'PETG CLEAR', hexColor: '#ffffff', colorTag: 'clear' } ]
       };
 
       service.getColors('PETG').subscribe(response => {
@@ -114,7 +99,7 @@ describe('ProductService', () => {
       const req = httpMock.expectOne(`${environment.baseurl}/colors?filamentType=PETG`);
       expect(req.request.method).toBe('GET');
       expect(req.request.params.get('filamentType')).toBe('PETG');
-      req.flush(petgColorsArray);
+      req.flush(petgBackendArray);
     });
 
     it('should handle getColors error', () => {
@@ -245,4 +230,19 @@ describe('ProductService', () => {
       req.flush(expectedResponse);
     });
   });
-});
+
+  describe('deleteProduct', () => {
+
+    it('should delete an existing product', () => {
+    const productId = 1;
+    service.deleteProduct(mockSingleProductResponse).subscribe(response => {
+      const res = response as unknown as { message: string; };
+      expect(res.message).toBe('Product deleted successfully');
+    });
+
+    const req = httpMock.expectOne(`${environment.baseurl}/delete-product/${productId}`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ message: 'Product deleted successfully' });
+    });
+  });
+  });
