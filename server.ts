@@ -1,5 +1,5 @@
-import { renderApplication } from "@angular/platform-server";
-import bootstrap from "./src/main.server";
+import { renderApplication } from '@angular/platform-server';
+import bootstrap from './src/main.server';
 
 interface Env {
 	ASSETS: { fetch: typeof fetch };
@@ -10,10 +10,9 @@ interface Env {
 // See tools/bundle.mjs
 async function workerFetchHandler(request: Request, env: Env) {
 	const url = new URL(request.url);
-	console.log("render SSR", url.href);
 
 	// Get the root `index.html` content.
-	const indexUrl = new URL("/", url);
+	const indexUrl = new URL('/', url);
 	const indexResponse = await env.ASSETS.fetch(new Request(indexUrl));
 	const document = await indexResponse.text();
 
@@ -28,7 +27,8 @@ async function workerFetchHandler(request: Request, env: Env) {
 
 export default {
 	fetch: (request: Request, env: Env) =>
-		(globalThis as any)["__zone_symbol__Promise"].resolve(
-			workerFetchHandler(request, env)
+		// biome-ignore lint/suspicious/noExplicitAny: This is fine...
+		(globalThis as any).__zone_symbol__Promise.resolve(
+			workerFetchHandler(request, env),
 		),
 };

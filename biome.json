@@ -6,7 +6,7 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!!**/dist"]
+		"includes": ["**", "!!**/dist", "!!cypress"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -15,10 +15,32 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"suspicious": {
+				"noUnknownAtRules": "off"
+			},
+			"style": {
+				"useImportType": "off"
+			},
+			"complexity": {
+				"useLiteralKeys": "off"
+			}
 		}
 	},
 	"javascript": {
+		"formatter": {
+			"quoteStyle": "single"
+		}
+	},
+	"html": {
+		"parser": {
+			"interpolation": true
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		},
 		"formatter": {
 			"quoteStyle": "single"
 		}

@@ -1,5 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
@@ -8,202 +8,242 @@ import { UploadService } from './upload.service';
 import { UploadStore } from './upload.store';
 
 describe('Upload Component', () => {
-  let component: Upload;
-  let fixture: ComponentFixture<Upload>;
-  let uploadService: jasmine.SpyObj<UploadService>;
-  let mockUploadStore: any;
+	let component: Upload;
+	let fixture: ComponentFixture<Upload>;
+	let uploadService: jasmine.SpyObj<UploadService>;
+	let mockUploadStore: any;
 
-  const mockUploadResponse = {
-    message: 'File uploaded successfully',
-    key: 'test-file-key-123',
-    url: 'https://example.com/uploaded-file.jpg'
-  };
+	const mockUploadResponse = {
+		message: 'File uploaded successfully',
+		key: 'test-file-key-123',
+		url: 'https://example.com/uploaded-file.jpg',
+	};
 
-  beforeEach(async () => {
-    const uploadServiceSpy = jasmine.createSpyObj('UploadService', ['uploadFile']);
+	beforeEach(async () => {
+		const uploadServiceSpy = jasmine.createSpyObj('UploadService', [
+			'uploadFile',
+		]);
 
-    // Create mock store with the methods we need
-    mockUploadStore = {
-      setFile: jasmine.createSpy('setFile'),
-      setMessage: jasmine.createSpy('setMessage'),
-      reset: jasmine.createSpy('reset'),
-      isFileSelected: jasmine.createSpy('isFileSelected').and.returnValue(false),
-      selectedFile: jasmine.createSpy('selectedFile').and.returnValue(null),
-      message: jasmine.createSpy('message').and.returnValue('')
-    };
+		// Create mock store with the methods we need
+		mockUploadStore = {
+			setFile: jasmine.createSpy('setFile'),
+			setMessage: jasmine.createSpy('setMessage'),
+			reset: jasmine.createSpy('reset'),
+			isFileSelected: jasmine
+				.createSpy('isFileSelected')
+				.and.returnValue(false),
+			selectedFile: jasmine.createSpy('selectedFile').and.returnValue(null),
+			message: jasmine.createSpy('message').and.returnValue(''),
+		};
 
-    await TestBed.configureTestingModule({
-      imports: [Upload, HttpClientTestingModule, ReactiveFormsModule],
-      providers: [
-        { provide: UploadService, useValue: uploadServiceSpy },
-        { provide: UploadStore, useValue: mockUploadStore }
-      ]
-    }).compileComponents();
+		await TestBed.configureTestingModule({
+			imports: [Upload, HttpClientTestingModule, ReactiveFormsModule],
+			providers: [
+				{ provide: UploadService, useValue: uploadServiceSpy },
+				{ provide: UploadStore, useValue: mockUploadStore },
+			],
+		}).compileComponents();
 
-    fixture = TestBed.createComponent(Upload);
-    component = fixture.componentInstance;
-    uploadService = TestBed.inject(UploadService) as jasmine.SpyObj<UploadService>;
+		fixture = TestBed.createComponent(Upload);
+		component = fixture.componentInstance;
+		uploadService = TestBed.inject(
+			UploadService,
+		) as jasmine.SpyObj<UploadService>;
 
-    fixture.detectChanges();
-  });
+		fixture.detectChanges();
+	});
 
-  describe('Component Initialization', () => {
-    it('should create', () => {
-      expect(component).toBeTruthy();
-    });
+	describe('Component Initialization', () => {
+		it('should create', () => {
+			expect(component).toBeTruthy();
+		});
 
-    it('should initialize upload form', () => {
-      expect(component.uploadForm).toBeDefined();
-      expect(component.uploadForm.get('file')).toBeDefined();
-      expect(component.uploadForm.get('file')?.value).toBeNull();
-    });
+		it('should initialize upload form', () => {
+			expect(component.uploadForm).toBeDefined();
+			expect(component.uploadForm.get('file')).toBeDefined();
+			expect(component.uploadForm.get('file')?.value).toBeNull();
+		});
 
-    it('should have uploaded event emitter', () => {
-      expect(component.uploaded).toBeDefined();
-    });
-  });
+		it('should have uploaded event emitter', () => {
+			expect(component.uploaded).toBeDefined();
+		});
+	});
 
-  describe('File Selection', () => {
-    it('should handle file selection', () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      const mockEvent = {
-        target: { files: [mockFile] }
-      } as any;
+	describe('File Selection', () => {
+		it('should handle file selection', () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			const mockEvent = {
+				target: { files: [mockFile] },
+			} as any;
 
-      component.onFileSelected(mockEvent);
+			component.onFileSelected(mockEvent);
 
-      expect(mockUploadStore.setFile).toHaveBeenCalledWith(mockFile);
-      expect(component.uploadForm.get('file')?.value).toBe(mockFile);
-    });
+			expect(mockUploadStore.setFile).toHaveBeenCalledWith(mockFile);
+			expect(component.uploadForm.get('file')?.value).toBe(mockFile);
+		});
 
-    it('should handle no file selected', () => {
-      const mockEvent = {
-        target: { files: [] }
-      } as any;
+		it('should handle no file selected', () => {
+			const mockEvent = {
+				target: { files: [] },
+			} as any;
 
-      component.onFileSelected(mockEvent);
+			component.onFileSelected(mockEvent);
 
-      expect(mockUploadStore.setFile).toHaveBeenCalledWith(null);
-      expect(component.uploadForm.get('file')?.value).toBeNull();
-    });
+			expect(mockUploadStore.setFile).toHaveBeenCalledWith(null);
+			expect(component.uploadForm.get('file')?.value).toBeNull();
+		});
 
-    it('should handle null files array', () => {
-      const mockEvent = {
-        target: { files: null }
-      } as any;
+		it('should handle null files array', () => {
+			const mockEvent = {
+				target: { files: null },
+			} as any;
 
-      component.onFileSelected(mockEvent);
+			component.onFileSelected(mockEvent);
 
-      expect(mockUploadStore.setFile).toHaveBeenCalledWith(null);
-      expect(component.uploadForm.get('file')?.value).toBeNull();
-    });
-  });
+			expect(mockUploadStore.setFile).toHaveBeenCalledWith(null);
+			expect(component.uploadForm.get('file')?.value).toBeNull();
+		});
+	});
 
-  describe('File Upload', () => {
-    it('should upload file successfully', async () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      component.uploadForm.patchValue({ file: mockFile });
-      uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+	describe('File Upload', () => {
+		it('should upload file successfully', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
 
-      spyOn(component.uploaded, 'emit');
+			spyOn(component.uploaded, 'emit');
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(uploadService.uploadFile).toHaveBeenCalled();
-      expect(component.uploaded.emit).toHaveBeenCalledWith(mockUploadResponse.url);
-      expect(mockUploadStore.setMessage).toHaveBeenCalledWith(mockUploadResponse.message);
-      expect(component.uploadForm.get('file')?.value).toBeNull();
-    });
+			expect(uploadService.uploadFile).toHaveBeenCalled();
+			expect(component.uploaded.emit).toHaveBeenCalledWith(
+				mockUploadResponse.url,
+			);
+			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
+				mockUploadResponse.message,
+			);
+			expect(component.uploadForm.get('file')?.value).toBeNull();
+		});
 
-    it('should handle no file selected for upload', async () => {
-      component.uploadForm.patchValue({ file: null });
+		it('should handle no file selected for upload', async () => {
+			component.uploadForm.patchValue({ file: null });
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(mockUploadStore.setMessage).toHaveBeenCalledWith('No file selected.');
-      expect(uploadService.uploadFile).not.toHaveBeenCalled();
-    });
+			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
+				'No file selected.',
+			);
+			expect(uploadService.uploadFile).not.toHaveBeenCalled();
+		});
 
-    it('should handle upload error with Error object', async () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      component.uploadForm.patchValue({ file: mockFile });
-      const errorMessage = 'Network error';
-      uploadService.uploadFile.and.returnValue(throwError(() => new Error(errorMessage)));
+		it('should handle upload error with Error object', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			const errorMessage = 'Network error';
+			uploadService.uploadFile.and.returnValue(
+				throwError(() => new Error(errorMessage)),
+			);
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(mockUploadStore.setMessage).toHaveBeenCalledWith(`Upload failed: ${errorMessage}`);
-    });
+			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
+				`Upload failed: ${errorMessage}`,
+			);
+		});
 
-    it('should handle upload error with non-Error object', async () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      component.uploadForm.patchValue({ file: mockFile });
-      uploadService.uploadFile.and.returnValue(throwError(() => 'String error'));
+		it('should handle upload error with non-Error object', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadFile.and.returnValue(
+				throwError(() => 'String error'),
+			);
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(mockUploadStore.setMessage).toHaveBeenCalledWith('Upload failed: An error occurred during upload.');
-    });
+			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
+				'Upload failed: An error occurred during upload.',
+			);
+		});
 
-    it('should create FormData with correct file', async () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      component.uploadForm.patchValue({ file: mockFile });
-      uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+		it('should create FormData with correct file', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(uploadService.uploadFile).toHaveBeenCalledWith(jasmine.any(FormData));
+			expect(uploadService.uploadFile).toHaveBeenCalledWith(
+				jasmine.any(FormData),
+			);
 
-      // Verify FormData content
-      const formDataCall = uploadService.uploadFile.calls.mostRecent().args[0];
-      expect(formDataCall).toBeInstanceOf(FormData);
-    });
+			// Verify FormData content
+			const formDataCall = uploadService.uploadFile.calls.mostRecent().args[0];
+			expect(formDataCall).toBeInstanceOf(FormData);
+		});
 
-    it('should reset form after successful upload', async () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      component.uploadForm.patchValue({ file: mockFile });
-      uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+		it('should reset form after successful upload', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
 
-      expect(component.uploadForm.get('file')?.value).toBe(mockFile);
+			expect(component.uploadForm.get('file')?.value).toBe(mockFile);
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(component.uploadForm.get('file')?.value).toBeNull();
-    });
-  });
+			expect(component.uploadForm.get('file')?.value).toBeNull();
+		});
+	});
 
-  describe('Event Emitters', () => {
-    it('should emit uploaded event with correct URL', async () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      component.uploadForm.patchValue({ file: mockFile });
-      uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+	describe('Event Emitters', () => {
+		it('should emit uploaded event with correct URL', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
 
-      spyOn(component.uploaded, 'emit');
+			spyOn(component.uploaded, 'emit');
 
-      await component.onUpload();
+			await component.onUpload();
 
-      expect(component.uploaded.emit).toHaveBeenCalledWith(mockUploadResponse.url);
-      expect(component.uploaded.emit).toHaveBeenCalledTimes(1);
-    });
-  });
+			expect(component.uploaded.emit).toHaveBeenCalledWith(
+				mockUploadResponse.url,
+			);
+			expect(component.uploaded.emit).toHaveBeenCalledTimes(1);
+		});
+	});
 
-  describe('Form Integration', () => {
-    it('should update form when file is selected', () => {
-      const mockFile = new File(['test content'], 'test.stl', { type: 'application/octet-stream' });
-      const mockEvent = {
-        target: { files: [mockFile] }
-      } as any;
+	describe('Form Integration', () => {
+		it('should update form when file is selected', () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			const mockEvent = {
+				target: { files: [mockFile] },
+			} as any;
 
-      expect(component.uploadForm.get('file')?.value).toBeNull();
+			expect(component.uploadForm.get('file')?.value).toBeNull();
 
-      component.onFileSelected(mockEvent);
+			component.onFileSelected(mockEvent);
 
-      expect(component.uploadForm.get('file')?.value).toBe(mockFile);
-    });
+			expect(component.uploadForm.get('file')?.value).toBe(mockFile);
+		});
 
-    it('should access form builder injection', () => {
-      expect(component.uploadForm).toBeDefined();
-      expect(component.uploadForm.get('file')).toBeDefined();
-    });
-  });
+		it('should access form builder injection', () => {
+			expect(component.uploadForm).toBeDefined();
+			expect(component.uploadForm.get('file')).toBeDefined();
+		});
+	});
 });

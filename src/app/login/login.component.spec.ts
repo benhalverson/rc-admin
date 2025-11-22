@@ -1,242 +1,256 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { provideToastr } from 'ngx-toastr';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { provideToastr, ToastrService } from 'ngx-toastr';
 import { of, throwError } from 'rxjs';
-
-import { LoginComponent } from './login.component';
 import { AuthService } from '../auth.service';
-import { ToastrService } from 'ngx-toastr';
+import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
-  let authService: jasmine.SpyObj<AuthService>;
-  let toastrService: jasmine.SpyObj<ToastrService>;
-  let router: jasmine.SpyObj<Router>;
-  let activatedRoute: any;
+	let component: LoginComponent;
+	let fixture: ComponentFixture<LoginComponent>;
+	let authService: jasmine.SpyObj<AuthService>;
+	let toastrService: jasmine.SpyObj<ToastrService>;
+	let router: jasmine.SpyObj<Router>;
+	let activatedRoute: any;
 
-  beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['signin']);
-    const toastrServiceSpy = jasmine.createSpyObj('ToastrService', ['success', 'error']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+	beforeEach(async () => {
+		const authServiceSpy = jasmine.createSpyObj('AuthService', ['signin']);
+		const toastrServiceSpy = jasmine.createSpyObj('ToastrService', [
+			'success',
+			'error',
+		]);
+		const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
-    const activatedRouteMock = {
-      snapshot: {
-        queryParams: {}
-      }
-    };
+		const activatedRouteMock = {
+			snapshot: {
+				queryParams: {},
+			},
+		};
 
-    await TestBed.configureTestingModule({
-      imports: [LoginComponent, HttpClientTestingModule, RouterTestingModule, ReactiveFormsModule],
-      providers: [
-        provideAnimations(),
-        provideToastr({
-          timeOut: 3000,
-          positionClass: 'toast-top-right',
-          preventDuplicates: true,
-        }),
-        { provide: AuthService, useValue: authServiceSpy },
-        { provide: ToastrService, useValue: toastrServiceSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteMock }
-      ]
-    })
-    .compileComponents();
+		await TestBed.configureTestingModule({
+			imports: [
+				LoginComponent,
+				HttpClientTestingModule,
+				RouterTestingModule,
+				ReactiveFormsModule,
+			],
+			providers: [
+				provideAnimations(),
+				provideToastr({
+					timeOut: 3000,
+					positionClass: 'toast-top-right',
+					preventDuplicates: true,
+				}),
+				{ provide: AuthService, useValue: authServiceSpy },
+				{ provide: ToastrService, useValue: toastrServiceSpy },
+				{ provide: Router, useValue: routerSpy },
+				{ provide: ActivatedRoute, useValue: activatedRouteMock },
+			],
+		}).compileComponents();
 
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    toastrService = TestBed.inject(ToastrService) as jasmine.SpyObj<ToastrService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    activatedRoute = TestBed.inject(ActivatedRoute);
+		authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+		toastrService = TestBed.inject(
+			ToastrService,
+		) as jasmine.SpyObj<ToastrService>;
+		router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+		activatedRoute = TestBed.inject(ActivatedRoute);
 
-    fixture = TestBed.createComponent(LoginComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+		fixture = TestBed.createComponent(LoginComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('should create', () => {
+		expect(component).toBeTruthy();
+	});
 
-  it('should initialize form with empty values', () => {
-    expect(component.loginForm.value).toEqual({
-      email: '',
-      password: ''
-    });
-  });
+	it('should initialize form with empty values', () => {
+		expect(component.loginForm.value).toEqual({
+			email: '',
+			password: '',
+		});
+	});
 
-  it('should initialize returnUrl from query params', () => {
-    const testReturnUrl = '/dashboard';
-    activatedRoute.snapshot.queryParams = { returnUrl: testReturnUrl };
+	it('should initialize returnUrl from query params', () => {
+		const testReturnUrl = '/dashboard';
+		activatedRoute.snapshot.queryParams = { returnUrl: testReturnUrl };
 
-    const fb = TestBed.inject(FormBuilder);
-    const newComponent = new LoginComponent(
-      router,
-      activatedRoute,
-      authService,
-      fb,
-      toastrService
-    );
+		const fb = TestBed.inject(FormBuilder);
+		const newComponent = new LoginComponent(
+			router,
+			activatedRoute,
+			authService,
+			fb,
+			toastrService,
+		);
 
-    expect((newComponent as any).returnUrl).toBe(testReturnUrl);
-  });
+		expect((newComponent as any).returnUrl).toBe(testReturnUrl);
+	});
 
-  it('should use default returnUrl when no query params', () => {
-    activatedRoute.snapshot.queryParams = {};
+	it('should use default returnUrl when no query params', () => {
+		activatedRoute.snapshot.queryParams = {};
 
-    const fb = TestBed.inject(FormBuilder);
-    const newComponent = new LoginComponent(
-      router,
-      activatedRoute,
-      authService,
-      fb,
-      toastrService
-    );
+		const fb = TestBed.inject(FormBuilder);
+		const newComponent = new LoginComponent(
+			router,
+			activatedRoute,
+			authService,
+			fb,
+			toastrService,
+		);
 
-    expect((newComponent as any).returnUrl).toBe('/');
-  });
+		expect((newComponent as any).returnUrl).toBe('/');
+	});
 
-  it('should submit valid form successfully', async () => {
-    const mockResponse = { message: 'Login successful' };
-    authService.signin.and.returnValue(of(mockResponse));
+	it('should submit valid form successfully', async () => {
+		const mockResponse = { message: 'Login successful' };
+		authService.signin.and.returnValue(of(mockResponse));
 
-    component.loginForm.patchValue({
-      email: 'test@example.com',
-      password: 'password123'
-    });
+		component.loginForm.patchValue({
+			email: 'test@example.com',
+			password: 'password123',
+		});
 
-    await component.onSubmit();
+		await component.onSubmit();
 
-    expect(authService.signin).toHaveBeenCalledWith({
-      email: 'test@example.com',
-      password: 'password123'
-    });
-    expect(toastrService.success).toHaveBeenCalledWith('Login successful');
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/');
-  });
+		expect(authService.signin).toHaveBeenCalledWith({
+			email: 'test@example.com',
+			password: 'password123',
+		});
+		expect(toastrService.success).toHaveBeenCalledWith('Login successful');
+		expect(router.navigateByUrl).toHaveBeenCalledWith('/');
+	});
 
-  it('should handle signin error with error message', async () => {
-    const mockError = {
-      error: {
-        error: 'Invalid credentials'
-      }
-    };
-    authService.signin.and.returnValue(throwError(mockError));
+	it('should handle signin error with error message', async () => {
+		const mockError = {
+			error: {
+				error: 'Invalid credentials',
+			},
+		};
+		authService.signin.and.returnValue(throwError(mockError));
 
-    component.loginForm.patchValue({
-      email: 'test@example.com',
-      password: 'wrongpassword'
-    });
+		component.loginForm.patchValue({
+			email: 'test@example.com',
+			password: 'wrongpassword',
+		});
 
-    await component.onSubmit();
+		await component.onSubmit();
 
-    expect(toastrService.error).toHaveBeenCalledWith('Failed to login. Invalid credentials');
-  });
+		expect(toastrService.error).toHaveBeenCalledWith(
+			'Failed to login. Invalid credentials',
+		);
+	});
 
-  it('should handle signin error with details message', async () => {
-    const mockError = {
-      error: {
-        details: 'Account locked'
-      }
-    };
-    authService.signin.and.returnValue(throwError(mockError));
+	it('should handle signin error with details message', async () => {
+		const mockError = {
+			error: {
+				details: 'Account locked',
+			},
+		};
+		authService.signin.and.returnValue(throwError(mockError));
 
-    component.loginForm.patchValue({
-      email: 'test@example.com',
-      password: 'password123'
-    });
+		component.loginForm.patchValue({
+			email: 'test@example.com',
+			password: 'password123',
+		});
 
-    await component.onSubmit();
+		await component.onSubmit();
 
-    expect(toastrService.error).toHaveBeenCalledWith('Failed to login. Account locked');
-  });
+		expect(toastrService.error).toHaveBeenCalledWith(
+			'Failed to login. Account locked',
+		);
+	});
 
-  it('should handle signin error with unknown error', async () => {
-    const mockError = {
-      error: {}
-    };
-    authService.signin.and.returnValue(throwError(mockError));
+	it('should handle signin error with unknown error', async () => {
+		const mockError = {
+			error: {},
+		};
+		authService.signin.and.returnValue(throwError(mockError));
 
-    component.loginForm.patchValue({
-      email: 'test@example.com',
-      password: 'password123'
-    });
+		component.loginForm.patchValue({
+			email: 'test@example.com',
+			password: 'password123',
+		});
 
-    await component.onSubmit();
+		await component.onSubmit();
 
-    expect(toastrService.error).toHaveBeenCalledWith('Failed to login. Unknown error');
-  });
+		expect(toastrService.error).toHaveBeenCalledWith(
+			'Failed to login. Unknown error',
+		);
+	});
 
-  it('should not submit invalid form', async () => {
-    // Leave form invalid (empty required fields)
-    await component.onSubmit();
+	it('should not submit invalid form', async () => {
+		// Leave form invalid (empty required fields)
+		await component.onSubmit();
 
-    expect(authService.signin).not.toHaveBeenCalled();
-    expect(toastrService.success).not.toHaveBeenCalled();
-  });
+		expect(authService.signin).not.toHaveBeenCalled();
+		expect(toastrService.success).not.toHaveBeenCalled();
+	});
 
-  it('should handle custom return URL navigation', async () => {
-    // Set custom return URL
-    (component as any).returnUrl = '/products';
+	it('should handle custom return URL navigation', async () => {
+		// Set custom return URL
+		(component as any).returnUrl = '/products';
 
-    const mockResponse = { message: 'Welcome back!' };
-    authService.signin.and.returnValue(of(mockResponse));
+		const mockResponse = { message: 'Welcome back!' };
+		authService.signin.and.returnValue(of(mockResponse));
 
-    component.loginForm.patchValue({
-      email: 'test@example.com',
-      password: 'password123'
-    });
+		component.loginForm.patchValue({
+			email: 'test@example.com',
+			password: 'password123',
+		});
 
-    await component.onSubmit();
+		await component.onSubmit();
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/products');
-    expect(toastrService.success).toHaveBeenCalledWith('Welcome back!');
-  });
+		expect(router.navigateByUrl).toHaveBeenCalledWith('/products');
+		expect(toastrService.success).toHaveBeenCalledWith('Welcome back!');
+	});
 
-  it('should handle response without message', async () => {
-    const mockResponse = {}; // No message property
-    authService.signin.and.returnValue(of(mockResponse));
+	it('should handle response without message', async () => {
+		// Provide minimal user shape without message to trigger default toast
+		const mockResponse = { email: 'test@example.com' };
+		authService.signin.and.returnValue(of(mockResponse));
 
-    component.loginForm.patchValue({
-      email: 'test@example.com',
-      password: 'password123'
-    });
+		component.loginForm.patchValue({
+			email: 'test@example.com',
+			password: 'password123',
+		});
 
-    await component.onSubmit();
+		await component.onSubmit();
 
-    expect(toastrService.success).toHaveBeenCalledWith('Login successful');
-  });
+		expect(toastrService.success).toHaveBeenCalledWith('Login successful');
+	});
 
-  it('should validate email format', () => {
-    const emailControl = component.loginForm.get('email');
+	it('should validate email format', () => {
+		const emailControl = component.loginForm.get('email');
 
-    emailControl?.setValue('invalid-email');
-    expect(emailControl?.hasError('email')).toBeTruthy();
+		emailControl?.setValue('invalid-email');
+		expect(emailControl?.hasError('email')).toBeTruthy();
 
-    emailControl?.setValue('valid@email.com');
-    expect(emailControl?.hasError('email')).toBeFalsy();
-  });
+		emailControl?.setValue('valid@email.com');
+		expect(emailControl?.hasError('email')).toBeFalsy();
+	});
 
-  it('should require email field', () => {
-    const emailControl = component.loginForm.get('email');
+	it('should require email field', () => {
+		const emailControl = component.loginForm.get('email');
 
-    emailControl?.setValue('');
-    expect(emailControl?.hasError('required')).toBeTruthy();
+		emailControl?.setValue('');
+		expect(emailControl?.hasError('required')).toBeTruthy();
 
-    emailControl?.setValue('test@example.com');
-    expect(emailControl?.hasError('required')).toBeFalsy();
-  });
+		emailControl?.setValue('test@example.com');
+		expect(emailControl?.hasError('required')).toBeFalsy();
+	});
 
-  it('should require password field', () => {
-    const passwordControl = component.loginForm.get('password');
+	it('should require password field', () => {
+		const passwordControl = component.loginForm.get('password');
 
-    passwordControl?.setValue('');
-    expect(passwordControl?.hasError('required')).toBeTruthy();
+		passwordControl?.setValue('');
+		expect(passwordControl?.hasError('required')).toBeTruthy();
 
-    passwordControl?.setValue('password123');
-    expect(passwordControl?.hasError('required')).toBeFalsy();
-  });
+		passwordControl?.setValue('password123');
+		expect(passwordControl?.hasError('required')).toBeFalsy();
+	});
 });
