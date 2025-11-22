@@ -2,14 +2,14 @@
   <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-bold text-gray-800">Product Details</h2>
     <button
-      (click)="isEditing = !isEditing"
+      (click)="isEditing.set(!isEditing())"
       class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
       >
-      {{ isEditing ? "Cancel" : "Edit" }}
+      {{ isEditing()? "Cancel" : "Edit" }}
     </button>
   </div>
 
-  @if (!isEditing && productDetails) {
+  @if (!isEditing() && productDetails) {
     <div class="space-y-4">
       <p class="text-lg font-semibold text-gray-700">
         Name: <span class="text-gray-900">{{ productDetails.name }}</span>
@@ -71,7 +71,7 @@
         </div>
       }
     </div>
-    } @if (isEditing && productForm) {
+    } @if (isEditing() && productForm) {
     <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="space-y-4">
       <label class="block">
         <span class="text-gray-700">Name</span>
@@ -177,7 +177,7 @@
         <button
           type="button"
           class="px-4 py-2 text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
-          (click)="isEditing = false"
+          (click)="isEditing.set(false)"
           >
           Cancel
         </button>

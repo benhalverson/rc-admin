@@ -74,6 +74,13 @@ describe('ProductDetailsComponent', () => {
 	const mockColorsSignal = signal(mockFilaments);
 	const mockColorsLoadingSignal = signal(false);
 
+	// Helper to stabilize change detection (Angular 21 OnPush fix)
+	async function detectChanges() {
+		fixture.detectChanges();
+		await fixture.whenStable();
+		fixture.detectChanges();
+	}
+
 	beforeEach(async () => {
 		const productServiceSpy = jasmine.createSpyObj(
 			'ProductService',
@@ -147,7 +154,7 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should initialize with default values', () => {
-			expect(component.isEditing).toBe(false);
+			expect(component.isEditing()).toBe(false);
 			expect(component.productDetails).toBeNull();
 			expect(component.colorOptions()).toEqual([]);
 			expect(component.isLoading()).toBe(false);
@@ -180,7 +187,7 @@ describe('ProductDetailsComponent', () => {
 	});
 
 	describe('Image Gallery Processing', () => {
-		it('should handle imageGallery as array', () => {
+		it('should handle imageGallery as array', async () => {
 			const productWithArrayGallery = {
 				...mockProduct,
 				imageGallery: ['image1.jpg', 'image2.jpg'],
@@ -189,7 +196,7 @@ describe('ProductDetailsComponent', () => {
 				of(productWithArrayGallery),
 			);
 
-			fixture.detectChanges();
+			await detectChanges();
 
 			expect(component.safeImageGallery).toEqual(['image1.jpg', 'image2.jpg']);
 			expect(component.imageGallery()).toEqual(['image1.jpg', 'image2.jpg']);
@@ -233,11 +240,11 @@ describe('ProductDetailsComponent', () => {
 			expect(console.error).toHaveBeenCalled();
 		});
 
-		it('should handle null/undefined imageGallery', () => {
+		it('should handle null/undefined imageGallery', async () => {
 			const productWithoutGallery = { ...mockProduct, imageGallery: undefined };
 			productService.getProductById.and.returnValue(of(productWithoutGallery));
 
-			fixture.detectChanges();
+			await detectChanges();
 
 			expect(component.safeImageGallery).toEqual([]);
 		});
@@ -288,8 +295,8 @@ describe('ProductDetailsComponent', () => {
 	});
 
 	describe('Form Validation', () => {
-		beforeEach(() => {
-			fixture.detectChanges();
+		beforeEach(async () => {
+			await detectChanges();
 		});
 
 		it('should validate required name field', () => {
@@ -348,28 +355,29 @@ describe('ProductDetailsComponent', () => {
 	});
 
 	describe('Edit Mode', () => {
-		beforeEach(() => {
-			fixture.detectChanges();
+		beforeEach(async () => {
+			await detectChanges();
 		});
 
-		it('should toggle edit mode', () => {
-			expect(component.isEditing).toBe(false);
+		it('should toggle edit mode', async () => {
+			expect(component.isEditing()).toBe(false);
 
-			component.isEditing = !component.isEditing;
-			expect(component.isEditing).toBe(true);
+			component.isEditing.set(!component.isEditing());
+			await detectChanges();
+			expect(component.isEditing()).toBe(true);
 		});
 
-		it('should display edit button in view mode', () => {
-			component.isEditing = false;
-			fixture.detectChanges();
+		it('should display edit button in view mode', async () => {
+			component.isEditing.set(false);
+			await detectChanges();
 
 			const editButton = fixture.debugElement.query(By.css('button'));
 			expect(editButton.nativeElement.textContent.trim()).toBe('Edit');
 		});
 
-		it('should display cancel button in edit mode', () => {
-			component.isEditing = true;
-			fixture.detectChanges();
+		it('should display cancel button in edit mode', async () => {
+			component.isEditing.set(true);
+			await detectChanges();
 
 			const cancelButton = fixture.debugElement.query(By.css('button'));
 			expect(cancelButton.nativeElement.textContent.trim()).toBe('Cancel');
@@ -377,9 +385,9 @@ describe('ProductDetailsComponent', () => {
 	});
 
 	describe('Save Changes', () => {
-		beforeEach(() => {
-			fixture.detectChanges();
-			component.isEditing = true;
+		beforeEach(async () => {
+			await detectChanges();
+			component.isEditing.set(true);
 		});
 
 		it('should save valid form changes', () => {
@@ -396,7 +404,7 @@ describe('ProductDetailsComponent', () => {
 			expect(toastrService.success).toHaveBeenCalledWith(
 				'Product updated successfully',
 			);
-			expect(component.isEditing).toBe(false);
+			expect(component.isEditing()).toBe(false);
 		});
 
 		it('should not save invalid form', () => {
@@ -498,26 +506,27 @@ describe('ProductDetailsComponent', () => {
 	});
 
 	describe('Error Handling', () => {
-		it('should handle product loading error', () => {
+		it('should handle product loading error', async () => {
 			productService.getProductById.and.returnValue(
-				throwError('Loading Error'),
+				throwError(() => 'Loading Error'),
 			);
 			spyOn(console, 'error');
 
-			expect(() => {
-				fixture.detectChanges();
-			}).not.toThrow();
+			fixture.detectChanges();
+			await fixture.whenStable(); // 👈 prevents afterAll teardown error
+
+			expect(console.error).toHaveBeenCalled();
 		});
 	});
 
 	describe('Display Content', () => {
-		beforeEach(() => {
-			fixture.detectChanges();
+		beforeEach(async () => {
+			await detectChanges();
 		});
 
-		it('should display product details in view mode', () => {
-			component.isEditing = false;
-			fixture.detectChanges();
+		it('should display product details in view mode', async () => {
+			component.isEditing.set(false);
+			await detectChanges();
 
 			const compiled = fixture.nativeElement;
 			expect(compiled.textContent).toContain(mockProduct.name);
@@ -526,7 +535,7 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should display form inputs in edit mode', () => {
-			component.isEditing = true;
+			component.isEditing.set(true);
 			fixture.detectChanges();
 
 			const nameInput = fixture.debugElement.query(
