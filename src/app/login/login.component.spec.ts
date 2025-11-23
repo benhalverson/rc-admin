@@ -87,7 +87,9 @@ describe('LoginComponent', () => {
 	/**
 	 * Helper function to configure TestBed with custom ActivatedRoute query params
 	 */
-	function configureTestBedWithActivatedRoute(queryParams: Record<string, string>) {
+	function configureTestBedWithActivatedRoute(
+		queryParams: Record<string, string>,
+	) {
 		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({
 			imports: [
@@ -122,7 +124,9 @@ describe('LoginComponent', () => {
 
 	it('should initialize returnUrl from query params', () => {
 		const testReturnUrl = '/dashboard';
-		const { testComponent } = configureTestBedWithActivatedRoute({ returnUrl: testReturnUrl });
+		const { testComponent } = configureTestBedWithActivatedRoute({
+			returnUrl: testReturnUrl,
+		});
 
 		expect((testComponent as unknown as { returnUrl: string }).returnUrl).toBe(
 			testReturnUrl,
