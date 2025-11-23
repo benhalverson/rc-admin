@@ -10,5 +10,5 @@ import { ProductCardComponent } from '../product-card/product-card.component';
 })
 export class ProductComponent {
 	service = inject(ProductService);
-	products = this.service.productsResource;
+	products = this.service.productsResource || [];
 }

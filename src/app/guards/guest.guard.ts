@@ -1,46 +1,31 @@
-import { computed, inject } from '@angular/core';
-import { type CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import {
+	ActivatedRouteSnapshot,
+	CanActivateFn,
+	Router,
+	RouterStateSnapshot,
+} from '@angular/router';
+import { filter, map, take } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 
-export const guestGuard: CanActivateFn = (_route, _state) => {
+export const guestGuard: CanActivateFn = (
+	_route: ActivatedRouteSnapshot,
+	_state: RouterStateSnapshot,
+) => {
 	const authService = inject(AuthService);
-	const router = inject(Router);
 	const authStore = authService.getAuthStore();
+	const router = inject(Router);
 
 	// Wait for auth initialization to complete
-	const isInitialized = computed(() => authStore.isInitialized());
-	const isAuthenticated = computed(() => authStore.isAuthenticated());
+	const initialized$ = toObservable(authStore.isInitialized).pipe(
+		filter(Boolean),
+		take(1),
+	);
 
-	// If not initialized yet, wait for it
-	if (!isInitialized()) {
-		// Return a promise that resolves when initialization is complete
-		return new Promise((resolve) => {
-			const checkInit = () => {
-				if (isInitialized()) {
-					if (isAuthenticated()) {
-						// Already authenticated, redirect to home
-						router.navigate(['/']);
-						resolve(false);
-					} else {
-						// Not authenticated, allow access to login page
-						resolve(true);
-					}
-				} else {
-					// Check again in next tick
-					setTimeout(checkInit, 10);
-				}
-			};
-			checkInit();
-		});
-	}
-
-	// If already initialized, check authentication immediately
-	if (isAuthenticated()) {
-		// Already authenticated, redirect to home
-		router.navigate(['/']);
-		return false;
-	} else {
-		// Not authenticated, allow access to login page
-		return true;
-	}
+	return initialized$.pipe(
+		map(() => {
+			return authStore.isAuthenticated() ? router.createUrlTree(['/']) : true;
+		}),
+	);
 };
