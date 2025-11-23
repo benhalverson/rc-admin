@@ -110,7 +110,8 @@ describe('AddProductComponent', () => {
 		) as unknown as typeof productService;
 		toastrService = TestBed.inject(
 			ToastrService,
-		) as unknown as typeof toastrService; // Setup default mock returns
+		) as unknown as typeof toastrService;
+		// Setup default mock returns
 		productService.getColors.mockReturnValue(of(mockColors));
 		productService.createProduct.mockReturnValue(of(mockProduct));
 
