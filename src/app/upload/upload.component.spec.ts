@@ -10,14 +10,16 @@ import { UploadStore } from './upload.store';
 describe('Upload Component', () => {
 	let component: Upload;
 	let fixture: ComponentFixture<Upload>;
-	let uploadService: jasmine.SpyObj<UploadService>;
+	let uploadService: {
+		uploadFile: ReturnType<typeof vi.fn>;
+	};
 	interface MockUploadStore {
-		setFile: jasmine.Spy<(file: File | null) => void>;
-		setMessage: jasmine.Spy<(msg: string) => void>;
-		reset: jasmine.Spy<() => void>;
-		isFileSelected: jasmine.Spy<() => boolean>;
-		selectedFile: jasmine.Spy<() => File | null>;
-		message: jasmine.Spy<() => string>;
+		setFile: ReturnType<typeof vi.fn<(file: File | null) => void>>;
+		setMessage: ReturnType<typeof vi.fn<(msg: string) => void>>;
+		reset: ReturnType<typeof vi.fn<() => void>>;
+		isFileSelected: ReturnType<typeof vi.fn<() => boolean>>;
+		selectedFile: ReturnType<typeof vi.fn<() => File | null>>;
+		message: ReturnType<typeof vi.fn<() => string>>;
 	}
 	let mockUploadStore: MockUploadStore;
 
@@ -28,20 +30,18 @@ describe('Upload Component', () => {
 	};
 
 	beforeEach(async () => {
-		const uploadServiceSpy = jasmine.createSpyObj('UploadService', [
-			'uploadFile',
-		]);
+		const uploadServiceSpy = {
+			uploadFile: vi.fn(),
+		};
 
 		// Create mock store with the methods we need
 		mockUploadStore = {
-			setFile: jasmine.createSpy('setFile'),
-			setMessage: jasmine.createSpy('setMessage'),
-			reset: jasmine.createSpy('reset'),
-			isFileSelected: jasmine
-				.createSpy('isFileSelected')
-				.and.returnValue(false),
-			selectedFile: jasmine.createSpy('selectedFile').and.returnValue(null),
-			message: jasmine.createSpy('message').and.returnValue(''),
+			setFile: vi.fn(),
+			setMessage: vi.fn(),
+			reset: vi.fn(),
+			isFileSelected: vi.fn().mockReturnValue(false),
+			selectedFile: vi.fn().mockReturnValue(null),
+			message: vi.fn().mockReturnValue(''),
 		};
 
 		await TestBed.configureTestingModule({
@@ -56,7 +56,7 @@ describe('Upload Component', () => {
 		component = fixture.componentInstance;
 		uploadService = TestBed.inject(
 			UploadService,
-		) as jasmine.SpyObj<UploadService>;
+		) as unknown as typeof uploadService;
 
 		fixture.detectChanges();
 	});
@@ -115,9 +115,9 @@ describe('Upload Component', () => {
 				type: 'application/octet-stream',
 			});
 			component.uploadForm.patchValue({ file: mockFile });
-			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+			uploadService.uploadFile.mockReturnValue(of(mockUploadResponse));
 
-			spyOn(component.uploaded, 'emit');
+			vi.spyOn(component.uploaded, 'emit');
 
 			await component.onUpload();
 
@@ -148,7 +148,7 @@ describe('Upload Component', () => {
 			});
 			component.uploadForm.patchValue({ file: mockFile });
 			const errorMessage = 'Network error';
-			uploadService.uploadFile.and.returnValue(
+			uploadService.uploadFile.mockReturnValue(
 				throwError(() => new Error(errorMessage)),
 			);
 
@@ -164,7 +164,7 @@ describe('Upload Component', () => {
 				type: 'application/octet-stream',
 			});
 			component.uploadForm.patchValue({ file: mockFile });
-			uploadService.uploadFile.and.returnValue(
+			uploadService.uploadFile.mockReturnValue(
 				throwError(() => 'String error'),
 			);
 
@@ -180,16 +180,17 @@ describe('Upload Component', () => {
 				type: 'application/octet-stream',
 			});
 			component.uploadForm.patchValue({ file: mockFile });
-			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+			uploadService.uploadFile.mockReturnValue(of(mockUploadResponse));
 
 			await component.onUpload();
 
-			expect(uploadService.uploadFile).toHaveBeenCalledWith(
-				jasmine.any(FormData),
-			);
+			expect(uploadService.uploadFile).toHaveBeenCalled();
 
 			// Verify FormData content
-			const formDataCall = uploadService.uploadFile.calls.mostRecent().args[0];
+			const formDataCall =
+				uploadService.uploadFile.mock.calls[
+					uploadService.uploadFile.mock.calls.length - 1
+				][0];
 			expect(formDataCall).toBeInstanceOf(FormData);
 		});
 
@@ -198,7 +199,7 @@ describe('Upload Component', () => {
 				type: 'application/octet-stream',
 			});
 			component.uploadForm.patchValue({ file: mockFile });
-			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+			uploadService.uploadFile.mockReturnValue(of(mockUploadResponse));
 
 			expect(component.uploadForm.get('file')?.value).toBe(mockFile);
 
@@ -214,9 +215,9 @@ describe('Upload Component', () => {
 				type: 'application/octet-stream',
 			});
 			component.uploadForm.patchValue({ file: mockFile });
-			uploadService.uploadFile.and.returnValue(of(mockUploadResponse));
+			uploadService.uploadFile.mockReturnValue(of(mockUploadResponse));
 
-			spyOn(component.uploaded, 'emit');
+			vi.spyOn(component.uploaded, 'emit');
 
 			await component.onUpload();
 

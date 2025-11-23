@@ -1,4 +1,3 @@
-/// <reference types="jasmine" />
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
@@ -19,8 +18,17 @@ import { ProductDetailsComponent } from './product-details.component';
 describe('ProductDetailsComponent', () => {
 	let component: ProductDetailsComponent;
 	let fixture: ComponentFixture<ProductDetailsComponent>;
-	let productService: jasmine.SpyObj<ProductService>;
-	let toastrService: jasmine.SpyObj<ToastrService>;
+	let productService: {
+		getProductById: ReturnType<typeof vi.fn>;
+		updateProduct: ReturnType<typeof vi.fn>;
+		getColors: ReturnType<typeof vi.fn>;
+		colors: () => FilamentColorsResponse[];
+		colorsLoading: () => boolean;
+	};
+	let toastrService: {
+		success: ReturnType<typeof vi.fn>;
+		error: ReturnType<typeof vi.fn>;
+	};
 	let activatedRoute: ActivatedRoute;
 
 	const mockProduct: ProductResponse = {
@@ -82,19 +90,18 @@ describe('ProductDetailsComponent', () => {
 	}
 
 	beforeEach(async () => {
-		const productServiceSpy = jasmine.createSpyObj(
-			'ProductService',
-			['getProductById', 'updateProduct', 'getColors'],
-			{
-				colors: mockColorsSignal,
-				colorsLoading: mockColorsLoadingSignal,
-			},
-		);
+		const productServiceSpy = {
+			getProductById: vi.fn(),
+			updateProduct: vi.fn(),
+			getColors: vi.fn(),
+			colors: mockColorsSignal,
+			colorsLoading: mockColorsLoadingSignal,
+		};
 
-		const toastrServiceSpy = jasmine.createSpyObj('ToastrService', [
-			'success',
-			'error',
-		]);
+		const toastrServiceSpy = {
+			success: vi.fn(),
+			error: vi.fn(),
+		};
 
 		activatedRoute = {
 			params: of({ id: '1' }),
@@ -137,15 +144,15 @@ describe('ProductDetailsComponent', () => {
 		component = fixture.componentInstance;
 		productService = TestBed.inject(
 			ProductService,
-		) as jasmine.SpyObj<ProductService>;
+		) as unknown as typeof productService;
 		toastrService = TestBed.inject(
 			ToastrService,
-		) as jasmine.SpyObj<ToastrService>;
+		) as unknown as typeof toastrService;
 
 		// Setup spies to accept any parameter type
-		productService.getProductById.and.returnValue(of(mockProduct));
-		productService.getColors.and.returnValue(of(mockFilaments));
-		productService.updateProduct.and.returnValue(of(undefined));
+		productService.getProductById.mockReturnValue(of(mockProduct));
+		productService.getColors.mockReturnValue(of(mockFilaments));
+		productService.updateProduct.mockReturnValue(of(undefined));
 	});
 
 	describe('Component Initialization', () => {
@@ -192,7 +199,7 @@ describe('ProductDetailsComponent', () => {
 				...mockProduct,
 				imageGallery: ['image1.jpg', 'image2.jpg'],
 			};
-			productService.getProductById.and.returnValue(
+			productService.getProductById.mockReturnValue(
 				of(productWithArrayGallery),
 			);
 
@@ -211,7 +218,7 @@ describe('ProductDetailsComponent', () => {
 				...mockProduct,
 				imageGallery: JSON.stringify(['image1.jpg', 'image2.jpg']),
 			};
-			productService.getProductById.and.returnValue(
+			productService.getProductById.mockReturnValue(
 				of(productWithStringGallery as ProductResponse),
 			);
 
@@ -221,7 +228,7 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should handle invalid JSON string in imageGallery', () => {
-			spyOn(console, 'error');
+			vi.spyOn(console, 'error');
 			interface ExtendedInvalidProduct
 				extends Omit<ProductResponse, 'imageGallery'> {
 				imageGallery: string | string[];
@@ -230,7 +237,7 @@ describe('ProductDetailsComponent', () => {
 				...mockProduct,
 				imageGallery: 'invalid json string',
 			};
-			productService.getProductById.and.returnValue(
+			productService.getProductById.mockReturnValue(
 				of(productWithInvalidJson as ProductResponse),
 			);
 
@@ -242,7 +249,7 @@ describe('ProductDetailsComponent', () => {
 
 		it('should handle null/undefined imageGallery', async () => {
 			const productWithoutGallery = { ...mockProduct, imageGallery: undefined };
-			productService.getProductById.and.returnValue(of(productWithoutGallery));
+			productService.getProductById.mockReturnValue(of(productWithoutGallery));
 
 			await detectChanges();
 
@@ -281,8 +288,8 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should handle error when fetching colors', async () => {
-			productService.getColors.and.returnValue(throwError('API Error'));
-			spyOn(console, 'error');
+			productService.getColors.mockReturnValue(throwError('API Error'));
+			vi.spyOn(console, 'error');
 
 			await component.fetchColorsByFilamentType('PETG');
 
@@ -391,7 +398,7 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should save valid form changes', () => {
-			productService.updateProduct.and.returnValue(of(undefined));
+			productService.updateProduct.mockReturnValue(of(undefined));
 
 			component.productForm.patchValue({
 				name: 'Updated Product',
@@ -419,7 +426,7 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should handle save error', () => {
-			productService.updateProduct.and.returnValue(throwError('Save Error'));
+			productService.updateProduct.mockReturnValue(throwError('Save Error'));
 
 			component.saveChanges();
 
@@ -484,8 +491,8 @@ describe('ProductDetailsComponent', () => {
 
 	describe('Component Lifecycle', () => {
 		it('should complete destroy subject on destroy', () => {
-			spyOn(component.destroy$, 'next');
-			spyOn(component.destroy$, 'complete');
+			vi.spyOn(component.destroy$, 'next');
+			vi.spyOn(component.destroy$, 'complete');
 
 			component.ngOnDestroy();
 
@@ -507,10 +514,10 @@ describe('ProductDetailsComponent', () => {
 
 	describe('Error Handling', () => {
 		it('should handle product loading error', async () => {
-			productService.getProductById.and.returnValue(
+			productService.getProductById.mockReturnValue(
 				throwError(() => 'Loading Error'),
 			);
-			spyOn(console, 'error');
+			vi.spyOn(console, 'error');
 
 			fixture.detectChanges();
 			await fixture.whenStable(); // 👈 prevents afterAll teardown error

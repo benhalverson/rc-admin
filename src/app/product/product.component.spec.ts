@@ -14,7 +14,6 @@ describe('ProductComponent', () => {
 			imports: [ProductComponent, HttpClientTestingModule, RouterTestingModule],
 			schemas: [NO_ERRORS_SCHEMA],
 		}).compileComponents();
-
 		fixture = TestBed.createComponent(ProductComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();

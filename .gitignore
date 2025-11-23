@@ -38,6 +38,7 @@ testem.log
 /typings
 /cypress/screenshots
 /cypress/videos
+**/__screenshots__
 
 # System files
 .DS_Store

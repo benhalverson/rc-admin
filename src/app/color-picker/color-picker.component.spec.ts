@@ -9,12 +9,16 @@ import { ColorPickerComponent } from './color-picker.component';
 describe('ColorPickerComponent', () => {
 	let component: ColorPickerComponent;
 	let fixture: ComponentFixture<ColorPickerComponent>;
-	let productService: jasmine.SpyObj<ProductService>;
+	let productService: {
+		getColors: ReturnType<typeof vi.fn>;
+		colors: () => FilamentColorsResponse[];
+		colorsLoading: () => boolean;
+	};
 
 	beforeEach(async () => {
-		const productServiceSpy = jasmine.createSpyObj('ProductService', [
-			'getColors',
-		]);
+		const productServiceSpy = {
+			getColors: vi.fn(),
+		};
 
 		const mockColors: FilamentColorsResponse[] = [
 			{
@@ -67,8 +71,8 @@ describe('ColorPickerComponent', () => {
 
 		productService = TestBed.inject(
 			ProductService,
-		) as jasmine.SpyObj<ProductService>;
-		productService.getColors.and.returnValue(of(mockColors));
+		) as unknown as typeof productService;
+		productService.getColors.mockReturnValue(of(mockColors));
 
 		fixture = TestBed.createComponent(ColorPickerComponent);
 		component = fixture.componentInstance;
@@ -93,7 +97,7 @@ describe('ColorPickerComponent', () => {
 	});
 
 	it('should emit modelChange when selectColor is called', () => {
-		spyOn(component.modelChange, 'emit');
+		vi.spyOn(component.modelChange, 'emit');
 
 		component.selectColor('red');
 
@@ -101,7 +105,7 @@ describe('ColorPickerComponent', () => {
 	});
 
 	it('should emit different colors when selectColor is called multiple times', () => {
-		spyOn(component.modelChange, 'emit');
+		vi.spyOn(component.modelChange, 'emit');
 
 		component.selectColor('red');
 		component.selectColor('blue');
@@ -125,7 +129,7 @@ describe('ColorPickerComponent', () => {
 	});
 
 	it('should handle filamentType change to PETG', () => {
-		productService.getColors.calls.reset();
+		productService.getColors.mockClear();
 
 		// Set the new filament type and trigger change detection
 		component.filamentType = 'PETG';

@@ -13,8 +13,16 @@ import { AddProductComponent } from './add-product.component';
 describe('AddProductComponent', () => {
 	let component: AddProductComponent;
 	let fixture: ComponentFixture<AddProductComponent>;
-	let productService: jasmine.SpyObj<ProductService>;
-	let toastrService: jasmine.SpyObj<ToastrService>;
+	let productService: {
+		createProduct: ReturnType<typeof vi.fn>;
+		getColors: ReturnType<typeof vi.fn>;
+		colors: ReturnType<typeof vi.fn>;
+		colorsLoading: ReturnType<typeof vi.fn>;
+	};
+	let toastrService: {
+		success: ReturnType<typeof vi.fn>;
+		error: ReturnType<typeof vi.fn>;
+	};
 
 	const mockProduct: ProductResponse = {
 		id: 1,
@@ -27,9 +35,6 @@ describe('AddProductComponent', () => {
 		color: 'red',
 		imageGallery: ['image1.jpg', 'image2.jpg'],
 	};
-
-	let _mockProductService: jasmine.SpyObj<ProductService>;
-	let _mockToastr: jasmine.SpyObj<ToastrService>;
 
 	const mockColors: FilamentColorsResponse[] = [
 		{
@@ -65,25 +70,19 @@ describe('AddProductComponent', () => {
 	];
 
 	// Mock signals for the service
-	const mockColorsSignal = jasmine
-		.createSpy('colors')
-		.and.returnValue(mockColors);
-	const mockColorsLoadingSignal = jasmine
-		.createSpy('colorsLoading')
-		.and.returnValue(false);
+	const mockColorsSignal = vi.fn().mockReturnValue(mockColors);
+	const mockColorsLoadingSignal = vi.fn().mockReturnValue(false);
 	beforeEach(async () => {
-		const productServiceSpy = jasmine.createSpyObj(
-			'ProductService',
-			['createProduct', 'getColors'],
-			{
-				colors: mockColorsSignal,
-				colorsLoading: mockColorsLoadingSignal,
-			},
-		);
-		const toastrServiceSpy = jasmine.createSpyObj('ToastrService', [
-			'success',
-			'error',
-		]);
+		const productServiceSpy = {
+			createProduct: vi.fn(),
+			getColors: vi.fn(),
+			colors: mockColorsSignal,
+			colorsLoading: mockColorsLoadingSignal,
+		};
+		const toastrServiceSpy = {
+			success: vi.fn(),
+			error: vi.fn(),
+		};
 
 		await TestBed.configureTestingModule({
 			imports: [
@@ -108,14 +107,13 @@ describe('AddProductComponent', () => {
 		component = fixture.componentInstance;
 		productService = TestBed.inject(
 			ProductService,
-		) as jasmine.SpyObj<ProductService>;
+		) as unknown as typeof productService;
 		toastrService = TestBed.inject(
 			ToastrService,
-		) as jasmine.SpyObj<ToastrService>;
-
+		) as unknown as typeof toastrService;
 		// Setup default mock returns
-		productService.getColors.and.returnValue(of(mockColors));
-		productService.createProduct.and.returnValue(of(mockProduct));
+		productService.getColors.mockReturnValue(of(mockColors));
+		productService.createProduct.mockReturnValue(of(mockProduct));
 
 		fixture.detectChanges();
 	});
@@ -346,9 +344,9 @@ describe('AddProductComponent', () => {
 
 		it('should handle submission error', async () => {
 			// Spy on console.error to prevent error logging during test
-			spyOn(console, 'error');
+			vi.spyOn(console, 'error');
 
-			productService.createProduct.and.returnValue(
+			productService.createProduct.mockReturnValue(
 				throwError(() => new Error('Server error')),
 			);
 
@@ -359,7 +357,7 @@ describe('AddProductComponent', () => {
 			);
 			expect(console.error).toHaveBeenCalledWith(
 				'Failed to add product',
-				jasmine.any(Error),
+				expect.any(Error),
 			);
 		});
 
@@ -385,7 +383,7 @@ describe('AddProductComponent', () => {
 			await component.onSubmit();
 
 			expect(productService.createProduct).toHaveBeenCalledWith(
-				jasmine.objectContaining({
+				expect.objectContaining({
 					price: 29.99, // Should be converted to number
 				}),
 			);
@@ -399,7 +397,7 @@ describe('AddProductComponent', () => {
 			await component.onSubmit();
 
 			expect(productService.createProduct).toHaveBeenCalledWith(
-				jasmine.objectContaining({
+				expect.objectContaining({
 					price: 0, // Should default to 0
 				}),
 			);

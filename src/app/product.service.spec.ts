@@ -93,7 +93,7 @@ describe('ProductService', () => {
 
 		it('should handle getProducts error', () => {
 			service.getProducts().subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(500);
 					expect(error.statusText).toBe('Internal Server Error');
@@ -111,7 +111,7 @@ describe('ProductService', () => {
 	describe('getColors', () => {
 		it('should retrieve PLA colors from API', () => {
 			service.getColors('PLA').subscribe((response) => {
-				expect(Array.isArray(response)).toBeTrue();
+				expect(Array.isArray(response)).toBe(true);
 				expect(response.length).toBe(2);
 				expect(response[0].hexValue).toBe('f91010');
 			});
@@ -153,7 +153,7 @@ describe('ProductService', () => {
 
 		it('should handle getColors error', () => {
 			service.getColors('PLA').subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(404);
 					expect(error.statusText).toBe('Not Found');
@@ -190,7 +190,7 @@ describe('ProductService', () => {
 			const productId = 999;
 
 			service.getProductById(productId).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(404);
 					expect(error.statusText).toBe('Not Found');
@@ -227,7 +227,7 @@ describe('ProductService', () => {
 
 		it('should handle updateProduct error', () => {
 			service.updateProduct(mockProduct).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(400);
 					expect(error.statusText).toBe('Bad Request');
@@ -278,7 +278,7 @@ describe('ProductService', () => {
 
 		it('should handle createProduct error', () => {
 			service.createProduct(mockProduct).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(400);
 					expect(error.statusText).toBe('Bad Request');

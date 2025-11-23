@@ -16,18 +16,16 @@ describe('AuthService', () => {
 	// Mock sessionStorage
 	const mockStorage = {
 		store: {} as Record<string, string>,
-		getItem: jasmine
-			.createSpy('getItem')
-			.and.callFake((key: string) => mockStorage.store[key] || null),
-		setItem: jasmine
-			.createSpy('setItem')
-			.and.callFake((key: string, value: string) => {
-				mockStorage.store[key] = value;
-			}),
-		removeItem: jasmine
-			.createSpy('removeItem')
-			.and.callFake((key: string) => delete mockStorage.store[key]),
-		clear: jasmine.createSpy('clear').and.callFake(() => {
+		getItem: vi
+			.fn()
+			.mockImplementation((key: string) => mockStorage.store[key] || null),
+		setItem: vi.fn().mockImplementation((key: string, value: string) => {
+			mockStorage.store[key] = value;
+		}),
+		removeItem: vi
+			.fn()
+			.mockImplementation((key: string) => delete mockStorage.store[key]),
+		clear: vi.fn().mockImplementation(() => {
 			mockStorage.store = {};
 		}),
 	};
@@ -97,7 +95,7 @@ describe('AuthService', () => {
 	});
 
 	describe('signin', () => {
-		it('should successfully sign in user and fetch profile', (done) => {
+		it('should successfully sign in user and fetch profile', async () => {
 			const formData: MyFormData = {
 				email: 'test@test.com',
 				password: 'password',
@@ -124,7 +122,6 @@ describe('AuthService', () => {
 						'user',
 						JSON.stringify(mockUser),
 					);
-					done();
 				},
 			});
 
@@ -145,7 +142,7 @@ describe('AuthService', () => {
 			profileReq.flush(mockUser);
 		});
 
-		it('should handle signin failure', (done) => {
+		it('should handle signin failure', async () => {
 			const formData: MyFormData = {
 				email: 'test@test.com',
 				password: 'wrongpassword',
@@ -168,7 +165,6 @@ describe('AuthService', () => {
 						'isAuthenticated',
 					);
 					expect(mockSessionStorage.removeItem).toHaveBeenCalledWith('user');
-					done();
 				},
 			});
 
@@ -179,7 +175,7 @@ describe('AuthService', () => {
 			);
 		});
 
-		it('should handle profile fetch failure after successful signin', (done) => {
+		it('should handle profile fetch failure after successful signin', async () => {
 			const formData: MyFormData = {
 				email: 'test@test.com',
 				password: 'password',
@@ -206,7 +202,6 @@ describe('AuthService', () => {
 						'user',
 						JSON.stringify(expectedBasicUser),
 					);
-					done();
 				},
 			});
 
@@ -235,7 +230,7 @@ describe('AuthService', () => {
 			);
 		});
 
-		it('should successfully logout user', (done) => {
+		it('should successfully logout user', async () => {
 			// First set user as authenticated
 			authStore.setAuthenticated(true, { id: 1, email: 'test@test.com' });
 
@@ -247,7 +242,6 @@ describe('AuthService', () => {
 						'isAuthenticated',
 					);
 					expect(mockSessionStorage.removeItem).toHaveBeenCalledWith('user');
-					done();
 				},
 			});
 
@@ -256,7 +250,7 @@ describe('AuthService', () => {
 			req.flush({ success: true });
 		});
 
-		it('should clear local state even if server logout fails', (done) => {
+		it('should clear local state even if server logout fails', async () => {
 			// First set user as authenticated
 			authStore.setAuthenticated(true, { id: 1, email: 'test@test.com' });
 
@@ -268,7 +262,6 @@ describe('AuthService', () => {
 						'isAuthenticated',
 					);
 					expect(mockSessionStorage.removeItem).toHaveBeenCalledWith('user');
-					done();
 				},
 			});
 
