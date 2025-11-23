@@ -84,10 +84,10 @@ describe('LoginComponent', () => {
 		});
 	});
 
-	it('should initialize returnUrl from query params', () => {
-		const testReturnUrl = '/dashboard';
-
-		// Create new TestBed with custom ActivatedRoute
+	/**
+	 * Helper function to configure TestBed with custom ActivatedRoute query params
+	 */
+	function configureTestBedWithActivatedRoute(queryParams: Record<string, string>) {
 		TestBed.resetTestingModule();
 		TestBed.configureTestingModule({
 			imports: [
@@ -108,7 +108,7 @@ describe('LoginComponent', () => {
 				{ provide: Router, useValue: router },
 				{
 					provide: ActivatedRoute,
-					useValue: { snapshot: { queryParams: { returnUrl: testReturnUrl } } },
+					useValue: { snapshot: { queryParams } },
 				},
 			],
 		}).compileComponents();
@@ -116,6 +116,13 @@ describe('LoginComponent', () => {
 		const testFixture = TestBed.createComponent(LoginComponent);
 		const testComponent = testFixture.componentInstance;
 		testFixture.detectChanges();
+
+		return { testFixture, testComponent };
+	}
+
+	it('should initialize returnUrl from query params', () => {
+		const testReturnUrl = '/dashboard';
+		const { testComponent } = configureTestBedWithActivatedRoute({ returnUrl: testReturnUrl });
 
 		expect((testComponent as unknown as { returnUrl: string }).returnUrl).toBe(
 			testReturnUrl,
@@ -123,35 +130,7 @@ describe('LoginComponent', () => {
 	});
 
 	it('should use default returnUrl when no query params', () => {
-		// Create new TestBed with empty query params
-		TestBed.resetTestingModule();
-		TestBed.configureTestingModule({
-			imports: [
-				LoginComponent,
-				HttpClientTestingModule,
-				RouterTestingModule,
-				ReactiveFormsModule,
-			],
-			providers: [
-				provideAnimations(),
-				provideToastr({
-					timeOut: 3000,
-					positionClass: 'toast-top-right',
-					preventDuplicates: true,
-				}),
-				{ provide: AuthService, useValue: authService },
-				{ provide: ToastrService, useValue: toastrService },
-				{ provide: Router, useValue: router },
-				{
-					provide: ActivatedRoute,
-					useValue: { snapshot: { queryParams: {} } },
-				},
-			],
-		}).compileComponents();
-
-		const testFixture = TestBed.createComponent(LoginComponent);
-		const testComponent = testFixture.componentInstance;
-		testFixture.detectChanges();
+		const { testComponent } = configureTestBedWithActivatedRoute({});
 
 		expect((testComponent as unknown as { returnUrl: string }).returnUrl).toBe(
 			'/',
