@@ -72,7 +72,7 @@ describe('UploadService', () => {
 			);
 
 			service.uploadFile(mockFormData).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(400);
 					expect(error.statusText).toBe('Bad Request');
@@ -95,7 +95,7 @@ describe('UploadService', () => {
 			);
 
 			service.uploadFile(mockFormData).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(500);
 					expect(error.statusText).toBe('Internal Server Error');
@@ -118,7 +118,7 @@ describe('UploadService', () => {
 			);
 
 			service.uploadFile(mockFormData).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(413);
 					expect(error.statusText).toBe('Payload Too Large');
@@ -141,7 +141,7 @@ describe('UploadService', () => {
 			);
 
 			service.uploadFile(mockFormData).subscribe({
-				next: () => fail('Expected an error'),
+				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(415);
 					expect(error.statusText).toBe('Unsupported Media Type');

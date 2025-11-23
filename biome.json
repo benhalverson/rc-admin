@@ -17,7 +17,8 @@
 		"rules": {
 			"recommended": true,
 			"suspicious": {
-				"noUnknownAtRules": "off"
+				"noUnknownAtRules": "off",
+				"noExplicitAny": "error"
 			},
 			"style": {
 				"useImportType": "off"

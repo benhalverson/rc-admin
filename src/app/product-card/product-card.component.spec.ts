@@ -1,7 +1,7 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
-import type {} from 'jasmine';
+
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { type ProductResponse, ProductService } from '../product.service';
@@ -10,10 +10,16 @@ import { ProductCardComponent } from './product-card.component';
 describe('ProductCardComponent', () => {
 	let component: ProductCardComponent;
 	let fixture: ComponentFixture<ProductCardComponent>;
-	let productService: jasmine.SpyObj<ProductService>;
-	let toastrService: jasmine.SpyObj<ToastrService>;
+	let productService: {
+		deleteProduct: ReturnType<typeof vi.fn>;
+		productsResource: { reload: ReturnType<typeof vi.fn> };
+	};
+	let toastrService: {
+		success: ReturnType<typeof vi.fn>;
+		error: ReturnType<typeof vi.fn>;
+	};
 	const productsResource = {
-		reload: jasmine.createSpy('reload'),
+		reload: vi.fn(),
 	};
 
 	const mockProduct: ProductResponse = {
@@ -33,14 +39,18 @@ describe('ProductCardComponent', () => {
 	};
 
 	beforeEach(async () => {
-		productService = jasmine.createSpyObj('ProductService', ['deleteProduct'], {
+		productService = {
+			deleteProduct: vi.fn(),
 			productsResource,
-		});
-		productService.deleteProduct.and.returnValue(
+		};
+		productService.deleteProduct.mockReturnValue(
 			of({ success: true, message: 'Product deleted successfully' }),
 		);
 
-		toastrService = jasmine.createSpyObj('ToastrService', ['success', 'error']);
+		toastrService = {
+			success: vi.fn(),
+			error: vi.fn(),
+		};
 
 		await TestBed.configureTestingModule({
 			imports: [ProductCardComponent, RouterTestingModule],

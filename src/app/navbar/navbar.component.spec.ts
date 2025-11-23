@@ -12,7 +12,6 @@ describe('NavbarComponent', () => {
 		await TestBed.configureTestingModule({
 			imports: [NavbarComponent, HttpClientTestingModule, RouterTestingModule],
 		}).compileComponents();
-
 		fixture = TestBed.createComponent(NavbarComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();

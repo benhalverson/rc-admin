@@ -1,6 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -12,18 +12,28 @@ import { LoginComponent } from './login.component';
 describe('LoginComponent', () => {
 	let component: LoginComponent;
 	let fixture: ComponentFixture<LoginComponent>;
-	let authService: jasmine.SpyObj<AuthService>;
-	let toastrService: jasmine.SpyObj<ToastrService>;
-	let router: jasmine.SpyObj<Router>;
-	let activatedRoute: ActivatedRoute;
+	let authService: {
+		signin: ReturnType<typeof vi.fn>;
+	};
+	let toastrService: {
+		success: ReturnType<typeof vi.fn>;
+		error: ReturnType<typeof vi.fn>;
+	};
+	let router: {
+		navigateByUrl: ReturnType<typeof vi.fn>;
+	};
 
 	beforeEach(async () => {
-		const authServiceSpy = jasmine.createSpyObj('AuthService', ['signin']);
-		const toastrServiceSpy = jasmine.createSpyObj('ToastrService', [
-			'success',
-			'error',
-		]);
-		const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+		const authServiceSpy = {
+			signin: vi.fn(),
+		};
+		const toastrServiceSpy = {
+			success: vi.fn(),
+			error: vi.fn(),
+		};
+		const routerSpy = {
+			navigateByUrl: vi.fn(),
+		};
 
 		const activatedRouteMock = {
 			snapshot: {
@@ -52,12 +62,11 @@ describe('LoginComponent', () => {
 			],
 		}).compileComponents();
 
-		authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+		authService = TestBed.inject(AuthService) as unknown as typeof authService;
 		toastrService = TestBed.inject(
 			ToastrService,
-		) as jasmine.SpyObj<ToastrService>;
-		router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-		activatedRoute = TestBed.inject(ActivatedRoute);
+		) as unknown as typeof toastrService;
+		router = TestBed.inject(Router) as unknown as typeof router;
 
 		fixture = TestBed.createComponent(LoginComponent);
 		component = fixture.componentInstance;
@@ -77,42 +86,81 @@ describe('LoginComponent', () => {
 
 	it('should initialize returnUrl from query params', () => {
 		const testReturnUrl = '/dashboard';
-		activatedRoute.snapshot.queryParams = { returnUrl: testReturnUrl };
 
-		const fb = TestBed.inject(FormBuilder);
-		const newComponent = new LoginComponent(
-			router,
-			activatedRoute,
-			authService,
-			fb,
-			toastrService,
-		);
+		// Create new TestBed with custom ActivatedRoute
+		TestBed.resetTestingModule();
+		TestBed.configureTestingModule({
+			imports: [
+				LoginComponent,
+				HttpClientTestingModule,
+				RouterTestingModule,
+				ReactiveFormsModule,
+			],
+			providers: [
+				provideAnimations(),
+				provideToastr({
+					timeOut: 3000,
+					positionClass: 'toast-top-right',
+					preventDuplicates: true,
+				}),
+				{ provide: AuthService, useValue: authService },
+				{ provide: ToastrService, useValue: toastrService },
+				{ provide: Router, useValue: router },
+				{
+					provide: ActivatedRoute,
+					useValue: { snapshot: { queryParams: { returnUrl: testReturnUrl } } },
+				},
+			],
+		}).compileComponents();
 
-		expect((newComponent as unknown as { returnUrl: string }).returnUrl).toBe(
+		const testFixture = TestBed.createComponent(LoginComponent);
+		const testComponent = testFixture.componentInstance;
+		testFixture.detectChanges();
+
+		expect((testComponent as unknown as { returnUrl: string }).returnUrl).toBe(
 			testReturnUrl,
 		);
 	});
 
 	it('should use default returnUrl when no query params', () => {
-		activatedRoute.snapshot.queryParams = {};
+		// Create new TestBed with empty query params
+		TestBed.resetTestingModule();
+		TestBed.configureTestingModule({
+			imports: [
+				LoginComponent,
+				HttpClientTestingModule,
+				RouterTestingModule,
+				ReactiveFormsModule,
+			],
+			providers: [
+				provideAnimations(),
+				provideToastr({
+					timeOut: 3000,
+					positionClass: 'toast-top-right',
+					preventDuplicates: true,
+				}),
+				{ provide: AuthService, useValue: authService },
+				{ provide: ToastrService, useValue: toastrService },
+				{ provide: Router, useValue: router },
+				{
+					provide: ActivatedRoute,
+					useValue: { snapshot: { queryParams: {} } },
+				},
+			],
+		}).compileComponents();
 
-		const fb = TestBed.inject(FormBuilder);
-		const newComponent = new LoginComponent(
-			router,
-			activatedRoute,
-			authService,
-			fb,
-			toastrService,
-		);
+		const testFixture = TestBed.createComponent(LoginComponent);
+		const testComponent = testFixture.componentInstance;
+		testFixture.detectChanges();
 
-		expect((newComponent as unknown as { returnUrl: string }).returnUrl).toBe(
+		expect((testComponent as unknown as { returnUrl: string }).returnUrl).toBe(
 			'/',
 		);
 	});
 
 	it('should submit valid form successfully', async () => {
 		const mockResponse = { message: 'Login successful' };
-		authService.signin.and.returnValue(of(mockResponse));
+		authService.signin.mockReturnValue(of(mockResponse));
 
 		component.loginForm.patchValue({
 			email: 'test@example.com',
@@ -135,7 +183,7 @@ describe('LoginComponent', () => {
 				error: 'Invalid credentials',
 			},
 		};
-		authService.signin.and.returnValue(throwError(mockError));
+		authService.signin.mockReturnValue(throwError(mockError));
 
 		component.loginForm.patchValue({
 			email: 'test@example.com',
@@ -155,7 +203,7 @@ describe('LoginComponent', () => {
 				details: 'Account locked',
 			},
 		};
-		authService.signin.and.returnValue(throwError(mockError));
+		authService.signin.mockReturnValue(throwError(mockError));
 
 		component.loginForm.patchValue({
 			email: 'test@example.com',
@@ -173,7 +221,7 @@ describe('LoginComponent', () => {
 		const mockError = {
 			error: {},
 		};
-		authService.signin.and.returnValue(throwError(mockError));
+		authService.signin.mockReturnValue(throwError(mockError));
 
 		component.loginForm.patchValue({
 			email: 'test@example.com',
@@ -200,7 +248,7 @@ describe('LoginComponent', () => {
 		(component as unknown as { returnUrl: string }).returnUrl = '/products';
 
 		const mockResponse = { message: 'Welcome back!' };
-		authService.signin.and.returnValue(of(mockResponse));
+		authService.signin.mockReturnValue(of(mockResponse));
 
 		component.loginForm.patchValue({
 			email: 'test@example.com',
@@ -216,7 +264,7 @@ describe('LoginComponent', () => {
 	it('should handle response without message', async () => {
 		// Provide minimal user shape without message to trigger default toast
 		const mockResponse = { email: 'test@example.com' };
-		authService.signin.and.returnValue(of(mockResponse));
+		authService.signin.mockReturnValue(of(mockResponse));
 
 		component.loginForm.patchValue({
 			email: 'test@example.com',
