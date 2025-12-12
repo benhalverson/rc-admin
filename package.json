@@ -11,7 +11,7 @@
     "test:ci": "BROWSER_HEADLESS=true ng test --watch=false",
     "serve:ssr:rc-admin": "node dist/rc-admin/server/server.mjs",
     "process": "node ./tools/copy-files.mjs && node ./tools/alter-polyfills.mjs",
-    "deploy": "npm run build && wrangler pages deploy dist/cloudflare",
+    "deploy": "npm run build && wrangler pages deploy dist",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
