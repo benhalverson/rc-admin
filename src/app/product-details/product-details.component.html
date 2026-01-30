@@ -49,7 +49,7 @@
             <p class="text-xs text-gray-600">Raw imageGallery: {{ productDetails.imageGallery }}</p>
             <p class="text-xs text-gray-600">Type: {{ typeof productDetails.imageGallery }}</p>
             <p class="text-xs text-gray-600">Safe array length: {{ safeImageGallery.length }}</p>
-            @for (image of safeImageGallery; track image; let i = $index) {
+            @for (image of safeImageGallery; track i; let i = $index) {
               <div class="mb-2">
                 <p class="text-xs text-gray-600">Image {{ i + 1 }}: {{ image }}</p>
                 <p class="text-xs text-gray-600">Length: {{ image.length }} characters</p>
@@ -57,7 +57,7 @@
             }
           </div>
           <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            @for (image of safeImageGallery; track image; let i = $index) {
+            @for (image of safeImageGallery; track i; let i = $index) {
               <div class="border-2 border-gray-200 rounded-lg">
                 <img
                   [src]="image"
@@ -148,7 +148,7 @@
           <pre>Image gallery: {{ imageGallery() | json }}</pre>
           @if (imageGallery().length > 0) {
             <div class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
-              @for (image of imageGallery(); track image; let i = $index) {
+              @for (image of imageGallery(); track i; let i = $index) {
                 <div class="relative group">
                   <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
                   <button

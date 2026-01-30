@@ -5,6 +5,7 @@ import { guestGuard } from './guards/guest.guard';
 import { LoginComponent } from './login/login.component';
 import { ProductComponent } from './product/product.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
+import { colorOptionsResolver } from './resolvers/color-options.resolver';
 
 export const routes: Routes = [
 	{
@@ -16,6 +17,9 @@ export const routes: Routes = [
 		path: 'product/:id',
 		component: ProductDetailsComponent,
 		canActivate: [authGuard],
+		resolve: {
+			colorOptions: colorOptionsResolver,
+		},
 	},
 	{
 		path: 'add-product',

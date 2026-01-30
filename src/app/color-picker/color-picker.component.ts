@@ -26,6 +26,11 @@ export class ColorPickerComponent implements OnInit, OnChanges {
 
 	// Use computed signals from the product service
 	colorOptions = computed(() => this.productService.colors());
+	filteredColorOptions = computed(() =>
+		this.colorOptions().filter(
+			(option) => option.profile === this.filamentType,
+		),
+	);
 	isLoading = computed(() => this.productService.colorsLoading());
 
 	ngOnInit() {

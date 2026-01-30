@@ -117,11 +117,11 @@ describe('ProductService', () => {
 			});
 
 			const req = httpMock.expectOne(
-				`${environment.baseurl}/colors?filamentType=PLA`,
+				`${environment.baseurl}/v2/colors?filamentType=PLA`,
 			);
 			expect(req.request.method).toBe('GET');
 			expect(req.request.params.get('filamentType')).toBe('PLA');
-			req.flush(mockFilamentColorsArray);
+			req.flush({ data: mockFilamentColorsArray });
 		});
 
 		it('should retrieve PETG colors from API', () => {
@@ -144,11 +144,11 @@ describe('ProductService', () => {
 			});
 
 			const req = httpMock.expectOne(
-				`${environment.baseurl}/colors?filamentType=PETG`,
+				`${environment.baseurl}/v2/colors?filamentType=PETG`,
 			);
 			expect(req.request.method).toBe('GET');
 			expect(req.request.params.get('filamentType')).toBe('PETG');
-			req.flush(petgColorsArray);
+			req.flush({ data: petgColorsArray });
 		});
 
 		it('should handle getColors error', () => {
@@ -161,7 +161,7 @@ describe('ProductService', () => {
 			});
 
 			const req = httpMock.expectOne(
-				`${environment.baseurl}/colors?filamentType=PLA`,
+				`${environment.baseurl}/v2/colors?filamentType=PLA`,
 			);
 			req.flush(
 				{ error: 'Colors not found' },
@@ -209,8 +209,8 @@ describe('ProductService', () => {
 
 	describe('updateProduct', () => {
 		it('should update an existing product', () => {
-			const updatedProduct: Product = {
-				...mockProduct,
+			const updatedProduct: ProductResponse = {
+				...mockSingleProductResponse,
 				name: 'Updated Product Name',
 				price: 39.99,
 			};
@@ -221,12 +221,22 @@ describe('ProductService', () => {
 
 			const req = httpMock.expectOne(`${environment.baseurl}/update-product`);
 			expect(req.request.method).toBe('PUT');
-			expect(req.request.body).toEqual(updatedProduct);
+			expect(req.request.body).toEqual({
+				id: updatedProduct.id,
+				name: updatedProduct.name,
+				description: updatedProduct.description,
+				stl: updatedProduct.stl,
+				price: updatedProduct.price,
+				filamentType: updatedProduct.filamentType,
+				color: updatedProduct.color,
+				image: updatedProduct.image,
+				imageGallery: updatedProduct.imageGallery,
+			});
 			req.flush(null);
 		});
 
 		it('should handle updateProduct error', () => {
-			service.updateProduct(mockProduct).subscribe({
+			service.updateProduct(mockSingleProductResponse).subscribe({
 				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(400);

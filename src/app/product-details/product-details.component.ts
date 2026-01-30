@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	inject,
+	signal,
+} from '@angular/core';
 import {
 	FormBuilder,
 	FormControl,
@@ -19,7 +25,7 @@ import {
 	tap,
 } from 'rxjs';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
-import { Product, ProductService } from '../product.service';
+import { ProductResponse, ProductService } from '../product.service';
 import { FilamentColorsResponse } from '../types/filament';
 import { Upload } from '../upload/upload';
 
@@ -34,7 +40,7 @@ import { Upload } from '../upload/upload';
 export class ProductDetailsComponent {
 	productForm!: FormGroup;
 	colorControl = new FormControl<string | null>(null);
-	productDetails: Product | null = null;
+	productDetails: ProductResponse | null = null;
 	isEditing = signal(false);
 	colorOptions = signal<FilamentColorsResponse[]>([]);
 	isLoading = signal(false);
@@ -42,6 +48,7 @@ export class ProductDetailsComponent {
 	imageGallery = signal<string[]>([]);
 
 	destroy$ = new Subject<void>();
+	private readonly cdr = inject(ChangeDetectorRef);
 
 	constructor(
 		private readonly productService: ProductService,
@@ -75,7 +82,7 @@ export class ProductDetailsComponent {
 				switchMap((params: Params) =>
 					this.productService.getProductById(Number(params['id'])),
 				),
-				tap((product: Product) => {
+				tap((product: ProductResponse) => {
 					// Existing logic...
 					if (
 						product.imageGallery &&
@@ -96,7 +103,8 @@ export class ProductDetailsComponent {
 					this.productDetails = product;
 					this.initForm(product);
 
-					const initialColors = this.route.snapshot.data['colorOptions'];
+					const initialColors = this.route.snapshot
+						.data['colorOptions'] as FilamentColorsResponse[];
 					this.colorOptions.set(initialColors);
 					this.updateFilteredColorOptions();
 
@@ -105,6 +113,8 @@ export class ProductDetailsComponent {
 						?.valueChanges.subscribe((ft) =>
 							this.fetchColorsByFilamentType(ft),
 						);
+
+					this.cdr.markForCheck();
 				}),
 				catchError((error) => {
 					console.error('Failed to load product:', error);
@@ -117,9 +127,10 @@ export class ProductDetailsComponent {
 
 	updateFilteredColorOptions() {
 		const selectedFilamentType = this.productForm?.get('filamentType')?.value;
-		const filtered = this.colorOptions().filter(
-			(option) => option.color === selectedFilamentType,
-		);
+		const allColors = this.colorOptions() ?? [];
+		const filtered = selectedFilamentType
+			? allColors.filter((option) => option.profile === selectedFilamentType)
+			: allColors;
 		this.filteredColorOptions.set(filtered);
 	}
 
@@ -134,7 +145,7 @@ export class ProductDetailsComponent {
 		}
 	}
 
-	initForm(product: Product) {
+	initForm(product: ProductResponse) {
 		this.colorControl = new FormControl<string | null>(
 			product.color ?? null,
 			Validators.required,
@@ -163,10 +174,10 @@ export class ProductDetailsComponent {
 			return;
 		}
 
-		const updatedProduct: Product = {
-			...(this.productDetails ? this.productDetails : {}),
+		const updatedProduct: ProductResponse = {
+			...(this.productDetails as ProductResponse),
 			...this.productForm.value,
-			color: this.colorControl.value,
+			color: this.colorControl.value as string,
 			imageGallery: this.imageGallery(),
 		};
 

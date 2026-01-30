@@ -1,7 +1,7 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { computed, Injectable, inject, signal } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, map, tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import type { FilamentColorsResponse } from './types/filament';
 
@@ -44,12 +44,15 @@ export class ProductService {
 	): Observable<FilamentColorsResponse[]> {
 		this.colorsLoadingSignal.set(true);
 		return this.http
-			.get<FilamentColorsResponse[]>(`${this.baseUrl}/colors`, {
+			.get<FilamentColorsApiResponse>(`${this.baseUrl}/v2/colors`, {
 				params: { filamentType },
 			})
 			.pipe(
+				map((response) => response.data),
 				tap((colors) => {
 					this.colorsSignal.set(colors);
+				}),
+				finalize(() => {
 					this.colorsLoadingSignal.set(false);
 				}),
 			);
@@ -59,8 +62,25 @@ export class ProductService {
 		return this.http.get<ProductResponse>(`${this.baseUrl}/product/${id}`);
 	}
 
-	updateProduct(product: Product): Observable<void> {
-		return this.http.put<void>(`${this.baseUrl}/update-product`, product);
+	updateProduct(product: ProductResponse): Observable<void> {
+		const basePayload: ProductUpdatePayload = {
+			id: product.id,
+			name: product.name,
+			description: product.description,
+			stl: product.stl,
+			price: product.price,
+			filamentType: product.filamentType,
+			color: product.color,
+			image: product.image,
+		};
+
+		const imageGallery = product.imageGallery ?? [];
+		const payload =
+			imageGallery.length > 0
+				? { ...basePayload, imageGallery }
+				: basePayload;
+
+		return this.http.put<void>(`${this.baseUrl}/update-product`, payload);
 	}
 
 	createProduct(product: Product): Observable<ProductResponse> {
@@ -100,4 +120,24 @@ export interface Product {
 export interface DeleteProductResponse {
 	success: boolean;
 	message: string;
+}
+
+interface FilamentColorsApiResponse {
+	success: boolean;
+	message: string;
+	data: FilamentColorsResponse[];
+	count: number;
+	lastUpdated: string;
+}
+
+interface ProductUpdatePayload {
+	id: number;
+	name: string;
+	description: string;
+	stl: string;
+	price: number;
+	filamentType: 'PLA' | 'PETG';
+	color: string;
+	image: string;
+	imageGallery?: string[];
 }
