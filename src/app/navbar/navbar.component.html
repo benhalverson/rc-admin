@@ -19,6 +19,15 @@
               >Add Product</a
               >
             </li>
+            <li>
+              <a
+                routerLink="/orders"
+                routerLinkActive="router-link-active"
+                class="text-white hover:text-yellow-300"
+                data-cy="orders-link"
+                >Orders</a
+                >
+            </li>
           }
 
           <!-- Show Sign-in only when not authenticated -->
@@ -84,7 +93,14 @@
                       data-cy="mobile-add-product-link"
                       >Add Product</a
                       >
-                    }
+                    <a
+                      [routerLink]="['/orders']"
+                      routerLinkActive="text-yellow-300"
+                      class="block text-white hover:text-yellow-300"
+                      data-cy="mobile-orders-link"
+                      >Orders</a
+                      >
+                  }
                     <!-- Mobile menu: Show Sign-in only when not authenticated -->
                     @if (!authStore.isAuthenticated()) {
                       <a

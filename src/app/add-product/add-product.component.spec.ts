@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -5,7 +6,11 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { provideToastr, ToastrService } from 'ngx-toastr';
 import { of, throwError } from 'rxjs';
-import { type ProductResponse, ProductService } from '../product.service';
+import {
+	FilamentType,
+	type ProductResponse,
+	ProductService,
+} from '../product.service';
 import type { FilamentColorsResponse } from '../types/filament';
 import { Profile, Provider } from '../types/filament';
 import { AddProductComponent } from './add-product.component';
@@ -30,8 +35,9 @@ describe('AddProductComponent', () => {
 		description: 'Test Description',
 		image: 'test-image.jpg',
 		stl: 'test-file.stl',
+		publicFileServiceId: 'file_123',
 		price: 29.99,
-		filamentType: 'PLA' as const,
+		filamentType: FilamentType.PLA,
 		color: 'red',
 		imageGallery: ['image1.jpg', 'image2.jpg'],
 	};
@@ -129,6 +135,7 @@ describe('AddProductComponent', () => {
 			expect(component.productForm.get('description')?.value).toBe('');
 			expect(component.productForm.get('image')?.value).toBe('');
 			expect(component.productForm.get('stl')?.value).toBe('');
+			expect(component.productForm.get('publicFileServiceId')?.value).toBe('');
 			expect(component.productForm.get('price')?.value).toBe(0);
 			expect(component.productForm.get('filamentType')?.value).toBe('PLA');
 			expect(component.productForm.get('color')?.value).toBeNull();
@@ -188,6 +195,15 @@ describe('AddProductComponent', () => {
 			expect(stlControl?.valid).toBe(true);
 		});
 
+		it('should validate publicFileServiceId field', () => {
+			const fileIdControl = component.productForm.get('publicFileServiceId');
+
+			expect(fileIdControl?.hasError('required')).toBe(true);
+
+			fileIdControl?.setValue('file_123');
+			expect(fileIdControl?.valid).toBe(true);
+		});
+
 		it('should validate price field', () => {
 			const priceControl = component.productForm.get('price');
 
@@ -213,11 +229,20 @@ describe('AddProductComponent', () => {
 
 	describe('File Upload Handlers', () => {
 		it('should handle STL file upload', () => {
-			const testUrl = 'https://example.com/test.stl';
+			const uploadedFile = {
+				fileURL: 'https://slant3d.com/files/test.stl',
+				publicFileServiceId: 'file_123',
+				fileName: 'test.stl',
+			};
 
-			component.onStlUploaded(testUrl);
+			component.onStlUploaded(uploadedFile);
 
-			expect(component.productForm.get('stl')?.value).toBe(testUrl);
+			expect(component.productForm.get('stl')?.value).toBe(
+				'https://slant3d.com/files/test.stl',
+			);
+			expect(component.productForm.get('publicFileServiceId')?.value).toBe(
+				'file_123',
+			);
 		});
 
 		it('should handle PNG file upload', () => {
@@ -302,8 +327,9 @@ describe('AddProductComponent', () => {
 				description: 'Test Description',
 				image: 'test.jpg',
 				stl: 'test.stl',
+				publicFileServiceId: 'file_123',
 				price: 29.99,
-				filamentType: 'PLA',
+				filamentType: FilamentType.PLA,
 				color: 'red',
 				imageGallery: ['gallery.jpg'],
 			});
@@ -318,8 +344,9 @@ describe('AddProductComponent', () => {
 				description: 'Test Description',
 				image: 'test.jpg',
 				stl: 'test.stl',
+				publicFileServiceId: 'file_123',
 				price: 29.99,
-				filamentType: 'PLA',
+				filamentType: FilamentType.PLA,
 				color: 'red',
 				imageGallery: ['gallery.jpg'],
 			});
@@ -335,8 +362,11 @@ describe('AddProductComponent', () => {
 			expect(component.productForm.get('description')?.value).toBe('');
 			expect(component.productForm.get('image')?.value).toBe('');
 			expect(component.productForm.get('stl')?.value).toBe('');
+			expect(component.productForm.get('publicFileServiceId')?.value).toBe('');
 			expect(component.productForm.get('price')?.value).toBe(0);
-			expect(component.productForm.get('filamentType')?.value).toBe('PLA');
+			expect(component.productForm.get('filamentType')?.value).toBe(
+				FilamentType.PLA,
+			);
 			expect(component.productForm.get('color')?.value).toBeNull();
 			expect(component.productForm.get('imageGallery')?.value).toEqual([]);
 			expect(component.imageGallery()).toEqual([]);
@@ -358,6 +388,45 @@ describe('AddProductComponent', () => {
 			expect(console.error).toHaveBeenCalledWith(
 				'Failed to add product',
 				expect.any(Error),
+			);
+		});
+
+		it('should show API error details when product creation fails with a structured response', async () => {
+			vi.spyOn(console, 'error');
+
+			productService.createProduct.mockReturnValue(
+				throwError(
+					() =>
+						new HttpErrorResponse({
+							status: 404,
+							error: {
+								error: 'Failed to estimate file price from Slant3D V2 API',
+								details: {
+									url: 'https://slant3dapi.com/v2/api/files/file_123/estimate',
+									cause: 'DNS lookup failed',
+								},
+							},
+						}),
+				),
+			);
+
+			await component.onSubmit();
+
+			expect(toastrService.error).toHaveBeenCalledWith(
+				'Failed to estimate file price from Slant3D V2 API: https://slant3dapi.com/v2/api/files/file_123/estimate - DNS lookup failed',
+			);
+		});
+
+		it('should not submit when STL upload has not been confirmed', async () => {
+			component.productForm.patchValue({
+				publicFileServiceId: '',
+			});
+
+			await component.onSubmit();
+
+			expect(productService.createProduct).not.toHaveBeenCalled();
+			expect(toastrService.error).toHaveBeenCalledWith(
+				'Upload and confirm an STL file before adding product.',
 			);
 		});
 
@@ -407,7 +476,11 @@ describe('AddProductComponent', () => {
 	describe('Integration Tests', () => {
 		it('should handle complete product creation workflow', async () => {
 			// Simulate file uploads
-			component.onStlUploaded('https://example.com/model.stl');
+			component.onStlUploaded({
+				fileURL: 'https://slant3d.com/files/model.stl',
+				publicFileServiceId: 'file_123',
+				fileName: 'model.stl',
+			});
 			component.onPngUpload('https://example.com/main.jpg');
 			component.onGalleryImageUpload('https://example.com/gallery1.jpg');
 			component.onGalleryImageUpload('https://example.com/gallery2.jpg');
@@ -417,7 +490,7 @@ describe('AddProductComponent', () => {
 				name: 'Complete Product',
 				description: 'Complete Description',
 				price: 49.99,
-				filamentType: 'PETG',
+				filamentType: FilamentType.PETG,
 			});
 			component.colorControl.setValue('blue');
 
@@ -428,9 +501,10 @@ describe('AddProductComponent', () => {
 				name: 'Complete Product',
 				description: 'Complete Description',
 				image: 'https://example.com/main.jpg',
-				stl: 'https://example.com/model.stl',
+				stl: 'https://slant3d.com/files/model.stl',
+				publicFileServiceId: 'file_123',
 				price: 49.99,
-				filamentType: 'PETG',
+				filamentType: FilamentType.PETG,
 				color: 'blue',
 				imageGallery: [
 					'https://example.com/gallery1.jpg',

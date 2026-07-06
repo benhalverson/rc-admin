@@ -45,9 +45,18 @@ export class LoginComponent {
 			this.toastr.success(message || 'Login successful');
 			this.router.navigateByUrl(this.returnUrl);
 		} catch (error: unknown) {
-			const err = error as { error?: { error?: string; details?: string } };
+			const err = error as {
+				error?:
+					| string
+					| { message?: string; details?: string; error?: string };
+				message?: string;
+			};
+			const responseError =
+				typeof err.error === 'string'
+					? err.error
+					: err.error?.message || err.error?.details || err.error?.error;
 			this.toastr.error(
-				`Failed to login. ${err.error?.error || err.error?.details || 'Unknown error'}`,
+				`Failed to login. ${responseError || err.message || 'Unknown error'}`,
 			);
 		}
 	}

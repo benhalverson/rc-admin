@@ -25,9 +25,14 @@ import {
 	tap,
 } from 'rxjs';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
-import { ProductResponse, ProductService } from '../product.service';
+import {
+	FilamentType,
+	ProductResponse,
+	ProductService,
+} from '../product.service';
 import { FilamentColorsResponse } from '../types/filament';
 import { Upload } from '../upload/upload';
+import type { Slant3dUploadedFile } from '../upload/upload.service';
 
 @Component({
 	selector: 'app-product-details',
@@ -103,8 +108,9 @@ export class ProductDetailsComponent {
 					this.productDetails = product;
 					this.initForm(product);
 
-					const initialColors = this.route.snapshot
-						.data['colorOptions'] as FilamentColorsResponse[];
+					const initialColors = this.route.snapshot.data[
+						'colorOptions'
+					] as FilamentColorsResponse[];
 					this.colorOptions.set(initialColors);
 					this.updateFilteredColorOptions();
 
@@ -134,10 +140,10 @@ export class ProductDetailsComponent {
 		this.filteredColorOptions.set(filtered);
 	}
 
-	async fetchColorsByFilamentType(filamentType: 'PLA' | 'PETG') {
+	async fetchColorsByFilamentType(ft: FilamentType) {
 		try {
 			this.isLoading.set(true);
-			await firstValueFrom(this.productService.getColors(filamentType));
+			await firstValueFrom(this.productService.getColors(ft));
 		} catch (error) {
 			console.error('Failed to fetch colors:', error);
 		} finally {
@@ -198,7 +204,9 @@ export class ProductDetailsComponent {
 			.subscribe();
 	}
 
-	onGalleryImageUpload(url: string) {
+	onGalleryImageUpload(uploadedFile: string | Slant3dUploadedFile) {
+		const url =
+			typeof uploadedFile === 'string' ? uploadedFile : uploadedFile.fileURL;
 		const currentGallery = this.imageGallery();
 		const updatedGallery = [...currentGallery, url];
 		this.imageGallery.set(updatedGallery);

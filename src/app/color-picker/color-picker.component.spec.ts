@@ -1,25 +1,19 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {
+	HttpClientTestingModule,
+	HttpTestingController,
+} from '@angular/common/http/testing';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of } from 'rxjs';
-import { ProductService } from '../product.service';
+import { environment } from '../../environments/environment';
 import { FilamentColorsResponse, Profile, Provider } from '../types/filament';
 import { ColorPickerComponent } from './color-picker.component';
 
 describe('ColorPickerComponent', () => {
 	let component: ColorPickerComponent;
 	let fixture: ComponentFixture<ColorPickerComponent>;
-	let productService: {
-		getColors: ReturnType<typeof vi.fn>;
-		colors: () => FilamentColorsResponse[];
-		colorsLoading: () => boolean;
-	};
+	let httpMock: HttpTestingController;
 
 	beforeEach(async () => {
-		const productServiceSpy = {
-			getColors: vi.fn(),
-		};
-
 		const mockColors: FilamentColorsResponse[] = [
 			{
 				name: 'Red PLA',
@@ -53,31 +47,38 @@ describe('ColorPickerComponent', () => {
 			},
 		];
 
-		Object.defineProperty(productServiceSpy, 'colors', {
-			value: (() => mockColors) as unknown,
-		});
-		Object.defineProperty(productServiceSpy, 'colorsLoading', {
-			value: (() => false) as unknown,
-		});
-
 		await TestBed.configureTestingModule({
 			imports: [
 				ColorPickerComponent,
 				HttpClientTestingModule,
 				RouterTestingModule,
 			],
-			providers: [{ provide: ProductService, useValue: productServiceSpy }],
 		}).compileComponents();
-
-		productService = TestBed.inject(
-			ProductService,
-		) as unknown as typeof productService;
-		productService.getColors.mockReturnValue(of(mockColors));
 
 		fixture = TestBed.createComponent(ColorPickerComponent);
 		component = fixture.componentInstance;
-		component.filamentType = 'PLA'; // Set required input
+		component.filamentType = 'PLA';
+
+		httpMock = TestBed.inject(HttpTestingController);
+
 		fixture.detectChanges();
+
+		const req = httpMock.expectOne(
+			`${environment.baseurl}/v2/colors?filamentType=PLA`,
+		);
+		expect(req.request.method).toBe('GET');
+		req.flush({
+			success: true,
+			message: 'ok',
+			data: mockColors,
+			count: mockColors.length,
+			lastUpdated: new Date().toISOString(),
+		});
+		fixture.detectChanges();
+	});
+
+	afterEach(() => {
+		httpMock.verify();
 	});
 
 	it('should create', () => {
@@ -90,10 +91,6 @@ describe('ColorPickerComponent', () => {
 
 	it('should initialize with null model by default', () => {
 		expect(component.model).toBeNull();
-	});
-
-	it('should call getColors on init with filamentType', () => {
-		expect(productService.getColors).toHaveBeenCalledWith('PLA');
 	});
 
 	it('should emit modelChange when selectColor is called', () => {
@@ -128,17 +125,10 @@ describe('ColorPickerComponent', () => {
 		expect(isLoading).toBeFalsy();
 	});
 
-	it('should handle filamentType change to PETG', () => {
-		productService.getColors.mockClear();
-
-		// Set the new filament type and trigger change detection
-		component.filamentType = 'PETG';
-
-		// Call ngOnInit to trigger the effect with the new filament type
-		component.ngOnInit();
-
-		// The effect should trigger getColors with new filament type
-		expect(productService.getColors).toHaveBeenCalledWith('PETG');
+	it('should fetch colors for initial filamentType', () => {
+		const colorOptions = component.colorOptions();
+		expect(colorOptions.length).toBe(3);
+		expect(colorOptions[0].hexValue).toBe('FF0000');
 	});
 
 	it('should handle empty color list', () => {
@@ -151,15 +141,39 @@ describe('ColorPickerComponent', () => {
 		expect(Array.isArray(colorOptions)).toBeTruthy();
 	});
 
-	it('should handle loading state', () => {
-		// Mock the service to simulate loading state
-		// We need to directly test the computed signal which reflects the service's loading state
+	it('should handle filamentType change to PETG', async () => {
+		const mockPetgColors: FilamentColorsResponse[] = [
+			{
+				name: 'Blue PETG',
+				provider: Provider.Polymaker,
+				public: true,
+				available: true,
+				color: 'PETG',
+				profile: Profile.Petg,
+				hexValue: '0000FF',
+				publicId: 'blue-petg',
+			},
+		];
 
-		// Check that initially the loading state is false (from beforeEach setup)
-		expect(component.isLoading()).toBeFalsy();
+		component.filamentType = 'PETG';
+		fixture.detectChanges();
 
-		// Test that we can get loading state from the service
-		const isServiceLoading = productService.colorsLoading();
-		expect(isServiceLoading).toBeDefined();
+		const req = httpMock.expectOne(
+			`${environment.baseurl}/v2/colors?filamentType=PETG`,
+		);
+		expect(req.request.method).toBe('GET');
+		req.flush({
+			success: true,
+			message: 'ok',
+			data: mockPetgColors,
+			count: mockPetgColors.length,
+			lastUpdated: new Date().toISOString(),
+		});
+		await fixture.whenStable();
+		fixture.detectChanges();
+
+		const colorOptions = component.colorOptions();
+		expect(colorOptions.length).toBe(1);
+		expect(colorOptions[0].profile).toBe(Profile.Petg);
 	});
 });

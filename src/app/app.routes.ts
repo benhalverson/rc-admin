@@ -27,6 +27,14 @@ export const routes: Routes = [
 		canActivate: [authGuard],
 	},
 	{
+		path: 'orders',
+		loadComponent: () =>
+			import('./admin-orders/admin-orders.component').then(
+				(m) => m.AdminOrdersComponent,
+			),
+		canActivate: [authGuard],
+	},
+	{
 		path: 'signin',
 		component: LoginComponent,
 		canActivate: [guestGuard],

@@ -3,7 +3,11 @@ import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, EMPTY, finalize, tap } from 'rxjs';
-import { type ProductResponse, ProductService } from '../product.service';
+import {
+	type CatalogProductReadiness,
+	type ProductResponse,
+	ProductService,
+} from '../product.service';
 
 @Component({
 	selector: 'app-product-card',
@@ -14,6 +18,7 @@ import { type ProductResponse, ProductService } from '../product.service';
 })
 export class ProductCardComponent {
 	product = input.required<ProductResponse>();
+	readiness = input<CatalogProductReadiness | null>(null);
 	private readonly service = inject(ProductService);
 	private readonly toastService = inject(ToastrService);
 
@@ -43,5 +48,17 @@ export class ProductCardComponent {
 				}),
 			)
 			.subscribe();
+	}
+
+	readinessLabel() {
+		const readiness = this.readiness();
+		if (!readiness) {
+			return 'Readiness unknown';
+		}
+		return readiness.checkoutReady ? 'Checkout ready' : 'Needs setup';
+	}
+
+	readinessReasons() {
+		return this.readiness()?.reasons.join(', ') ?? '';
 	}
 }

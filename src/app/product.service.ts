@@ -28,6 +28,11 @@ export class ProductService {
 	readonly productsResource = httpResource<ProductResponse[]>(() => {
 		return `${this.baseUrl}/products`;
 	});
+	readonly catalogReadinessResource = httpResource<CatalogReadinessResponse>(
+		() => {
+			return `${this.baseUrl}/admin/catalog/readiness`;
+		},
+	);
 	/** @deprecated use productsResource instead */
 	getProducts(): Observable<ProductResponse[]> {
 		this.productsLoadingSignal.set(true);
@@ -39,9 +44,7 @@ export class ProductService {
 		);
 	}
 
-	getColors(
-		filamentType: 'PLA' | 'PETG',
-	): Observable<FilamentColorsResponse[]> {
+	getColors(filamentType: FilamentType): Observable<FilamentColorsResponse[]> {
 		this.colorsLoadingSignal.set(true);
 		return this.http
 			.get<FilamentColorsApiResponse>(`${this.baseUrl}/v2/colors`, {
@@ -76,18 +79,24 @@ export class ProductService {
 
 		const imageGallery = product.imageGallery ?? [];
 		const payload =
-			imageGallery.length > 0
-				? { ...basePayload, imageGallery }
-				: basePayload;
+			imageGallery.length > 0 ? { ...basePayload, imageGallery } : basePayload;
 
 		return this.http.put<void>(`${this.baseUrl}/update-product`, payload);
 	}
 
-	createProduct(product: Product): Observable<ProductResponse> {
-		return this.http.post<ProductResponse>(
-			`${this.baseUrl}/add-product`,
-			product,
-		);
+	createProduct(product: ProductCreateRequest): Observable<ProductResponse> {
+		const imageGallery = product.imageGallery ?? [];
+		const payload =
+			imageGallery.length > 0
+				? { ...product, imageGallery }
+				: { ...product, imageGallery: undefined };
+
+		return this.http
+			.post<AddProductV2Response>(`${this.baseUrl}/v2/add-product`, payload)
+			.pipe(
+				map((response) => response.product),
+				tap(() => this.reloadProductResources()),
+			);
 	}
 
 	deleteProduct(id: number): Observable<DeleteProductResponse> {
@@ -100,10 +109,36 @@ export class ProductService {
 	refreshProducts(): void {
 		this.getProducts().subscribe();
 	}
+
+	reloadProductResources(): void {
+		this.productsResource.reload();
+		this.catalogReadinessResource.reload();
+	}
 }
 
 export interface ProductResponse extends Product {
 	id: number;
+	publicFileServiceId: string | null;
+}
+
+export interface CatalogProductReadiness {
+	productId: number;
+	skuNumber: string | null;
+	name: string | null;
+	checkoutReady: boolean;
+	reasons: string[];
+	stripePriceId: string | null;
+	publicFileServiceId: string | null;
+	defaultFilamentId: string;
+}
+
+export interface CatalogReadinessResponse {
+	products: CatalogProductReadiness[];
+	summary: {
+		total: number;
+		ready: number;
+		notReady: number;
+	};
 }
 
 export interface Product {
@@ -112,9 +147,36 @@ export interface Product {
 	image: string;
 	stl: string;
 	price: number;
-	filamentType: 'PLA' | 'PETG';
+	filamentType: FilamentType;
 	color: string;
 	imageGallery?: string[];
+}
+
+export interface ProductCreateRequest extends Product {
+	publicFileServiceId: string;
+}
+
+export interface ProductV2Response {
+	name: string;
+	description: string;
+	image: string;
+	imageGallery: string[];
+	stl: string;
+	price: number;
+	filamentType: FilamentType;
+	skuNumber: string;
+	color: string;
+	stripeProductId: string;
+	stripePriceId: string;
+	publicFileServiceId: string | null;
+	categories: {
+		categoryId: number;
+		categoryName: string;
+	}[];
+}
+
+export interface ProductV2Response extends Product {
+	id: number;
 }
 
 export interface DeleteProductResponse {
@@ -130,14 +192,25 @@ interface FilamentColorsApiResponse {
 	lastUpdated: string;
 }
 
+interface AddProductV2Response {
+	success: boolean;
+	message: string;
+	product: ProductResponse;
+}
+
 interface ProductUpdatePayload {
 	id: number;
 	name: string;
 	description: string;
 	stl: string;
 	price: number;
-	filamentType: 'PLA' | 'PETG';
+	filamentType: FilamentType;
 	color: string;
 	image: string;
 	imageGallery?: string[];
+}
+
+export enum FilamentType {
+	PLA = 'PLA',
+	PETG = 'PETG',
 }

@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +13,7 @@ describe('Upload Component', () => {
 	let fixture: ComponentFixture<Upload>;
 	let uploadService: {
 		uploadFile: ReturnType<typeof vi.fn>;
+		uploadStl: ReturnType<typeof vi.fn>;
 	};
 	interface MockUploadStore {
 		setFile: ReturnType<typeof vi.fn<(file: File | null) => void>>;
@@ -28,10 +30,19 @@ describe('Upload Component', () => {
 		key: 'test-file-key-123',
 		url: 'https://example.com/uploaded-file.jpg',
 	};
+	const mockSlantUploadResponse = {
+		message: 'Upload confirmed and file processed successfully',
+		data: {
+			publicFileServiceId: 'file_123',
+			fileName: 'test.stl',
+			fileURL: 'https://slant3d.com/files/test.stl',
+		},
+	};
 
 	beforeEach(async () => {
 		const uploadServiceSpy = {
 			uploadFile: vi.fn(),
+			uploadStl: vi.fn(),
 		};
 
 		// Create mock store with the methods we need
@@ -131,6 +142,27 @@ describe('Upload Component', () => {
 			expect(component.uploadForm.get('file')?.value).toBeNull();
 		});
 
+		it('should emit the confirmed Slant file data for v2 STL uploads', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'model/stl',
+			});
+			component.uploadType = 'v2';
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadStl.mockReturnValue(of(mockSlantUploadResponse));
+
+			vi.spyOn(component.uploaded, 'emit');
+
+			await component.onUpload();
+
+			expect(uploadService.uploadStl).toHaveBeenCalledWith(mockFile);
+			expect(component.uploaded.emit).toHaveBeenCalledWith(
+				mockSlantUploadResponse.data,
+			);
+			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
+				mockSlantUploadResponse.message,
+			);
+		});
+
 		it('should handle no file selected for upload', async () => {
 			component.uploadForm.patchValue({ file: null });
 
@@ -156,6 +188,31 @@ describe('Upload Component', () => {
 
 			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
 				`Upload failed: ${errorMessage}`,
+			);
+		});
+
+		it('should show structured API errors from upload responses', async () => {
+			const mockFile = new File(['test content'], 'test.stl', {
+				type: 'application/octet-stream',
+			});
+			component.uploadForm.patchValue({ file: mockFile });
+			uploadService.uploadFile.mockReturnValue(
+				throwError(
+					() =>
+						new HttpErrorResponse({
+							status: 500,
+							error: {
+								error: 'Failed to upload file',
+								details: 'R2 write failed',
+							},
+						}),
+				),
+			);
+
+			await component.onUpload();
+
+			expect(mockUploadStore.setMessage).toHaveBeenCalledWith(
+				'Upload failed: Failed to upload file: R2 write failed',
 			);
 		});
 

@@ -16,6 +16,32 @@ describe('UploadService', () => {
 		key: 'test-file-key-123',
 		url: 'https://example.com/uploaded-file.jpg',
 	};
+	const mockPresignedUploadResponse = {
+		success: true,
+		message: 'Presigned URL generated successfully',
+		data: {
+			presignedUrl: 'https://upload.slant3d.com/presigned',
+			key: 'uploads/test-file.stl',
+			filePlaceholder: {
+				publicFileServiceId: 'file_123',
+				name: 'test-file',
+				ownerId: 'user_123',
+				platformId: 'platform_123',
+				type: 'stl',
+				createdAt: '2026-07-06T00:00:00.000Z',
+				updatedAt: '2026-07-06T00:00:00.000Z',
+			},
+		},
+	};
+	const mockConfirmUploadResponse = {
+		success: true,
+		message: 'Upload confirmed and file processed successfully',
+		data: {
+			publicFileServiceId: 'file_123',
+			name: 'test-file',
+			fileURL: 'https://slant3d.com/files/test-file.stl',
+		},
+	};
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
@@ -153,6 +179,54 @@ describe('UploadService', () => {
 				{ error: 'Unsupported file type' },
 				{ status: 415, statusText: 'Unsupported Media Type' },
 			);
+		});
+	});
+
+	describe('uploadStl', () => {
+		it('should upload an STL through the presigned Slant3D flow', () => {
+			const file = new File(['solid test'], 'test-file.stl', {
+				type: 'model/stl',
+			});
+
+			service.uploadStl(file).subscribe((response) => {
+				expect(response.message).toBe(
+					'Upload confirmed and file processed successfully',
+				);
+				expect(response.data.fileURL).toBe(
+					'https://slant3d.com/files/test-file.stl',
+				);
+				expect(response.data.publicFileServiceId).toBe('file_123');
+				expect(response.data.fileName).toBe('test-file.stl');
+			});
+
+			const presignReq = httpMock.expectOne(
+				`${environment.baseurl}/v2/presigned-upload`,
+			);
+			expect(presignReq.request.method).toBe('POST');
+			expect(presignReq.request.body).toEqual({ fileName: 'test-file.stl' });
+			expect(presignReq.request.withCredentials).toBe(true);
+			presignReq.flush(mockPresignedUploadResponse);
+
+			const uploadReq = httpMock.expectOne(
+				'https://upload.slant3d.com/presigned',
+			);
+			expect(uploadReq.request.method).toBe('PUT');
+			expect(uploadReq.request.body).toBe(file);
+			expect(uploadReq.request.headers.get('Content-Type')).toBe(
+				'application/octet-stream',
+			);
+			expect(uploadReq.request.withCredentials).toBe(false);
+			uploadReq.flush('');
+
+			const confirmReq = httpMock.expectOne(
+				`${environment.baseurl}/v2/confirm`,
+			);
+			expect(confirmReq.request.method).toBe('POST');
+			expect(confirmReq.request.body).toEqual({
+				filePlaceholder: mockPresignedUploadResponse.data.filePlaceholder,
+			});
+			expect(confirmReq.request.withCredentials).toBe(true);
+			confirmReq.flush(mockConfirmUploadResponse);
 		});
 	});
 });

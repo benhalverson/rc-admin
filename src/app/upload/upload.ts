@@ -1,12 +1,33 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, EventEmitter, Input, inject, Output } from '@angular/core';
 import {
 	FormBuilder,
 	type FormGroup,
 	ReactiveFormsModule,
 } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { UploadService } from './upload.service';
+import { type Slant3dUploadedFile, UploadService } from './upload.service';
 import { UploadStore } from './upload.store';
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
+}
+
+function getUploadErrorMessage(error: unknown): string {
+	if (error instanceof HttpErrorResponse) {
+		const body = error.error;
+		if (typeof body === 'string') return body;
+		if (isRecord(body) && typeof body['error'] === 'string') {
+			const details =
+				typeof body['details'] === 'string' ? `: ${body['details']}` : '';
+			return `${body['error']}${details}`;
+		}
+	}
+
+	return error instanceof Error
+		? error.message
+		: 'An error occurred during upload.';
+}
 
 @Component({
 	selector: 'app-upload',
@@ -19,8 +40,8 @@ export class Upload {
 	private fb = inject(FormBuilder);
 	private uploadService = inject(UploadService);
 
-	// @Input({required: true}) stlControl!: FormControl<string>
-	@Output() uploaded = new EventEmitter<string>();
+	@Input() uploadType: 'v1' | 'v2' = 'v1'; // 'v1' for images, 'v2' for STL files
+	@Output() uploaded = new EventEmitter<string | Slant3dUploadedFile>();
 
 	uploadForm: FormGroup = this.fb.group({
 		file: [null],
@@ -43,19 +64,28 @@ export class Upload {
 		formData.append('file', file);
 
 		try {
-			const response = await firstValueFrom(
-				this.uploadService.uploadFile(formData),
-			);
-			const url = response.url;
+			let uploadedFile: string | Slant3dUploadedFile;
+			let message: string;
 
-			this.uploaded.emit(url);
-			this.uploadStore.setMessage(`${response.message}`);
+			if (this.uploadType === 'v2') {
+				const response = await firstValueFrom(
+					this.uploadService.uploadStl(file),
+				);
+				uploadedFile = response.data;
+				message = response.message;
+			} else {
+				const response = await firstValueFrom(
+					this.uploadService.uploadFile(formData),
+				);
+				uploadedFile = response.url;
+				message = response.message;
+			}
+
+			this.uploaded.emit(uploadedFile);
+			this.uploadStore.setMessage(message);
 			this.uploadForm.reset();
 		} catch (error) {
-			const message =
-				error instanceof Error
-					? error.message
-					: 'An error occurred during upload.';
+			const message = getUploadErrorMessage(error);
 			this.uploadStore.setMessage(`Upload failed: ${message}`);
 		}
 	}

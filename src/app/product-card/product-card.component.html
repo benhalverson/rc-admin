@@ -21,6 +21,14 @@
       {{ product().description }}
     </p>
 
+    <div
+      class="px-3 py-2 mb-3 text-xs font-medium rounded-md"
+      [ngClass]="readiness()?.checkoutReady ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'"
+      [title]="readinessReasons()"
+    >
+      {{ readinessLabel() }}
+    </div>
+
     <!-- Product Details -->
     <div class="flex items-center justify-between mb-3">
       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

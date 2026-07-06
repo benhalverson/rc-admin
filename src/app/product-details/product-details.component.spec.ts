@@ -9,7 +9,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { provideToastr, ToastrService } from 'ngx-toastr';
 import { of, Subject, throwError } from 'rxjs';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
-import { type ProductResponse, ProductService } from '../product.service';
+import {
+	FilamentType,
+	type ProductResponse,
+	ProductService,
+} from '../product.service';
 import type { FilamentColorsResponse } from '../types/filament';
 import { Profile, Provider } from '../types/filament';
 import { Upload } from '../upload/upload';
@@ -37,8 +41,9 @@ describe('ProductDetailsComponent', () => {
 		description: 'Test Description',
 		image: 'https://example.com/test.jpg',
 		stl: 'https://example.com/test.stl',
+		publicFileServiceId: 'file_123',
 		price: 29.99,
-		filamentType: 'PLA',
+		filamentType: FilamentType.PLA,
 		color: 'red',
 		imageGallery: [
 			'https://example.com/gallery1.jpg',
@@ -280,9 +285,9 @@ describe('ProductDetailsComponent', () => {
 		});
 
 		it('should fetch colors when filament type changes', async () => {
-			await component.fetchColorsByFilamentType('PETG');
+			await component.fetchColorsByFilamentType(FilamentType.PETG);
 
-			expect(productService.getColors).toHaveBeenCalledWith('PETG');
+			expect(productService.getColors).toHaveBeenCalledWith(FilamentType.PETG);
 			expect(component.colorOptions()).toEqual(mockFilaments);
 			expect(component.isLoading()).toBe(false);
 		});
@@ -291,7 +296,7 @@ describe('ProductDetailsComponent', () => {
 			productService.getColors.mockReturnValue(throwError('API Error'));
 			vi.spyOn(console, 'error');
 
-			await component.fetchColorsByFilamentType('PETG');
+			await component.fetchColorsByFilamentType(FilamentType.PETG);
 
 			expect(console.error).toHaveBeenCalledWith(
 				'Failed to fetch colors:',

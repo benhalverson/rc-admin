@@ -4,7 +4,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
-import { type ProductResponse, ProductService } from '../product.service';
+import {
+	FilamentType,
+	type ProductResponse,
+	ProductService,
+} from '../product.service';
 import { ProductCardComponent } from './product-card.component';
 
 describe('ProductCardComponent', () => {
@@ -29,8 +33,9 @@ describe('ProductCardComponent', () => {
 			'This is a test product description that should be displayed in the card',
 		image: 'https://example.com/test-image.jpg',
 		stl: 'https://example.com/test.stl',
+		publicFileServiceId: 'file_123',
 		price: 29.99,
-		filamentType: 'PLA',
+		filamentType: FilamentType.PLA,
 		color: '#FF0000',
 		imageGallery: [
 			'https://example.com/gallery1.jpg',
@@ -109,6 +114,25 @@ describe('ProductCardComponent', () => {
 		expect(colorTextElement.nativeElement.textContent.trim()).toBe('#FF0000');
 	});
 
+	it('should display checkout readiness when provided', () => {
+		fixture.componentRef.setInput('readiness', {
+			productId: 1,
+			skuNumber: 'TEST-001',
+			name: 'Test Product',
+			checkoutReady: false,
+			reasons: ['missing_stripe_price_id'],
+			stripePriceId: null,
+			publicFileServiceId: 'file_123',
+			defaultFilamentId: '76fe1f79-3f1e-43e4-b8f4-61159de5b93c',
+		});
+		fixture.detectChanges();
+
+		expect(fixture.nativeElement.textContent).toContain('Needs setup');
+		expect(fixture.nativeElement.textContent).not.toContain(
+			'Readiness unknown',
+		);
+	});
+
 	it('should have a router link to product details', () => {
 		const linkElement = fixture.debugElement.query(By.css('a'));
 
@@ -126,7 +150,7 @@ describe('ProductCardComponent', () => {
 	it('should display different filament types correctly', () => {
 		fixture.componentRef.setInput('product', {
 			...mockProduct,
-			filamentType: 'PETG',
+			filamentType: FilamentType.PETG,
 		});
 		fixture.detectChanges();
 

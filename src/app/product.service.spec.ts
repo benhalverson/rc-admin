@@ -5,7 +5,8 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../environments/environment';
 import {
-	type Product,
+	FilamentType,
+	type ProductCreateRequest,
 	type ProductResponse,
 	ProductService,
 } from './product.service';
@@ -16,13 +17,14 @@ describe('ProductService', () => {
 	let service: ProductService;
 	let httpMock: HttpTestingController;
 
-	const mockProduct: Product = {
+	const mockProduct: ProductCreateRequest = {
 		name: 'Test Product',
 		description: 'Test Description',
 		image: 'test-image.jpg',
 		stl: 'test-file.stl',
+		publicFileServiceId: 'file_123',
 		price: 29.99,
-		filamentType: 'PLA',
+		filamentType: FilamentType.PLA,
 		color: 'red',
 		imageGallery: ['image1.jpg', 'image2.jpg'],
 	};
@@ -110,7 +112,7 @@ describe('ProductService', () => {
 
 	describe('getColors', () => {
 		it('should retrieve PLA colors from API', () => {
-			service.getColors('PLA').subscribe((response) => {
+			service.getColors(FilamentType.PLA).subscribe((response) => {
 				expect(Array.isArray(response)).toBe(true);
 				expect(response.length).toBe(2);
 				expect(response[0].hexValue).toBe('f91010');
@@ -138,7 +140,7 @@ describe('ProductService', () => {
 				},
 			];
 
-			service.getColors('PETG').subscribe((response) => {
+			service.getColors(FilamentType.PETG).subscribe((response) => {
 				expect(response.length).toBe(1);
 				expect(response[0].profile).toBe('PETG');
 			});
@@ -152,7 +154,7 @@ describe('ProductService', () => {
 		});
 
 		it('should handle getColors error', () => {
-			service.getColors('PLA').subscribe({
+			service.getColors(FilamentType.PLA).subscribe({
 				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
 					expect(error.status).toBe(404);
@@ -275,18 +277,31 @@ describe('ProductService', () => {
 
 	describe('createProduct', () => {
 		it('should create a new product', () => {
+			const reloadSpy = vi
+				.spyOn(service, 'reloadProductResources')
+				.mockImplementation(() => undefined);
+
 			service.createProduct(mockProduct).subscribe((response) => {
 				expect(response).toEqual(mockSingleProductResponse);
 				expect(response.id).toBe(1);
 			});
 
-			const req = httpMock.expectOne(`${environment.baseurl}/add-product`);
+			const req = httpMock.expectOne(`${environment.baseurl}/v2/add-product`);
 			expect(req.request.method).toBe('POST');
 			expect(req.request.body).toEqual(mockProduct);
-			req.flush(mockSingleProductResponse);
+			req.flush({
+				success: true,
+				message: 'created',
+				product: mockSingleProductResponse,
+			});
+			expect(reloadSpy).toHaveBeenCalledTimes(1);
 		});
 
 		it('should handle createProduct error', () => {
+			const reloadSpy = vi
+				.spyOn(service, 'reloadProductResources')
+				.mockImplementation(() => undefined);
+
 			service.createProduct(mockProduct).subscribe({
 				next: () => expect.unreachable('Expected an error'),
 				error: (error) => {
@@ -295,21 +310,27 @@ describe('ProductService', () => {
 				},
 			});
 
-			const req = httpMock.expectOne(`${environment.baseurl}/add-product`);
+			const req = httpMock.expectOne(`${environment.baseurl}/v2/add-product`);
 			req.flush(
 				{ error: 'Product creation failed' },
 				{ status: 400, statusText: 'Bad Request' },
 			);
+			expect(reloadSpy).not.toHaveBeenCalled();
 		});
 
 		it('should create product with minimal required fields', () => {
-			const minimalProduct: Product = {
+			const reloadSpy = vi
+				.spyOn(service, 'reloadProductResources')
+				.mockImplementation(() => undefined);
+
+			const minimalProduct: ProductCreateRequest = {
 				name: 'Minimal Product',
 				description: 'Basic description',
 				image: '',
 				stl: 'minimal.stl',
+				publicFileServiceId: 'file_minimal',
 				price: 10.0,
-				filamentType: 'PLA',
+				filamentType: FilamentType.PLA,
 				color: 'white',
 			};
 
@@ -323,9 +344,14 @@ describe('ProductService', () => {
 				expect(response.imageGallery).toBeUndefined();
 			});
 
-			const req = httpMock.expectOne(`${environment.baseurl}/add-product`);
+			const req = httpMock.expectOne(`${environment.baseurl}/v2/add-product`);
 			expect(req.request.body).toEqual(minimalProduct);
-			req.flush(expectedResponse);
+			req.flush({
+				success: true,
+				message: 'created',
+				product: expectedResponse,
+			});
+			expect(reloadSpy).toHaveBeenCalledTimes(1);
 		});
 	});
 });
