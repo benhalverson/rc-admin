@@ -5,7 +5,7 @@
     "ng": "ng",
     "dev": "ng serve",
     "start": "npm run build && wrangler pages dev dist/cloudflare --compatibility-date=2024-10-04 --experimental-local",
-    "build": "ng build && npm run process",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "BROWSER_HEADLESS=true ng test --watch=false",
