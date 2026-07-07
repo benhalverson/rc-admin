@@ -31,8 +31,9 @@ export class ColorPickerComponent {
 	@Input() model: string | null = null;
 	@Output() modelChange = new EventEmitter<string>();
 
-	readonly colorsResource = httpResource<FilamentColorsApiResponse>(() =>
-		`${environment.baseurl}/v2/colors?filamentType=${this.filamentTypeSignal()}`,
+	readonly colorsResource = httpResource<FilamentColorsApiResponse>(
+		() =>
+			`${environment.baseurl}/v2/colors?filamentType=${this.filamentTypeSignal()}`,
 	);
 
 	colorOptions = computed<FilamentColorsResponse[]>(() => {

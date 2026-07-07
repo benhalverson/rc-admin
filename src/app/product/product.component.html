@@ -1,52 +1,59 @@
-@if(products.hasValue() && products.value().length > 0) {
-<div class="container px-4 py-8 mx-auto">
-  <h1 class="mb-8 text-3xl font-bold text-gray-900">Products</h1>
-  @if (readiness.hasValue()) {
-  <div class="grid gap-3 p-4 mb-6 border rounded-lg border-slate-200 bg-white md:grid-cols-3">
-    <div>
-      <p class="text-xs font-semibold uppercase text-slate-500">Catalog</p>
-      <p class="text-2xl font-semibold text-slate-950">{{ readiness.value().summary.total }}</p>
-    </div>
-    <div>
-      <p class="text-xs font-semibold uppercase text-slate-500">Checkout ready</p>
-      <p class="text-2xl font-semibold text-emerald-700">{{ readiness.value().summary.ready }}</p>
-    </div>
-    <div>
-      <p class="text-xs font-semibold uppercase text-slate-500">Needs attention</p>
-      <p class="text-2xl font-semibold text-rose-700">{{ readiness.value().summary.notReady }}</p>
-    </div>
-  </div>
-  }
-  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+<main class="admin-shell">
+  <section class="admin-rail">
+    <header class="page-header print-bed-grid">
+      <div class="page-header__content">
+        <div>
+          <p class="eyebrow">Catalog bench</p>
+          <h1 class="page-title">Products</h1>
+          <p class="page-copy">
+            Manage printable catalog items, material setup, file readiness, and storefront pricing.
+          </p>
+        </div>
+      </div>
+    </header>
 
-    @for(product of products.value(); track product.id) {
-    <app-product-card [product]="product" [readiness]="readinessByProductId().get(product.id) ?? null"></app-product-card>
+    @if (readiness.hasValue()) {
+      <div class="stat-grid mb-5">
+        <div class="stat-cell">
+          <p class="stat-cell__label">Catalog</p>
+          <p class="stat-cell__value">{{ readiness.value().summary.total }}</p>
+        </div>
+        <div class="stat-cell">
+          <p class="stat-cell__label">Checkout ready</p>
+          <p class="stat-cell__value stat-cell__value--ready">{{ readiness.value().summary.ready }}</p>
+        </div>
+        <div class="stat-cell">
+          <p class="stat-cell__label">Needs attention</p>
+          <p class="stat-cell__value stat-cell__value--alert">{{ readiness.value().summary.notReady }}</p>
+        </div>
+      </div>
     }
-  </div>
-</div>
-}
 
-
-@else if (products.error()) {
-<div class="container px-4 py-8 mx-auto">
-  <div class="px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded">
-    <strong class="font-bold">Error!</strong>
-    <span class="block sm:inline"> Error loading products: {{products.error()}}</span>
-  </div>
-</div>
-} @else if (products.isLoading()) {
-<div class="container px-4 py-8 mx-auto">
-  <div class="flex items-center justify-center">
-    <div class="w-12 h-12 border-b-2 border-blue-600 rounded-full animate-spin"></div>
-    <span class="ml-3 text-gray-600">Loading products...</span>
-  </div>
-</div>
-} @else {
-<div class="container px-4 py-8 mx-auto">
-  <div class="px-4 py-3 text-yellow-700 bg-yellow-100 border border-yellow-400 rounded">
-    <strong class="font-bold">Notice:</strong>
-    <span class="block sm:inline"> No products found.</span>
-  </div>
-</div>
-
-}
+    @if(products.hasValue() && products.value().length > 0) {
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        @for(product of products.value(); track product.id) {
+          <app-product-card [product]="product" [readiness]="readinessByProductId().get(product.id) ?? null"></app-product-card>
+        }
+      </div>
+    } @else if (products.error()) {
+      <div class="notice notice--error">
+        <strong class="font-semibold">Error.</strong>
+        <span> Error loading products: {{products.error()}}</span>
+      </div>
+    } @else if (products.isLoading()) {
+      <div class="admin-panel">
+        <div class="admin-panel__body flex items-center justify-center py-10">
+          <div class="h-10 w-10 animate-spin rounded-full border-2 border-rail border-b-filament"></div>
+          <span class="ml-3 text-sm text-slate-600">Loading products...</span>
+        </div>
+      </div>
+    } @else {
+      <div class="notice notice--empty print-bed-grid">
+        <div class="relative">
+          <p class="font-display text-lg font-semibold text-ink">No products found.</p>
+          <p class="mt-2 text-sm text-slate-600">Add a catalog item to start preparing print-ready storefront inventory.</p>
+        </div>
+      </div>
+    }
+  </section>
+</main>

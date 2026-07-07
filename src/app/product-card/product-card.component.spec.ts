@@ -76,11 +76,17 @@ describe('ProductCardComponent', () => {
 	});
 
 	it('should display product information correctly', () => {
-		const nameElement = fixture.debugElement.query(By.css('h3'));
-		const descriptionElement = fixture.debugElement.query(By.css('p'));
-		const priceElement = fixture.debugElement.query(By.css('.absolute span'));
+		const nameElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-name"]'),
+		);
+		const descriptionElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-description"]'),
+		);
+		const priceElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-price"]'),
+		);
 		const filamentTypeElement = fixture.debugElement.query(
-			By.css('.bg-blue-100'),
+			By.css('[data-cy="product-card-filament"]'),
 		);
 
 		expect(nameElement.nativeElement.textContent.trim()).toBe('Test Product');
@@ -102,10 +108,10 @@ describe('ProductCardComponent', () => {
 
 	it('should display color information', () => {
 		const colorElement = fixture.debugElement.query(
-			By.css('.w-4.h-4.rounded-full'),
+			By.css('[data-cy="product-card-color-preview"]'),
 		);
 		const colorTextElement = fixture.debugElement.query(
-			By.css('.text-xs.text-gray-500'),
+			By.css('[data-cy="product-card-color-value"]'),
 		);
 
 		expect(colorElement.nativeElement.style.backgroundColor).toBe(
@@ -134,14 +140,18 @@ describe('ProductCardComponent', () => {
 	});
 
 	it('should have a router link to product details', () => {
-		const linkElement = fixture.debugElement.query(By.css('a'));
+		const linkElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-details-link"]'),
+		);
 
 		expect(linkElement).toBeTruthy();
 		expect(linkElement.nativeElement.textContent.trim()).toBe('View Details');
 	});
 
 	it('should apply hover classes for transitions', () => {
-		const cardElement = fixture.debugElement.query(By.css('.bg-white'));
+		const cardElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card"]'),
+		);
 
 		expect(cardElement.nativeElement.classList).toContain('hover:shadow-lg');
 		expect(cardElement.nativeElement.classList).toContain('transition-shadow');
@@ -155,7 +165,7 @@ describe('ProductCardComponent', () => {
 		fixture.detectChanges();
 
 		const filamentTypeElement = fixture.debugElement.query(
-			By.css('.bg-blue-100'),
+			By.css('[data-cy="product-card-filament"]'),
 		);
 		expect(filamentTypeElement.nativeElement.textContent.trim()).toBe('PETG');
 	});
@@ -164,7 +174,9 @@ describe('ProductCardComponent', () => {
 		fixture.componentRef.setInput('product', { ...mockProduct, price: 100.5 });
 		fixture.detectChanges();
 
-		const priceElement = fixture.debugElement.query(By.css('.absolute span'));
+		const priceElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-price"]'),
+		);
 		expect(priceElement.nativeElement.textContent.trim()).toBe('$100.50');
 	});
 
@@ -177,7 +189,9 @@ describe('ProductCardComponent', () => {
 		});
 		fixture.detectChanges();
 
-		const descriptionElement = fixture.debugElement.query(By.css('p'));
+		const descriptionElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-description"]'),
+		);
 		expect(descriptionElement.nativeElement.classList).toContain(
 			'line-clamp-2',
 		);
@@ -192,12 +206,16 @@ describe('ProductCardComponent', () => {
 		});
 		fixture.detectChanges();
 
-		const nameElement = fixture.debugElement.query(By.css('h3'));
+		const nameElement = fixture.debugElement.query(
+			By.css('[data-cy="product-card-name"]'),
+		);
 		expect(nameElement.nativeElement.classList).toContain('line-clamp-1');
 	});
 
 	it('should call deleteProduct and reload products when delete button is clicked', () => {
-		const deleteButton = fixture.debugElement.query(By.css('button'));
+		const deleteButton = fixture.debugElement.query(
+			By.css('[data-cy="product-card-delete-button"]'),
+		);
 		deleteButton.triggerEventHandler('click', null);
 		fixture.detectChanges();
 

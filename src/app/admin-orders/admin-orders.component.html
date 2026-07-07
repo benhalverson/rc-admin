@@ -1,120 +1,132 @@
-<main class="min-h-screen bg-slate-50">
-  <section class="px-4 py-6 mx-auto max-w-7xl">
-    <div class="flex flex-col gap-4 pb-5 border-b border-slate-200 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fulfillment desk</p>
-        <h1 class="mt-1 text-2xl font-semibold text-slate-950">Orders</h1>
-      </div>
-
-      <form class="grid gap-3 md:grid-cols-5" (ngSubmit)="loadOrders()">
-        <label class="grid gap-1 text-sm text-slate-700">
-          Search
-          <input
-            name="q"
-            [(ngModel)]="filters.q"
-            class="h-10 px-3 border rounded-md border-slate-300 bg-white"
-          />
-        </label>
-        <label class="grid gap-1 text-sm text-slate-700">
-          Status
-          <input
-            name="status"
-            [(ngModel)]="filters.status"
-            class="h-10 px-3 border rounded-md border-slate-300 bg-white"
-          />
-        </label>
-        <label class="grid gap-1 text-sm text-slate-700">
-          Slant status
-          <input
-            name="slantStatus"
-            [(ngModel)]="filters.slantStatus"
-            class="h-10 px-3 border rounded-md border-slate-300 bg-white"
-          />
-        </label>
-        <label class="grid gap-1 text-sm text-slate-700">
-          Email
-          <input
-            name="email"
-            [(ngModel)]="filters.email"
-            class="h-10 px-3 border rounded-md border-slate-300 bg-white"
-          />
-        </label>
-        <div class="flex items-end gap-2">
-          <button
-            type="submit"
-            class="h-10 px-4 text-sm font-medium text-white rounded-md bg-slate-900 hover:bg-slate-700"
-          >
-            Filter
-          </button>
-          <button
-            type="button"
-            (click)="clearFilters()"
-            class="h-10 px-4 text-sm font-medium border rounded-md border-slate-300 text-slate-700 hover:bg-white"
-          >
-            Clear
-          </button>
+<main class="admin-shell">
+  <section class="admin-rail">
+    <header class="page-header print-bed-grid">
+      <div class="page-header__content">
+        <div>
+          <p class="eyebrow">Fulfillment desk</p>
+          <h1 class="page-title">Orders</h1>
+          <p class="page-copy">
+            Review customer orders, reconcile Slant3D state, retry failed work, and handle refunds.
+          </p>
         </div>
-      </form>
-    </div>
+      </div>
+    </header>
+
+    <form class="admin-panel mb-5" (ngSubmit)="loadOrders()">
+      <div class="admin-panel__header">
+        <h2 class="admin-panel__title">Filters</h2>
+      </div>
+      <div class="admin-panel__body">
+        <div class="grid gap-3 md:grid-cols-5">
+          <label class="form-field">
+            <span class="form-label">Search</span>
+            <input
+              name="q"
+              [(ngModel)]="filters.q"
+              class="form-control"
+            />
+          </label>
+          <label class="form-field">
+            <span class="form-label">Status</span>
+            <input
+              name="status"
+              [(ngModel)]="filters.status"
+              class="form-control"
+            />
+          </label>
+          <label class="form-field">
+            <span class="form-label">Slant status</span>
+            <input
+              name="slantStatus"
+              [(ngModel)]="filters.slantStatus"
+              class="form-control"
+            />
+          </label>
+          <label class="form-field">
+            <span class="form-label">Email</span>
+            <input
+              name="email"
+              [(ngModel)]="filters.email"
+              class="form-control"
+            />
+          </label>
+          <div class="flex items-end gap-2">
+            <button
+              type="submit"
+              class="btn btn-primary flex-1"
+            >
+              Filter
+            </button>
+            <button
+              type="button"
+              (click)="clearFilters()"
+              class="btn btn-secondary flex-1"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
 
     @if (error()) {
-      <div class="px-4 py-3 mt-5 text-sm border rounded-md border-rose-200 bg-rose-50 text-rose-800">
+      <div class="notice notice--error mb-5">
         {{ error() }}
       </div>
     }
 
-    <div class="grid gap-6 mt-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(420px,0.9fr)]">
-      <section class="overflow-hidden bg-white border rounded-lg border-slate-200">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-          <h2 class="text-sm font-semibold text-slate-900">Order queue</h2>
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(420px,0.9fr)]">
+      <section class="table-shell">
+        <div class="admin-panel__header">
+          <h2 class="admin-panel__title">Order queue</h2>
           @if (isLoading()) {
-            <span class="text-xs text-slate-500">Loading</span>
+            <span class="status-pill status-pill--neutral">Loading</span>
           } @else {
-            <span class="text-xs text-slate-500">{{ orders().length }} orders</span>
+            <span class="status-pill status-pill--neutral">{{ orders().length }} orders</span>
           }
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="text-left bg-slate-100 text-slate-600">
+          <table class="operator-table">
+            <thead>
               <tr>
-                <th class="px-4 py-3 font-medium">Order</th>
-                <th class="px-4 py-3 font-medium">Customer</th>
-                <th class="px-4 py-3 font-medium">Local</th>
-                <th class="px-4 py-3 font-medium">Slant3D</th>
-                <th class="px-4 py-3 font-medium">Created</th>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Local</th>
+                <th>Slant3D</th>
+                <th>Created</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100">
+            <tbody>
               @for (order of orders(); track order.id) {
                 <tr
-                  class="cursor-pointer hover:bg-slate-50"
-                  [class.bg-slate-100]="isSelected(order)"
+                  class="cursor-pointer"
+                  [class.bg-blue-50]="isSelected(order)"
                   (click)="selectOrder(order)"
                 >
-                  <td class="px-4 py-3 font-medium text-slate-950">
+                  <td class="font-mono font-semibold text-ink">
                     {{ order.orderNumber || ('#' + order.id) }}
                   </td>
-                  <td class="px-4 py-3 text-slate-700">
+                  <td class="text-slate-700">
                     {{ order.customerEmail || order.userId }}
                   </td>
-                  <td class="px-4 py-3">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="statusTone(order.status)">
+                  <td>
+                    <span class="status-pill" [ngClass]="statusTone(order.status)">
                       {{ order.status || 'pending' }}
                     </span>
                   </td>
-                  <td class="px-4 py-3">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="statusTone(order.slantStatus)">
+                  <td>
+                    <span class="status-pill" [ngClass]="statusTone(order.slantStatus)">
                       {{ order.slantStatus || 'none' }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-slate-600">
+                  <td class="font-mono text-xs text-slate-600">
                     {{ order.createdAt || '-' }}
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="px-4 py-10 text-center text-slate-500">
+                  <td colspan="5" class="py-10 text-center text-slate-500">
                     No orders found.
                   </td>
                 </tr>
@@ -124,48 +136,48 @@
         </div>
       </section>
 
-      <aside class="bg-white border rounded-lg border-slate-200">
-        <div class="px-4 py-3 border-b border-slate-200">
-          <h2 class="text-sm font-semibold text-slate-900">Order detail</h2>
+      <aside class="admin-panel">
+        <div class="admin-panel__header">
+          <h2 class="admin-panel__title">Order detail</h2>
         </div>
 
         @if (isDetailLoading()) {
-          <div class="p-6 text-sm text-slate-500">Loading order.</div>
+          <div class="admin-panel__body text-sm text-slate-500">Loading order.</div>
         } @else if (selectedOrder(); as order) {
-          <div class="grid gap-5 p-4">
-            <div class="grid gap-2">
+          <div class="admin-panel__body grid gap-5">
+            <div class="grid gap-3">
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <h3 class="text-xl font-semibold text-slate-950">{{ order.orderNumber }}</h3>
-                  <p class="text-sm text-slate-500">{{ order.customerEmail || order.userId }}</p>
+                <div class="min-w-0">
+                  <h3 class="break-words font-display text-xl font-semibold text-ink">{{ order.orderNumber }}</h3>
+                  <p class="mt-1 break-all text-sm text-slate-500">{{ order.customerEmail || order.userId }}</p>
                 </div>
-                <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="statusTone(order.status)">
+                <span class="status-pill" [ngClass]="statusTone(order.status)">
                   {{ order.status || 'pending' }}
                 </span>
               </div>
 
-              <dl class="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt class="text-slate-500">Slant order</dt>
-                  <dd class="font-medium text-slate-900">{{ order.slantPublicOrderId || '-' }}</dd>
+              <dl class="meta-grid">
+                <div class="meta-row">
+                  <dt class="meta-label">Slant order</dt>
+                  <dd class="meta-value mono-value break-all">{{ order.slantPublicOrderId || '-' }}</dd>
                 </div>
-                <div>
-                  <dt class="text-slate-500">Payment intent</dt>
-                  <dd class="font-medium text-slate-900">{{ order.stripePaymentIntentId || '-' }}</dd>
+                <div class="meta-row">
+                  <dt class="meta-label">Payment intent</dt>
+                  <dd class="meta-value mono-value break-all">{{ order.stripePaymentIntentId || '-' }}</dd>
                 </div>
-                <div>
-                  <dt class="text-slate-500">File</dt>
-                  <dd class="font-medium text-slate-900">{{ order.filename || '-' }}</dd>
+                <div class="meta-row">
+                  <dt class="meta-label">File</dt>
+                  <dd class="meta-value mono-value break-all">{{ order.filename || '-' }}</dd>
                 </div>
-                <div>
-                  <dt class="text-slate-500">Updated</dt>
-                  <dd class="font-medium text-slate-900">{{ order.updatedAt || '-' }}</dd>
+                <div class="meta-row">
+                  <dt class="meta-label">Updated</dt>
+                  <dd class="meta-value mono-value break-all">{{ order.updatedAt || '-' }}</dd>
                 </div>
               </dl>
             </div>
 
-            <div class="grid gap-2 text-sm">
-              <h3 class="font-semibold text-slate-900">Ship to</h3>
+            <div class="grid gap-2 border-t border-rail pt-4 text-sm">
+              <h3 class="font-display text-sm font-semibold uppercase tracking-[0.08em] text-ink">Ship to</h3>
               <p class="leading-6 text-slate-700">
                 {{ order.shipToName }}<br />
                 {{ order.shipToStreet1 }}<br />
@@ -177,18 +189,23 @@
               </p>
             </div>
 
-            <div class="grid gap-3">
-              <div class="grid gap-2">
-                <label class="text-sm font-medium text-slate-700" for="cancel-reason">Cancel/refund reason</label>
+            <div class="grid gap-3 border-t border-rail pt-4">
+              <div class="form-field">
+                <label class="form-label" for="cancel-reason">Cancel/refund reason</label>
                 <textarea
                   id="cancel-reason"
                   name="cancelReason"
                   [(ngModel)]="cancelReason"
                   rows="3"
-                  class="w-full px-3 py-2 text-sm border rounded-md border-slate-300"
+                  class="form-control form-control--textarea"
                 ></textarea>
                 <label class="flex items-center gap-2 text-sm text-slate-700">
-                  <input type="checkbox" name="cancelOverride" [(ngModel)]="cancelOverride" />
+                  <input
+                    type="checkbox"
+                    name="cancelOverride"
+                    [(ngModel)]="cancelOverride"
+                    class="h-4 w-4 rounded border-rail text-filament focus:ring-filament"
+                  />
                   Override shipped or Slant failure block
                 </label>
               </div>
@@ -198,7 +215,7 @@
                   type="button"
                   (click)="reconcileSelected()"
                   [disabled]="activeAction() !== null"
-                  class="px-3 py-2 text-sm font-medium border rounded-md border-slate-300 text-slate-800 hover:bg-slate-50 disabled:opacity-50"
+                  class="btn btn-secondary"
                 >
                   {{ isActionRunning('reconcile') ? 'Reconciling' : 'Reconcile' }}
                 </button>
@@ -206,7 +223,7 @@
                   type="button"
                   (click)="retrySelected()"
                   [disabled]="activeAction() !== null"
-                  class="px-3 py-2 text-sm font-medium border rounded-md border-slate-300 text-slate-800 hover:bg-slate-50 disabled:opacity-50"
+                  class="btn btn-secondary"
                 >
                   {{ isActionRunning('retry') ? 'Retrying' : 'Retry' }}
                 </button>
@@ -214,7 +231,7 @@
                   type="button"
                   (click)="resendSelectedNotification()"
                   [disabled]="activeAction() !== null"
-                  class="px-3 py-2 text-sm font-medium border rounded-md border-slate-300 text-slate-800 hover:bg-slate-50 disabled:opacity-50"
+                  class="btn btn-secondary"
                 >
                   {{ isActionRunning('resend-notification') ? 'Sending' : 'Resend notification' }}
                 </button>
@@ -222,34 +239,38 @@
                   type="button"
                   (click)="cancelRefundSelected()"
                   [disabled]="activeAction() !== null"
-                  class="px-3 py-2 text-sm font-medium text-white rounded-md bg-rose-700 hover:bg-rose-800 disabled:opacity-50"
+                  class="btn btn-destructive"
                 >
                   {{ isActionRunning('cancel-refund') ? 'Refunding' : 'Cancel/refund' }}
                 </button>
               </div>
             </div>
 
-            <div>
-              <h3 class="mb-2 text-sm font-semibold text-slate-900">Events</h3>
+            <div class="border-t border-rail pt-4">
+              <h3 class="mb-3 font-display text-sm font-semibold uppercase tracking-[0.08em] text-ink">Events</h3>
               <ol class="grid gap-2">
                 @for (event of visibleEvents(); track event.id) {
-                  <li class="px-3 py-2 text-sm border rounded-md border-slate-200">
+                  <li class="border-l-2 border-filament bg-blue-50/40 px-3 py-2 text-sm">
                     <div class="flex items-center justify-between gap-3">
-                      <span class="font-medium text-slate-900">{{ event.type }}</span>
-                      <span class="text-xs text-slate-500">{{ event.createdAt }}</span>
+                      <span class="font-medium text-ink">{{ event.type }}</span>
+                      <span class="font-mono text-xs text-slate-500">{{ event.createdAt }}</span>
                     </div>
                     @if (event.detail) {
                       <p class="mt-1 text-slate-600">{{ event.detail }}</p>
                     }
                   </li>
                 } @empty {
-                  <li class="text-sm text-slate-500">No events recorded.</li>
+                  <li class="notice notice--empty print-bed-grid">
+                    <span class="relative">No events recorded.</span>
+                  </li>
                 }
               </ol>
             </div>
           </div>
         } @else {
-          <div class="p-6 text-sm text-slate-500">Select an order.</div>
+          <div class="notice notice--empty print-bed-grid m-4">
+            <span class="relative">Select an order.</span>
+          </div>
         }
       </aside>
     </div>

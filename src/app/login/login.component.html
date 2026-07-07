@@ -1,57 +1,66 @@
-<div>
-  <form
-    [formGroup]="loginForm"
-    (ngSubmit)="onSubmit()"
-    class="p-8 space-y-6 bg-white rounded-lg shadow-md"
-  >
-    <!-- email input -->
-    <div class="flex flex-col">
-      <label for="email" class="mb-2 text-sm font-semibold text-gray-700"
-        >Email</label
-      >
-      <input
-        id="email"
-        type="email"
-        formControlName="email"
-        data-cy="email-input"
-        required
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
-      />
-      @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-        <div class="mt-1 text-sm text-red-500">
-          <small>Email is required.</small>
+<main class="admin-shell">
+  <section class="admin-rail max-w-xl">
+    <header class="page-header print-bed-grid">
+      <div class="page-header__content">
+        <div>
+          <p class="eyebrow">Operator access</p>
+          <h1 class="page-title">Sign in</h1>
+          <p class="page-copy">
+            Access catalog setup, upload confirmation, and order operations.
+          </p>
         </div>
-      }
-    </div>
+      </div>
+    </header>
 
-    <!-- password input -->
-    <div class="flex flex-col">
-      <label for="password" class="mb-2 text-sm font-semibold text-gray-700"
-        >Password</label
-      >
-      <input
-        id="password"
-        type="password"
-        formControlName="password"
-        data-cy="password-input"
-        required
-        class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
-      />
-      @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-        <div class="mt-1 text-sm text-red-500">
-          <small>Password is required</small>
-        </div>
-      }
-    </div>
-
-    <!-- submit button -->
-    <button
-      type="submit"
-      [disabled]="loginForm.invalid"
-      data-cy="login-button"
-      class="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      class="admin-panel"
     >
-      Sign in
-    </button>
-  </form>
-</div>
+      <div class="admin-panel__body grid gap-5">
+        <div class="form-field">
+          <label for="email" class="form-label">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            data-cy="email-input"
+            required
+            class="form-control"
+          />
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <div class="form-error">
+              <small>Email is required.</small>
+            </div>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="password" class="form-label">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            data-cy="password-input"
+            required
+            class="form-control"
+          />
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <div class="form-error">
+              <small>Password is required</small>
+            </div>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loginForm.invalid"
+          data-cy="login-button"
+          class="btn btn-primary w-full"
+        >
+          Sign in
+        </button>
+      </div>
+    </form>
+  </section>
+</main>

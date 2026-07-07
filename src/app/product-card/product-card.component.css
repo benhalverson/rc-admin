@@ -1,4 +1,14 @@
-/* Product Card Component Styles */
+:host {
+	display: block;
+}
+
+.product-card {
+	border: 1px solid #d7d2c6;
+	border-radius: 8px;
+	box-shadow:
+		0 1px 0 rgba(17, 24, 39, 0.04),
+		0 12px 30px rgba(17, 24, 39, 0.07);
+}
 
 .line-clamp-1 {
 	overflow: hidden;
@@ -12,16 +22,4 @@
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
-}
-
-/* Hover effects */
-.product-card:hover {
-	transform: translateY(-2px);
-	transition: transform 0.2s ease-in-out;
-}
-
-/* Color circle styling */
-.color-preview {
-	min-width: 1rem;
-	min-height: 1rem;
 }
