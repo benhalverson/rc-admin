@@ -1,5 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Input, inject, Output } from '@angular/core';
+import {
+	Component,
+	EventEmitter,
+	Input,
+	inject,
+	Output,
+	signal,
+} from '@angular/core';
 import {
 	FormBuilder,
 	type FormGroup,
@@ -41,15 +48,49 @@ export class Upload {
 	private uploadService = inject(UploadService);
 
 	@Input() uploadType: 'v1' | 'v2' = 'v1'; // 'v1' for images, 'v2' for STL files
+	@Input() label = '';
+	@Input() hint = '';
+	@Input() buttonLabel = 'Upload';
 	@Output() uploaded = new EventEmitter<string | Slant3dUploadedFile>();
+
+	uploadMessage = signal('');
+	uploadMessageTone = signal<'error' | 'success' | 'neutral'>('neutral');
 
 	uploadForm: FormGroup = this.fb.group({
 		file: [null],
 	});
 
+	get defaultLabel() {
+		return this.uploadType === 'v2' ? 'STL file upload' : 'Image upload';
+	}
+
+	get defaultHint() {
+		return this.uploadType === 'v2'
+			? 'Choose a confirmed STL file for Slant3D processing.'
+			: 'Choose an image file for the product catalog.';
+	}
+
+	get acceptedFileTypes() {
+		return this.uploadType === 'v2' ? '.stl' : 'image/*';
+	}
+
+	selectedFileName() {
+		return (this.uploadForm.get('file')?.value as File | null)?.name ?? '';
+	}
+
 	onFileSelected(event: Event) {
 		const file = (event.target as HTMLInputElement).files?.[0] || null;
 		this.uploadStore.setFile(file);
+		this.uploadMessage.set('');
+		this.uploadMessageTone.set('neutral');
+
+		if (this.uploadType === 'v2' && file && !this.isStlFile(file)) {
+			this.uploadForm.patchValue({ file: null });
+			this.uploadMessage.set('Select an STL file before uploading.');
+			this.uploadMessageTone.set('error');
+			return;
+		}
+
 		this.uploadForm.patchValue({ file });
 	}
 
@@ -57,6 +98,8 @@ export class Upload {
 		const file: File | null = this.uploadForm.get('file')?.value;
 		if (!file) {
 			this.uploadStore.setMessage('No file selected.');
+			this.uploadMessage.set('No file selected.');
+			this.uploadMessageTone.set('error');
 			return;
 		}
 
@@ -83,10 +126,18 @@ export class Upload {
 
 			this.uploaded.emit(uploadedFile);
 			this.uploadStore.setMessage(message);
+			this.uploadMessage.set(message);
+			this.uploadMessageTone.set('success');
 			this.uploadForm.reset();
 		} catch (error) {
 			const message = getUploadErrorMessage(error);
 			this.uploadStore.setMessage(`Upload failed: ${message}`);
+			this.uploadMessage.set(`Upload failed: ${message}`);
+			this.uploadMessageTone.set('error');
 		}
+	}
+
+	private isStlFile(file: File) {
+		return file.name.toLocaleLowerCase().endsWith('.stl');
 	}
 }

@@ -1,110 +1,168 @@
-<div>
+<main class="admin-shell">
+  <section class="admin-rail admin-rail--narrow">
+    <header class="page-header print-bed-grid">
+      <div class="page-header__content">
+        <div>
+          <p class="eyebrow">Catalog setup</p>
+          <h1 class="page-title">Add Product</h1>
+          <p class="page-copy">
+            Create a print-ready catalog item with storefront imagery, material setup, and a confirmed STL file.
+          </p>
+        </div>
+      </div>
+    </header>
+
   <form
     [formGroup]="productForm"
     (ngSubmit)="onSubmit()"
-    class="p-8 space-y-6 bg-white rounded-lg shadow-md"
-    >
-    <!-- product name -->
-    <div class="flex flex-col">
-      <label for="name" class="mb-2 text-sm font-semibold text-gray-700"
-        >Product Name:</label
-        >
+    class="admin-panel"
+  >
+    <div class="admin-panel__header">
+      <h2 class="admin-panel__title">Product record</h2>
+    </div>
+
+    <div class="admin-panel__body grid gap-6">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="name" class="form-label">Product name</label>
         <input
           type="text"
+          id="name"
           formControlName="name"
-          class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
-          />
+            class="form-control"
+        />
         @if (
           productForm.get('name')?.invalid && productForm.get('name')?.touched
           ) {
-          <div
-            class="mt-1 text-sm text-red-500"
-            >
+            <div class="form-error">
             <small>Product name is required (min 3 characters).</small>
           </div>
         }
-
-        <!-- product description -->
       </div>
-      <div class="flex flex-col">
-        <label for="description" class="mb-2 text-sm font-semibold text-gray-700"
-          >Product Description:</label
-          >
+
+        <div class="form-field form-field--wide">
+          <label for="description" class="form-label">Product description</label>
           <textarea
-            type="text"
+            id="description"
             formControlName="description"
-            class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focust:ring-blue-500"
+            rows="4"
+            class="form-control form-control--textarea"
           ></textarea>
           @if (
             productForm.get('description')?.invalid &&
             productForm.get('description')?.touched
             ) {
-            <div
-              class="mt-1 text-sm text-red-500"
-              >
+              <div class="form-error">
               <small>Product Description is required</small>
             </div>
           }
         </div>
 
-        <div class="flex flex-col">
-          <label for="image" class="mb-2 text-sm font-semibold text-gray-700"
-            >Image URL:</label
-            >
+        <div class="form-field">
+          <label for="price" class="form-label">Price</label>
+            <input
+              id="price"
+              formControlName="price"
+              type="number"
+              min="0"
+              class="form-control"
+            />
+            @if (
+              productForm.get('price')?.invalid && productForm.get('price')?.touched
+              ) {
+              <div class="form-error">
+                Price must be greater than or equal to 0.
+              </div>
+            }
+          </div>
+
+        <div class="form-field">
+          <label for="filamentType" class="form-label">Filament type</label>
+          <select
+            id="filamentType"
+            formControlName="filamentType"
+            class="form-control"
+          >
+            <option value="PLA">PLA</option>
+            <option value="PETG">PETG</option>
+          </select>
+        </div>
+
+        <div class="form-field form-field--wide">
+          <label for="color" class="form-label">Color</label>
+          <app-color-picker
+            [filamentType]="productForm.get('filamentType')?.value"
+            [model]="colorControl.value"
+            (modelChange)="colorControl.setValue($event)"
+          ></app-color-picker>
+        </div>
+      </div>
+
+      <div class="grid gap-4 border-t border-rail pt-5">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="image" class="form-label">Primary image URL</label>
             <input
               id="image"
               formControlName="image"
               type="text"
-              class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-          </div>
-          <div class="flex flex-col">
-            <app-upload (uploaded)="onPngUpload($event)" />
+              class="form-control"
+            />
           </div>
 
-          <!-- Image Gallery -->
-          <div class="flex flex-col">
-            <label class="mb-2 text-sm font-semibold text-gray-700">Image Gallery:</label>
-            <div class="flex flex-col space-y-2">
-              <app-upload (uploaded)="onGalleryImageUpload($event)" />
+          <div class="form-field">
+            <app-upload
+              label="Primary image upload"
+              hint="Upload the main catalog preview image."
+              buttonLabel="Upload image"
+              (uploaded)="onPngUpload($event)"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Image gallery</label>
+          <app-upload
+            label="Gallery image upload"
+            hint="Add supplemental product angles or detail photos."
+            buttonLabel="Add image"
+            (uploaded)="onGalleryImageUpload($event)"
+          />
               @if (imageGallery().length > 0) {
-                <div class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-3 lg:grid-cols-4">
+            <div class="gallery-grid mt-3">
                   @for (image of imageGallery(); track image; let i = $index) {
-                    <div class="relative group">
-                      <img [src]="image" [alt]="'Gallery image ' + (i + 1)" class="object-cover w-full h-32 rounded-lg shadow-md">
+                <div class="gallery-tile">
+                  <img [src]="image" [alt]="'Gallery image ' + (i + 1)">
                       <button
                         type="button"
                         (click)="removeGalleryImage(i)"
-                        class="absolute flex items-center justify-center w-6 h-6 text-white transition-opacity bg-red-500 rounded-full opacity-0 top-2 right-2 group-hover:opacity-100"
+                    class="btn-icon absolute right-2 top-2"
                         title="Remove image"
-                        >
-                        ×
+                  >
+                    X
                       </button>
+                  <p class="gallery-tile__meta truncate">{{ image }}</p>
                     </div>
                   }
                 </div>
               }
             </div>
-          </div>
+      </div>
 
-
-          <!-- STL File URL -->
-          <div class="flex flex-col">
-            <label for="stl" class="mb-2 text-sm font-semibold text-gray-700"
-              >STL File URL:</label
-              >
+      <div class="grid gap-4 border-t border-rail pt-5">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="stl" class="form-label">STL file URL</label>
               <input
                 id="stl"
                 formControlName="stl"
                 type="text"
-                class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              class="form-control"
+            />
 	              @if (
 	                productForm.get('stl')?.invalid && productForm.get('stl')?.touched
 	                ) {
-                <div
-                  class="mt-1 text-sm text-red-500"
-                  >
+              <div class="form-error">
 	                  STL file URL is required.
 	                </div>
 	              }
@@ -112,68 +170,35 @@
 	                productForm.get('publicFileServiceId')?.invalid &&
 	                productForm.get('publicFileServiceId')?.touched
 	                ) {
-	                <div
-	                  class="mt-1 text-sm text-red-500"
-	                  >
+              <div class="form-error">
 	                  STL upload must be confirmed.
 	                </div>
 	              }
 
-	            </div>
-
-	            <div class="flex flex-col">
-	              <app-upload uploadType="v2" (uploaded)="onStlUploaded($event)" />
-	            </div>
-
-            <!-- Price -->
-            <div class="flex flex-col">
-              <label for="price" class="mb-2 text-sm font-semibold text-gray-700"
-                >Price:</label
-                >
-                <input
-                  id="price"
-                  formControlName="price"
-                  type="number"
-                  min="0"
-                  class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                @if (
-                  productForm.get('price')?.invalid && productForm.get('price')?.touched
-                  ) {
-                  <div
-                    class="mt-1 text-sm text-red-500"
-                    >
-                    Price must be greater than or equal to 0.
-                  </div>
-                }
+            @if (productForm.get('publicFileServiceId')?.value) {
+              <div class="file-row mt-2">
+                <span class="meta-label">Confirmed file ID</span>
+                <span class="mono-value break-all">{{ productForm.get('publicFileServiceId')?.value }}</span>
               </div>
-              <!-- Filament Type -->
-              <div class="flex flex-col">
-                <label for="filamentType" class="mb-2 text-sm font-semibold text-gray-700"
-                  >Filament Type:</label
-                  >
-                  <select
-                    id="filamentType"
-                    formControlName="filamentType"
-                    class="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                    <option value="PLA">PLA</option>
-                    <option value="PETG">PETG</option>
-                  </select>
-                </div>
-                <!-- Color Picker -->
-                <div class="flex flex-col">
-                  <label for="color" class="mb-2 text-sm font-semibold text-gray-700"
-                    >Color:</label
-                    >
-                    <app-color-picker
-                      [filamentType]="productForm.get('filamentType')?.value"
-                      [model]="colorControl.value"
-                      (modelChange)="colorControl.setValue($event)"
-                    ></app-color-picker>
-
+            }
                   </div>
 
-                  <button type="submit" >Add Product</button>
-                </form>
-              </div>
+          <div class="form-field">
+            <app-upload
+              uploadType="v2"
+              label="Confirmed STL upload"
+              hint="Upload the printable STL and confirm it with Slant3D before saving."
+              buttonLabel="Upload STL"
+              (uploaded)="onStlUploaded($event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end border-t border-rail pt-5">
+        <button type="submit" class="btn btn-primary">Add Product</button>
+      </div>
+    </div>
+  </form>
+  </section>
+</main>

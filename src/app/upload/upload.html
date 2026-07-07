@@ -1,4 +1,35 @@
-<div [formGroup]="uploadForm" class="space-y-4">
-  <input type="file" (change)="onFileSelected($event)" />
-  <button type="button" (click)="onUpload()">Upload</button>
+<div [formGroup]="uploadForm" class="upload-zone">
+  <div>
+    <p class="upload-zone__label">{{ label || defaultLabel }}</p>
+    <p class="upload-zone__hint">{{ hint || defaultHint }}</p>
+  </div>
+
+  <label class="upload-zone__input">
+    <input
+      type="file"
+      class="sr-only"
+      [attr.accept]="acceptedFileTypes"
+      (change)="onFileSelected($event)"
+    />
+    <span class="upload-zone__filename">
+      {{ selectedFileName() || 'No file selected' }}
+    </span>
+    <span class="upload-zone__browse">Browse</span>
+  </label>
+
+  <div class="flex items-center justify-between gap-3">
+    <button type="button" class="btn btn-secondary" (click)="onUpload()">
+      {{ buttonLabel }}
+    </button>
+  </div>
+
+  @if (uploadMessage()) {
+    <p
+      class="form-help"
+      [class.form-error]="uploadMessageTone() === 'error'"
+      [class.text-emerald-700]="uploadMessageTone() === 'success'"
+    >
+      {{ uploadMessage() }}
+    </p>
+  }
 </div>
