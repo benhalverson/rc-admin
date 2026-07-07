@@ -21,7 +21,6 @@ describe('ProductService', () => {
 		name: 'Test Product',
 		description: 'Test Description',
 		image: 'test-image.jpg',
-		stl: 'test-file.stl',
 		publicFileServiceId: 'file_123',
 		price: 29.99,
 		filamentType: FilamentType.PLA,
@@ -32,6 +31,7 @@ describe('ProductService', () => {
 	const mockSingleProductResponse: ProductResponse = {
 		...mockProduct,
 		id: 1,
+		stl: 'https://slant3d.com/files/fresh-test-file.stl',
 	};
 
 	const mockProductResponse: ProductResponse[] = [mockSingleProductResponse];
@@ -227,7 +227,6 @@ describe('ProductService', () => {
 				id: updatedProduct.id,
 				name: updatedProduct.name,
 				description: updatedProduct.description,
-				stl: updatedProduct.stl,
 				price: updatedProduct.price,
 				filamentType: updatedProduct.filamentType,
 				color: updatedProduct.color,
@@ -297,6 +296,27 @@ describe('ProductService', () => {
 			expect(reloadSpy).toHaveBeenCalledTimes(1);
 		});
 
+		it('should strip deprecated STL URLs from create payloads', () => {
+			const reloadSpy = vi
+				.spyOn(service, 'reloadProductResources')
+				.mockImplementation(() => undefined);
+			const productWithDeprecatedStl: ProductCreateRequest = {
+				...mockProduct,
+				stl: 'https://slant3d.com/files/expiring-url.stl',
+			};
+
+			service.createProduct(productWithDeprecatedStl).subscribe();
+
+			const req = httpMock.expectOne(`${environment.baseurl}/v2/add-product`);
+			expect(req.request.body).toEqual(mockProduct);
+			req.flush({
+				success: true,
+				message: 'created',
+				product: mockSingleProductResponse,
+			});
+			expect(reloadSpy).toHaveBeenCalledTimes(1);
+		});
+
 		it('should handle createProduct error', () => {
 			const reloadSpy = vi
 				.spyOn(service, 'reloadProductResources')
@@ -327,7 +347,6 @@ describe('ProductService', () => {
 				name: 'Minimal Product',
 				description: 'Basic description',
 				image: '',
-				stl: 'minimal.stl',
 				publicFileServiceId: 'file_minimal',
 				price: 10.0,
 				filamentType: FilamentType.PLA,
@@ -337,6 +356,7 @@ describe('ProductService', () => {
 			const expectedResponse: ProductResponse = {
 				...minimalProduct,
 				id: 2,
+				stl: 'https://slant3d.com/files/minimal.stl',
 			};
 
 			service.createProduct(minimalProduct).subscribe((response) => {

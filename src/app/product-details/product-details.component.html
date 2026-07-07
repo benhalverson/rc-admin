@@ -1,20 +1,19 @@
-<main class="admin-shell">
-  <section class="admin-rail admin-rail--narrow">
-    <header class="page-header print-bed-grid">
-      <div class="page-header__content">
+<main class="min-h-screen bg-[#ECEAE1]">
+  <section class="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+    <header class="relative mb-5 overflow-hidden rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-5 py-4 shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:content-[''] before:[background:repeating-linear-gradient(90deg,#00A7B5_0_18px,#B8B2A3_18px_26px,#C2410C_26px_30px)] after:pointer-events-none after:absolute after:inset-0 after:content-[''] after:opacity-35 after:[background-image:linear-gradient(rgba(0,167,181,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(0,167,181,0.14)_1px,transparent_1px)] after:[background-size:18px_18px] after:[mask-image:linear-gradient(90deg,black,transparent_74%)]">
+      <div class="relative z-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="eyebrow">Catalog item</p>
-          <h1 class="page-title">Product Details</h1>
+          <p class="font-display text-xs font-semibold uppercase text-[#00A7B5]">Catalog item</p>
+          <h1 class="mt-1 font-display text-2xl font-semibold text-[#141817] md:text-3xl">Product Details</h1>
           @if (productDetails) {
-            <p class="page-copy">{{ productDetails.name }}</p>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-neutral-600">{{ productDetails.name }}</p>
           }
         </div>
         <button
           type="button"
           (click)="isEditing.set(!isEditing())"
-          class="btn"
-          [class.btn-primary]="!isEditing()"
-          [class.btn-secondary]="isEditing()"
+          class="inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 font-display text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5] disabled:cursor-not-allowed disabled:opacity-50"
+          [ngClass]="!isEditing() ? 'border-[#141817] bg-[#141817] text-white hover:bg-black' : 'border-[#B8B2A3] bg-[#FAFAF7] text-[#141817] hover:border-[#00A7B5] hover:bg-white'"
         >
           {{ isEditing()? "Cancel" : "Edit" }}
         </button>
@@ -23,57 +22,57 @@
 
     @if (!isEditing() && productDetails) {
       <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.65fr)]">
-        <section class="admin-panel">
-          <div class="admin-panel__header">
-            <h2 class="admin-panel__title">Product record</h2>
+        <section class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)]">
+          <div class="flex items-center justify-between gap-3 border-b border-[#B8B2A3] px-4 py-3">
+            <h2 class="font-display text-sm font-semibold uppercase text-[#141817]">Product record</h2>
           </div>
-          <div class="admin-panel__body grid gap-4">
+          <div class="grid gap-4 p-4">
             <div>
-              <h3 class="font-display text-2xl font-semibold text-ink">{{ productDetails.name }}</h3>
-              <p class="mt-2 text-sm leading-6 text-slate-600">{{ productDetails.description }}</p>
+              <h3 class="font-display text-2xl font-semibold text-[#141817]">{{ productDetails.name }}</h3>
+              <p class="mt-2 text-sm leading-6 text-neutral-600">{{ productDetails.description }}</p>
             </div>
 
-            <dl class="meta-grid">
-              <div class="meta-row">
-                <dt class="meta-label">Filament Type</dt>
-                <dd class="meta-value">{{ productDetails.filamentType }}</dd>
+            <dl class="grid gap-3 md:grid-cols-2">
+              <div class="min-w-0 rounded-md border border-[#B8B2A3] bg-white px-3 py-2">
+                <dt class="font-display text-xs font-semibold uppercase text-neutral-500">Filament Type</dt>
+                <dd class="mt-1 min-w-0 break-words text-sm font-medium text-[#141817]">{{ productDetails.filamentType }}</dd>
               </div>
-              <div class="meta-row">
-                <dt class="meta-label">Color</dt>
-                <dd class="meta-value flex min-w-0 items-center gap-2">
+              <div class="min-w-0 rounded-md border border-[#B8B2A3] bg-white px-3 py-2">
+                <dt class="font-display text-xs font-semibold uppercase text-neutral-500">Color</dt>
+                <dd class="mt-1 flex min-w-0 items-center gap-2 break-words text-sm font-medium text-[#141817]">
                   <span
-                    class="h-4 w-4 shrink-0 rounded-full border border-slate-300"
+                    class="h-4 w-4 shrink-0 rounded-full border border-neutral-300"
                     [style.background-color]="productDetails.color"
                   ></span>
-                  <span class="mono-value break-all">{{ productDetails.color }}</span>
+                  <span class="break-all font-mono text-xs leading-5 text-neutral-700">{{ productDetails.color }}</span>
                 </dd>
               </div>
-              <div class="meta-row">
-                <dt class="meta-label">Price</dt>
-                <dd class="meta-value font-mono">{{ productDetails.price | currency }}</dd>
+              <div class="min-w-0 rounded-md border border-[#B8B2A3] bg-white px-3 py-2">
+                <dt class="font-display text-xs font-semibold uppercase text-neutral-500">Price</dt>
+                <dd class="mt-1 min-w-0 break-words font-mono text-sm font-medium text-[#141817]">{{ productDetails.price | currency }}</dd>
               </div>
-              <div class="meta-row">
-                <dt class="meta-label">Public file ID</dt>
-                <dd class="meta-value mono-value break-all">{{ productDetails.publicFileServiceId || 'Not confirmed' }}</dd>
+              <div class="min-w-0 rounded-md border border-[#B8B2A3] bg-white px-3 py-2">
+                <dt class="font-display text-xs font-semibold uppercase text-neutral-500">Public file ID</dt>
+                <dd class="mt-1 min-w-0 break-all font-mono text-xs font-medium leading-5 text-neutral-700">{{ productDetails.publicFileServiceId || 'Not confirmed' }}</dd>
               </div>
             </dl>
           </div>
         </section>
 
-        <section class="admin-panel">
-          <div class="admin-panel__header">
-            <h2 class="admin-panel__title">Files</h2>
+        <section class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)]">
+          <div class="flex items-center justify-between gap-3 border-b border-[#B8B2A3] px-4 py-3">
+            <h2 class="font-display text-sm font-semibold uppercase text-[#141817]">Files</h2>
           </div>
-          <div class="admin-panel__body grid gap-3">
-            <div class="file-row">
-              <span class="meta-label">STL</span>
-              <a class="file-link" [href]="productDetails.stl" target="_blank" rel="noreferrer">
+          <div class="grid gap-3 p-4">
+            <div class="grid min-w-0 gap-1 rounded-md border border-[#B8B2A3] bg-white px-3 py-2">
+              <span class="font-display text-xs font-semibold uppercase text-neutral-500">STL</span>
+              <a class="min-w-0 break-all font-mono text-xs leading-5 text-[#006F78] hover:text-[#00A7B5] hover:underline" [href]="productDetails.stl" target="_blank" rel="noreferrer">
                 {{ productDetails.stl }}
               </a>
             </div>
-            <div class="file-row">
-              <span class="meta-label">Primary image</span>
-              <a class="file-link" [href]="productDetails.image" target="_blank" rel="noreferrer">
+            <div class="grid min-w-0 gap-1 rounded-md border border-[#B8B2A3] bg-white px-3 py-2">
+              <span class="font-display text-xs font-semibold uppercase text-neutral-500">Primary image</span>
+              <a class="min-w-0 break-all font-mono text-xs leading-5 text-[#006F78] hover:text-[#00A7B5] hover:underline" [href]="productDetails.image" target="_blank" rel="noreferrer">
                 {{ productDetails.image || 'No image URL' }}
               </a>
             </div>
@@ -82,20 +81,21 @@
       </div>
 
       @if (safeImageGallery.length > 0) {
-        <section class="admin-panel mt-4">
-          <div class="admin-panel__header">
-            <h2 class="admin-panel__title">Image gallery</h2>
-            <span class="status-pill status-pill--neutral">{{ safeImageGallery.length }} images</span>
+        <section class="mt-4 rounded-md border border-[#B8B2A3] bg-[#FAFAF7] shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)]">
+          <div class="flex items-center justify-between gap-3 border-b border-[#B8B2A3] px-4 py-3">
+            <h2 class="font-display text-sm font-semibold uppercase text-[#141817]">Image gallery</h2>
+            <span class="inline-flex items-center rounded-full border border-[#B8B2A3] bg-[#ECEAE1] px-2.5 py-1 font-mono text-[11px] font-semibold uppercase text-neutral-700">{{ safeImageGallery.length }} images</span>
           </div>
-          <div class="admin-panel__body">
-            <div class="gallery-grid">
+          <div class="p-4">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               @for (image of safeImageGallery; track i; let i = $index) {
-                <div class="gallery-tile">
+                <div class="relative overflow-hidden rounded-md border border-[#B8B2A3] bg-white">
                   <img
+                    class="h-32 w-full object-cover"
                     [src]="image"
                     [alt]="'Gallery image ' + (i + 1)"
                   >
-                  <p class="gallery-tile__meta break-all">{{ image }}</p>
+                  <p class="break-all border-t border-[#B8B2A3] px-2 py-2 font-mono text-[11px] leading-4 text-neutral-600">{{ image }}</p>
                 </div>
               }
             </div>
@@ -103,72 +103,63 @@
         </section>
       }
     } @if (isEditing() && productForm) {
-      <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="admin-panel">
-        <div class="admin-panel__header">
-          <h2 class="admin-panel__title">Edit product</h2>
+      <form [formGroup]="productForm" (ngSubmit)="saveChanges()" class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)]">
+        <div class="flex items-center justify-between gap-3 border-b border-[#B8B2A3] px-4 py-3">
+          <h2 class="font-display text-sm font-semibold uppercase text-[#141817]">Edit product</h2>
         </div>
 
-        <div class="admin-panel__body grid gap-6">
-          <div class="form-grid">
-            <label class="form-field">
-              <span class="form-label">Name</span>
+        <div class="grid gap-6 p-4">
+          <div class="grid gap-4 md:grid-cols-2">
+            <label class="grid gap-2">
+              <span class="font-display text-sm font-semibold text-neutral-700">Name</span>
               <input
                 type="text"
                 formControlName="name"
-                class="form-control"
+                class="min-h-10 w-full rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm text-[#141817] shadow-sm placeholder:text-neutral-400 focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
               />
             </label>
 
-            <label class="form-field form-field--wide">
-              <span class="form-label">Description</span>
+            <label class="grid gap-2 md:col-span-2">
+              <span class="font-display text-sm font-semibold text-neutral-700">Description</span>
               <textarea
                 formControlName="description"
-                class="form-control form-control--textarea"
+                class="min-h-24 w-full resize-y rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm leading-6 text-[#141817] shadow-sm placeholder:text-neutral-400 focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
                 rows="4"
               ></textarea>
             </label>
 
-            <label class="form-field">
-              <span class="form-label">Image URL</span>
+            <label class="grid gap-2">
+              <span class="font-display text-sm font-semibold text-neutral-700">Image URL</span>
               <input
                 type="text"
                 formControlName="image"
-                class="form-control"
+                class="min-h-10 w-full rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm text-[#141817] shadow-sm placeholder:text-neutral-400 focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
               />
             </label>
 
-            <label class="form-field">
-              <span class="form-label">STL file URL</span>
-              <input
-                type="text"
-                formControlName="stl"
-                class="form-control"
-              />
-            </label>
-
-            <label class="form-field">
-              <span class="form-label">Price</span>
+            <label class="grid gap-2">
+              <span class="font-display text-sm font-semibold text-neutral-700">Price</span>
               <input
                 type="number"
                 formControlName="price"
-                class="form-control"
+                class="min-h-10 w-full rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm text-[#141817] shadow-sm placeholder:text-neutral-400 focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
               />
             </label>
 
-            <label class="form-field">
-              <span class="form-label">Filament type</span>
+            <label class="grid gap-2">
+              <span class="font-display text-sm font-semibold text-neutral-700">Filament type</span>
               <select
                 formControlName="filamentType"
-                class="form-control"
+                class="min-h-10 w-full rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm text-[#141817] shadow-sm focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
               >
                 <option value="PLA">PLA</option>
                 <option value="PETG">PETG</option>
               </select>
             </label>
 
-            <div class="form-field form-field--wide">
-              <p class="form-help">Loaded {{ colorOptions().length || 0 }} colors</p>
-              <label class="form-label">Color</label>
+            <div class="grid gap-2 md:col-span-2">
+              <p class="text-sm leading-5 text-neutral-500">Loaded {{ colorOptions().length || 0 }} colors</p>
+              <label class="font-display text-sm font-semibold text-neutral-700">Color</label>
               <app-color-picker
                 [filamentType]="productForm.get('filamentType')?.value"
                 [model]="colorControl.value"
@@ -177,8 +168,12 @@
             </div>
           </div>
 
-          <div class="grid gap-3 border-t border-rail pt-5">
-            <label class="form-label">Image gallery</label>
+          <div class="grid gap-3 border-t border-[#B8B2A3] pt-5">
+            <div class="flex items-center gap-3">
+              <span class="h-px flex-1 bg-[#B8B2A3]"></span>
+              <h2 class="font-display text-sm font-semibold uppercase text-[#141817]">Image gallery</h2>
+              <span class="h-px flex-1 bg-[#B8B2A3]"></span>
+            </div>
             <app-upload
               label="Gallery image upload"
               hint="Add another product image to this catalog item."
@@ -187,36 +182,36 @@
             />
 
             @if (imageGallery().length > 0) {
-              <div class="gallery-grid">
+              <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 @for (image of imageGallery(); track i; let i = $index) {
-                  <div class="gallery-tile">
-                    <img [src]="image" [alt]="'Gallery image ' + (i + 1)">
+                  <div class="relative overflow-hidden rounded-md border border-[#B8B2A3] bg-white">
+                    <img class="h-32 w-full object-cover" [src]="image" [alt]="'Gallery image ' + (i + 1)">
                     <button
                       type="button"
                       (click)="removeGalleryImage(i)"
-                      class="btn-icon absolute right-2 top-2"
+                      class="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#C2410C] bg-[#C2410C] font-mono text-sm font-semibold text-white transition-colors hover:bg-red-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
                       title="Remove image"
                     >
                       X
                     </button>
-                    <p class="gallery-tile__meta break-all">{{ image }}</p>
+                    <p class="break-all border-t border-[#B8B2A3] px-2 py-2 font-mono text-[11px] leading-4 text-neutral-600">{{ image }}</p>
                   </div>
                 }
               </div>
             }
           </div>
 
-          <div class="flex flex-col-reverse gap-2 border-t border-rail pt-5 sm:flex-row sm:justify-end">
+          <div class="flex flex-col-reverse gap-2 border-t border-[#B8B2A3] pt-5 sm:flex-row sm:justify-end">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="inline-flex min-h-10 items-center justify-center rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-4 py-2 font-display text-sm font-semibold text-[#141817] transition-colors hover:border-[#00A7B5] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5] disabled:cursor-not-allowed disabled:opacity-50"
               (click)="isEditing.set(false)"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="btn btn-primary"
+              class="inline-flex min-h-10 items-center justify-center rounded-md border border-[#141817] bg-[#141817] px-4 py-2 font-display text-sm font-semibold text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5] disabled:cursor-not-allowed disabled:opacity-50"
               [disabled]="productForm.invalid"
             >
               Save changes

@@ -78,7 +78,6 @@ export class AddProductComponent implements OnInit {
 			name: ['', [Validators.required, Validators.minLength(3)]],
 			description: ['', Validators.required],
 			image: [''],
-			stl: ['', Validators.required],
 			publicFileServiceId: ['', Validators.required],
 			price: [0, [Validators.required, Validators.min(0)]],
 			filamentType: ['PLA', Validators.required],
@@ -95,14 +94,12 @@ export class AddProductComponent implements OnInit {
 	onStlUploaded(uploadedFile: string | Slant3dUploadedFile) {
 		if (typeof uploadedFile === 'string') {
 			this.productForm.patchValue({
-				stl: uploadedFile,
 				publicFileServiceId: '',
 			});
 			return;
 		}
 
 		this.productForm.patchValue({
-			stl: uploadedFile.fileURL,
 			publicFileServiceId: uploadedFile.publicFileServiceId,
 		});
 	}
@@ -156,7 +153,6 @@ export class AddProductComponent implements OnInit {
 					name: '',
 					description: '',
 					image: '',
-					stl: '',
 					publicFileServiceId: '',
 					price: 0,
 					filamentType: 'PLA',

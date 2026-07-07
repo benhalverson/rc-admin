@@ -134,7 +134,7 @@ describe('AddProductComponent', () => {
 			expect(component.productForm.get('name')?.value).toBe('');
 			expect(component.productForm.get('description')?.value).toBe('');
 			expect(component.productForm.get('image')?.value).toBe('');
-			expect(component.productForm.get('stl')?.value).toBe('');
+			expect(component.productForm.contains('stl')).toBe(false);
 			expect(component.productForm.get('publicFileServiceId')?.value).toBe('');
 			expect(component.productForm.get('price')?.value).toBe(0);
 			expect(component.productForm.get('filamentType')?.value).toBe('PLA');
@@ -186,15 +186,6 @@ describe('AddProductComponent', () => {
 			expect(descriptionControl?.valid).toBe(true);
 		});
 
-		it('should validate stl field', () => {
-			const stlControl = component.productForm.get('stl');
-
-			expect(stlControl?.hasError('required')).toBe(true);
-
-			stlControl?.setValue('model.stl');
-			expect(stlControl?.valid).toBe(true);
-		});
-
 		it('should validate publicFileServiceId field', () => {
 			const fileIdControl = component.productForm.get('publicFileServiceId');
 
@@ -228,7 +219,7 @@ describe('AddProductComponent', () => {
 	});
 
 	describe('File Upload Handlers', () => {
-		it('should handle STL file upload', () => {
+		it('should store only the Slant file ID for STL uploads', () => {
 			const uploadedFile = {
 				fileURL: 'https://slant3d.com/files/test.stl',
 				publicFileServiceId: 'file_123',
@@ -237,9 +228,7 @@ describe('AddProductComponent', () => {
 
 			component.onStlUploaded(uploadedFile);
 
-			expect(component.productForm.get('stl')?.value).toBe(
-				'https://slant3d.com/files/test.stl',
-			);
+			expect(component.productForm.contains('stl')).toBe(false);
 			expect(component.productForm.get('publicFileServiceId')?.value).toBe(
 				'file_123',
 			);
@@ -326,7 +315,6 @@ describe('AddProductComponent', () => {
 				name: 'Test Product',
 				description: 'Test Description',
 				image: 'test.jpg',
-				stl: 'test.stl',
 				publicFileServiceId: 'file_123',
 				price: 29.99,
 				filamentType: FilamentType.PLA,
@@ -343,7 +331,6 @@ describe('AddProductComponent', () => {
 				name: 'Test Product',
 				description: 'Test Description',
 				image: 'test.jpg',
-				stl: 'test.stl',
 				publicFileServiceId: 'file_123',
 				price: 29.99,
 				filamentType: FilamentType.PLA,
@@ -361,7 +348,7 @@ describe('AddProductComponent', () => {
 			expect(component.productForm.get('name')?.value).toBe('');
 			expect(component.productForm.get('description')?.value).toBe('');
 			expect(component.productForm.get('image')?.value).toBe('');
-			expect(component.productForm.get('stl')?.value).toBe('');
+			expect(component.productForm.contains('stl')).toBe(false);
 			expect(component.productForm.get('publicFileServiceId')?.value).toBe('');
 			expect(component.productForm.get('price')?.value).toBe(0);
 			expect(component.productForm.get('filamentType')?.value).toBe(
@@ -434,7 +421,6 @@ describe('AddProductComponent', () => {
 			component.productForm.patchValue({
 				name: '', // Invalid - required
 				description: 'Test Description',
-				stl: 'test.stl',
 				price: 29.99,
 			});
 
@@ -501,7 +487,6 @@ describe('AddProductComponent', () => {
 				name: 'Complete Product',
 				description: 'Complete Description',
 				image: 'https://example.com/main.jpg',
-				stl: 'https://slant3d.com/files/model.stl',
 				publicFileServiceId: 'file_123',
 				price: 49.99,
 				filamentType: FilamentType.PETG,

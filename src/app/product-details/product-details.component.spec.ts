@@ -334,14 +334,8 @@ describe('ProductDetailsComponent', () => {
 			expect(descriptionControl?.valid).toBe(true);
 		});
 
-		it('should validate required STL field', () => {
-			const stlControl = component.productForm.get('stl');
-
-			stlControl?.setValue('');
-			expect(stlControl?.hasError('required')).toBe(true);
-
-			stlControl?.setValue('https://example.com/model.stl');
-			expect(stlControl?.valid).toBe(true);
+		it('should not include STL URL in the edit form', () => {
+			expect(component.productForm.contains('stl')).toBe(false);
 		});
 
 		it('should validate price field', () => {

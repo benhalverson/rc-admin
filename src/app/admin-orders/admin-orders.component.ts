@@ -153,24 +153,26 @@ export class AdminOrdersComponent implements OnInit {
 	}
 
 	statusTone(status: string | null): string {
+		const base =
+			'inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[11px] font-semibold uppercase';
 		switch ((status ?? '').toLowerCase()) {
 			case 'paid':
 			case 'processing':
 			case 'retrying':
-				return 'status-pill--info';
+				return `${base} border-[#00A7B5]/30 bg-[#00A7B5]/10 text-[#006F78]`;
 			case 'shipped':
 			case 'delivered':
 			case 'fulfilled':
 			case 'completed':
-				return 'status-pill--ready';
+				return `${base} border-emerald-200 bg-emerald-50 text-emerald-800`;
 			case 'failed':
 			case 'error':
-				return 'status-pill--danger';
+				return `${base} border-red-200 bg-red-50 text-[#C2410C]`;
 			case 'canceled':
 			case 'cancelled':
-				return 'status-pill--neutral';
+				return `${base} border-[#B8B2A3] bg-[#ECEAE1] text-neutral-700`;
 			default:
-				return 'status-pill--warning';
+				return `${base} border-amber-200 bg-amber-50 text-amber-800`;
 		}
 	}
 

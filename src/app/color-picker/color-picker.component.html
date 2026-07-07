@@ -2,10 +2,9 @@
   <div class="flex flex-wrap items-center gap-3">
 	@for (option of filteredColorOptions(); track option.publicId) {
       <label
-        class="relative flex cursor-pointer items-center justify-center rounded-full border border-rail bg-panel p-1 transition-transform hover:-translate-y-0.5 focus:outline-none"
+        class="relative flex cursor-pointer items-center justify-center rounded-full border border-[#B8B2A3] bg-[#FAFAF7] p-1 ring-[#00A7B5] ring-offset-1 transition-transform hover:-translate-y-0.5 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#00A7B5]"
         [class.ring-2]="model === option.hexValue"
         [class.ring-offset-1]="model === option.hexValue"
-        [class.ring-filament]="model === option.hexValue"
         >
         <input
           type="radio"
@@ -23,7 +22,7 @@
         <span class="sr-only">{{ option.color }}</span>
         @if (model === option.hexValue) {
           <span
-            class="absolute inset-0 rounded-full ring-2 ring-filament ring-offset-2"
+            class="absolute inset-0 rounded-full ring-2 ring-[#00A7B5] ring-offset-2"
             aria-hidden="true"
           ></span>
         }
@@ -33,5 +32,5 @@
 </fieldset>
 
 @if (isLoading()) {
-  <div class="form-help mt-2">Loading colors...</div>
+  <div class="mt-2 text-sm leading-5 text-neutral-500">Loading colors...</div>
 }

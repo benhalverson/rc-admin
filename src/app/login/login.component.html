@@ -1,11 +1,11 @@
-<main class="admin-shell">
-  <section class="admin-rail max-w-xl">
-    <header class="page-header print-bed-grid">
-      <div class="page-header__content">
+<main class="min-h-screen bg-[#ECEAE1]">
+  <section class="mx-auto w-full max-w-xl px-4 py-6 sm:px-6 lg:px-8">
+    <header class="relative mb-5 overflow-hidden rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-5 py-4 shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:content-[''] before:[background:repeating-linear-gradient(90deg,#00A7B5_0_18px,#B8B2A3_18px_26px,#C2410C_26px_30px)] after:pointer-events-none after:absolute after:inset-0 after:content-[''] after:opacity-35 after:[background-image:linear-gradient(rgba(0,167,181,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(0,167,181,0.14)_1px,transparent_1px)] after:[background-size:18px_18px] after:[mask-image:linear-gradient(90deg,black,transparent_74%)]">
+      <div class="relative z-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="eyebrow">Operator access</p>
-          <h1 class="page-title">Sign in</h1>
-          <p class="page-copy">
+          <p class="font-display text-xs font-semibold uppercase text-[#00A7B5]">Operator access</p>
+          <h1 class="mt-1 font-display text-2xl font-semibold text-[#141817] md:text-3xl">Sign in</h1>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-neutral-600">
             Access catalog setup, upload confirmation, and order operations.
           </p>
         </div>
@@ -15,38 +15,38 @@
     <form
       [formGroup]="loginForm"
       (ngSubmit)="onSubmit()"
-      class="admin-panel"
+      class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)]"
     >
-      <div class="admin-panel__body grid gap-5">
-        <div class="form-field">
-          <label for="email" class="form-label">Email</label>
+      <div class="grid gap-5 p-4">
+        <div class="grid gap-2">
+          <label for="email" class="font-display text-sm font-semibold text-neutral-700">Email</label>
           <input
             id="email"
             type="email"
             formControlName="email"
             data-cy="email-input"
             required
-            class="form-control"
+            class="min-h-10 w-full rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm text-[#141817] shadow-sm placeholder:text-neutral-400 focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
           />
           @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-            <div class="form-error">
+            <div class="text-sm font-medium text-[#C2410C]">
               <small>Email is required.</small>
             </div>
           }
         </div>
 
-        <div class="form-field">
-          <label for="password" class="form-label">Password</label>
+        <div class="grid gap-2">
+          <label for="password" class="font-display text-sm font-semibold text-neutral-700">Password</label>
           <input
             id="password"
             type="password"
             formControlName="password"
             data-cy="password-input"
             required
-            class="form-control"
+            class="min-h-10 w-full rounded-md border border-[#B8B2A3] bg-white px-3 py-2 text-sm text-[#141817] shadow-sm placeholder:text-neutral-400 focus:border-[#00A7B5] focus:outline-none focus:ring-2 focus:ring-[#00A7B5]/20"
           />
           @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-            <div class="form-error">
+            <div class="text-sm font-medium text-[#C2410C]">
               <small>Password is required</small>
             </div>
           }
@@ -56,7 +56,7 @@
           type="submit"
           [disabled]="loginForm.invalid"
           data-cy="login-button"
-          class="btn btn-primary w-full"
+          class="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-[#141817] bg-[#141817] px-4 py-2 font-display text-sm font-semibold text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Sign in
         </button>

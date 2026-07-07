@@ -167,7 +167,6 @@ export class ProductDetailsComponent {
 			],
 			description: [product.description || '', Validators.required],
 			image: [product.image || ''],
-			stl: [product.stl || '', Validators.required],
 			price: [product.price || 0, [Validators.required, Validators.min(0)]],
 			filamentType: [product.filamentType || 'PLA', Validators.required],
 			color: this.colorControl, // 🎯 wire color control into form

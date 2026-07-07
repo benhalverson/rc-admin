@@ -153,8 +153,12 @@ describe('ProductCardComponent', () => {
 			By.css('[data-cy="product-card"]'),
 		);
 
-		expect(cardElement.nativeElement.classList).toContain('hover:shadow-lg');
-		expect(cardElement.nativeElement.classList).toContain('transition-shadow');
+		expect(cardElement.nativeElement.classList).toContain(
+			'hover:-translate-y-0.5',
+		);
+		expect(cardElement.nativeElement.classList).toContain(
+			'transition-[border-color,transform,box-shadow]',
+		);
 	});
 
 	it('should display different filament types correctly', () => {

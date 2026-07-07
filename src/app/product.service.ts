@@ -70,7 +70,6 @@ export class ProductService {
 			id: product.id,
 			name: product.name,
 			description: product.description,
-			stl: product.stl,
 			price: product.price,
 			filamentType: product.filamentType,
 			color: product.color,
@@ -85,11 +84,12 @@ export class ProductService {
 	}
 
 	createProduct(product: ProductCreateRequest): Observable<ProductResponse> {
-		const imageGallery = product.imageGallery ?? [];
+		const { stl: _deprecatedStl, ...canonicalProduct } = product;
+		const imageGallery = canonicalProduct.imageGallery ?? [];
 		const payload =
 			imageGallery.length > 0
-				? { ...product, imageGallery }
-				: { ...product, imageGallery: undefined };
+				? { ...canonicalProduct, imageGallery }
+				: { ...canonicalProduct, imageGallery: undefined };
 
 		return this.http
 			.post<AddProductV2Response>(`${this.baseUrl}/v2/add-product`, payload)
@@ -145,6 +145,7 @@ export interface Product {
 	name: string;
 	description: string;
 	image: string;
+	/** @deprecated Compatibility response field hydrated by the API; not product identity. */
 	stl: string;
 	price: number;
 	filamentType: FilamentType;
@@ -152,8 +153,10 @@ export interface Product {
 	imageGallery?: string[];
 }
 
-export interface ProductCreateRequest extends Product {
+export interface ProductCreateRequest extends Omit<Product, 'stl'> {
 	publicFileServiceId: string;
+	/** @deprecated Product creation stores publicFileServiceId, not STL URLs. */
+	stl?: string;
 }
 
 export interface ProductV2Response {
@@ -202,7 +205,6 @@ interface ProductUpdatePayload {
 	id: number;
 	name: string;
 	description: string;
-	stl: string;
 	price: number;
 	filamentType: FilamentType;
 	color: string;

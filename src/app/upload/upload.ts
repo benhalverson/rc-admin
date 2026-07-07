@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
 	Component,
@@ -38,7 +39,7 @@ function getUploadErrorMessage(error: unknown): string {
 
 @Component({
 	selector: 'app-upload',
-	imports: [ReactiveFormsModule],
+	imports: [CommonModule, ReactiveFormsModule],
 	templateUrl: './upload.html',
 	styleUrl: './upload.css',
 })

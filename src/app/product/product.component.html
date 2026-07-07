@@ -1,11 +1,11 @@
-<main class="admin-shell">
-  <section class="admin-rail">
-    <header class="page-header print-bed-grid">
-      <div class="page-header__content">
+<main class="min-h-screen bg-[#ECEAE1]">
+  <section class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <header class="relative mb-5 overflow-hidden rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-5 py-4 shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:content-[''] before:[background:repeating-linear-gradient(90deg,#00A7B5_0_18px,#B8B2A3_18px_26px,#C2410C_26px_30px)] after:pointer-events-none after:absolute after:inset-0 after:content-[''] after:opacity-35 after:[background-image:linear-gradient(rgba(0,167,181,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(0,167,181,0.14)_1px,transparent_1px)] after:[background-size:18px_18px] after:[mask-image:linear-gradient(90deg,black,transparent_74%)]">
+      <div class="relative z-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="eyebrow">Catalog bench</p>
-          <h1 class="page-title">Products</h1>
-          <p class="page-copy">
+          <p class="font-display text-xs font-semibold uppercase text-[#00A7B5]">Catalog bench</p>
+          <h1 class="mt-1 font-display text-2xl font-semibold text-[#141817] md:text-3xl">Products</h1>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-neutral-600">
             Manage printable catalog items, material setup, file readiness, and storefront pricing.
           </p>
         </div>
@@ -13,18 +13,18 @@
     </header>
 
     @if (readiness.hasValue()) {
-      <div class="stat-grid mb-5">
-        <div class="stat-cell">
-          <p class="stat-cell__label">Catalog</p>
-          <p class="stat-cell__value">{{ readiness.value().summary.total }}</p>
+      <div class="mb-5 grid gap-3 md:grid-cols-3">
+        <div class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-4 py-3 shadow-[0_1px_0_rgba(20,24,23,0.05)]">
+          <p class="font-display text-xs font-semibold uppercase text-neutral-500">Catalog</p>
+          <p class="mt-1 font-mono text-2xl font-semibold text-[#141817]">{{ readiness.value().summary.total }}</p>
         </div>
-        <div class="stat-cell">
-          <p class="stat-cell__label">Checkout ready</p>
-          <p class="stat-cell__value stat-cell__value--ready">{{ readiness.value().summary.ready }}</p>
+        <div class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-4 py-3 shadow-[0_1px_0_rgba(20,24,23,0.05)]">
+          <p class="font-display text-xs font-semibold uppercase text-neutral-500">Checkout ready</p>
+          <p class="mt-1 font-mono text-2xl font-semibold text-emerald-700">{{ readiness.value().summary.ready }}</p>
         </div>
-        <div class="stat-cell">
-          <p class="stat-cell__label">Needs attention</p>
-          <p class="stat-cell__value stat-cell__value--alert">{{ readiness.value().summary.notReady }}</p>
+        <div class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] px-4 py-3 shadow-[0_1px_0_rgba(20,24,23,0.05)]">
+          <p class="font-display text-xs font-semibold uppercase text-neutral-500">Needs attention</p>
+          <p class="mt-1 font-mono text-2xl font-semibold text-[#C2410C]">{{ readiness.value().summary.notReady }}</p>
         </div>
       </div>
     }
@@ -36,22 +36,22 @@
         }
       </div>
     } @else if (products.error()) {
-      <div class="notice notice--error">
+      <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-[#C2410C]">
         <strong class="font-semibold">Error.</strong>
         <span> Error loading products: {{products.error()}}</span>
       </div>
     } @else if (products.isLoading()) {
-      <div class="admin-panel">
-        <div class="admin-panel__body flex items-center justify-center py-10">
-          <div class="h-10 w-10 animate-spin rounded-full border-2 border-rail border-b-filament"></div>
-          <span class="ml-3 text-sm text-slate-600">Loading products...</span>
+      <div class="rounded-md border border-[#B8B2A3] bg-[#FAFAF7] shadow-[0_1px_0_rgba(20,24,23,0.05),0_14px_32px_rgba(20,24,23,0.08)]">
+        <div class="flex items-center justify-center px-4 py-10">
+          <div class="h-10 w-10 animate-spin rounded-full border-2 border-[#B8B2A3] border-b-[#00A7B5]"></div>
+          <span class="ml-3 text-sm text-neutral-600">Loading products...</span>
         </div>
       </div>
     } @else {
-      <div class="notice notice--empty print-bed-grid">
-        <div class="relative">
-          <p class="font-display text-lg font-semibold text-ink">No products found.</p>
-          <p class="mt-2 text-sm text-slate-600">Add a catalog item to start preparing print-ready storefront inventory.</p>
+      <div class="relative overflow-hidden rounded-md border border-[#B8B2A3] bg-[#FAFAF7] py-10 text-center text-neutral-600 before:absolute before:inset-x-0 before:top-0 before:h-1 before:content-[''] before:[background:repeating-linear-gradient(90deg,#00A7B5_0_18px,#B8B2A3_18px_26px,#C2410C_26px_30px)] after:pointer-events-none after:absolute after:inset-0 after:content-[''] after:opacity-30 after:[background-image:linear-gradient(rgba(0,167,181,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(0,167,181,0.14)_1px,transparent_1px)] after:[background-size:18px_18px]">
+        <div class="relative z-10">
+          <p class="font-display text-lg font-semibold text-[#141817]">No products found.</p>
+          <p class="mt-2 text-sm text-neutral-600">Add a catalog item to start preparing print-ready storefront inventory.</p>
         </div>
       </div>
     }

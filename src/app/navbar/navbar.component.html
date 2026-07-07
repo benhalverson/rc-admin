@@ -1,23 +1,23 @@
-<nav class="admin-nav" data-cy="navbar">
-  <div class="admin-nav__inner">
+<nav class="sticky top-0 z-40 border-b border-[#00A7B5]/30 bg-[#141817] text-white shadow-[0_1px_0_rgba(255,255,255,0.06)]" data-cy="navbar">
+  <div class="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
     <a
       [routerLink]="['/']"
-      routerLinkActive="is-active"
+      routerLinkActive="text-white"
       [routerLinkActiveOptions]="{ exact: true }"
-      class="admin-brand"
+      class="flex items-center gap-3 font-display text-sm font-semibold uppercase text-white/90 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
       data-cy="home-link"
     >
-      <span class="admin-brand__mark">RC</span>
+      <span class="flex h-8 w-8 items-center justify-center rounded-md border border-[#00A7B5]/50 bg-white/10 font-mono text-xs font-semibold text-white shadow-[inset_0_-2px_0_#00A7B5]">RC</span>
       <span>Print Farm Ops</span>
     </a>
 
-    <ul class="admin-nav__links hidden md:flex">
+    <ul class="hidden items-center gap-2 md:flex">
       @if (authStore.isAuthenticated()) {
         <li>
           <a
             routerLink="/add-product"
-            routerLinkActive="is-active"
-            class="admin-nav__link"
+            routerLinkActive="border-[#00A7B5] bg-[#00A7B5]/15 text-white shadow-[inset_0_-2px_0_#00A7B5]"
+            class="inline-flex h-9 items-center rounded-md border border-transparent px-3 font-display text-sm font-medium text-white/75 transition-colors hover:border-[#F59E0B]/50 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
             data-cy="add-product-link"
           >
             Add Product
@@ -26,8 +26,8 @@
         <li>
           <a
             routerLink="/orders"
-            routerLinkActive="is-active"
-            class="admin-nav__link"
+            routerLinkActive="border-[#00A7B5] bg-[#00A7B5]/15 text-white shadow-[inset_0_-2px_0_#00A7B5]"
+            class="inline-flex h-9 items-center rounded-md border border-transparent px-3 font-display text-sm font-medium text-white/75 transition-colors hover:border-[#F59E0B]/50 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
             data-cy="orders-link"
           >
             Orders
@@ -39,8 +39,8 @@
         <li>
           <a
             routerLink="/signin"
-            routerLinkActive="is-active"
-            class="admin-nav__link"
+            routerLinkActive="border-[#00A7B5] bg-[#00A7B5]/15 text-white shadow-[inset_0_-2px_0_#00A7B5]"
+            class="inline-flex h-9 items-center rounded-md border border-transparent px-3 font-display text-sm font-medium text-white/75 transition-colors hover:border-[#F59E0B]/50 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
             data-cy="signin-link"
           >
             Sign in
@@ -53,7 +53,7 @@
           <button
             type="button"
             (click)="logout()"
-            class="admin-nav__button"
+            class="inline-flex h-9 items-center rounded-md border border-white/20 px-3 font-display text-sm font-medium text-white/80 transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
             data-cy="logout-button"
           >
             Logout
@@ -64,27 +64,27 @@
 
     <button
       type="button"
-      class="admin-icon-button md:hidden"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/20 text-white transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5] md:hidden"
       (click)="toggleMobileMenu()"
       data-cy="mobile-menu-toggle"
       aria-label="Toggle navigation"
       [attr.aria-expanded]="isMobileMenuOpen"
     >
-      <span class="menu-glyph" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
+      <span class="flex w-5 flex-col gap-1" aria-hidden="true">
+        <span class="block h-0.5 w-full bg-current"></span>
+        <span class="block h-0.5 w-full bg-current"></span>
+        <span class="block h-0.5 w-full bg-current"></span>
       </span>
     </button>
   </div>
 
   @if (isMobileMenuOpen) {
-    <div class="mobile-menu" data-cy="mobile-menu">
+    <div class="border-t border-white/10 bg-[#141817] px-4 py-3 sm:px-6 md:hidden" data-cy="mobile-menu">
       <a
         [routerLink]="['/']"
-        routerLinkActive="is-active"
+        routerLinkActive="border-[#00A7B5] bg-white/10 text-white"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="mobile-menu__link"
+        class="block rounded-md border-l-2 border-transparent px-3 py-2 font-display text-sm font-medium text-white/80 transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
         data-cy="mobile-home-link"
       >
         Home
@@ -93,16 +93,16 @@
       @if (authStore.isAuthenticated()) {
         <a
           [routerLink]="['/add-product']"
-          routerLinkActive="is-active"
-          class="mobile-menu__link"
+          routerLinkActive="border-[#00A7B5] bg-white/10 text-white"
+          class="block rounded-md border-l-2 border-transparent px-3 py-2 font-display text-sm font-medium text-white/80 transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
           data-cy="mobile-add-product-link"
         >
           Add Product
         </a>
         <a
           [routerLink]="['/orders']"
-          routerLinkActive="is-active"
-          class="mobile-menu__link"
+          routerLinkActive="border-[#00A7B5] bg-white/10 text-white"
+          class="block rounded-md border-l-2 border-transparent px-3 py-2 font-display text-sm font-medium text-white/80 transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
           data-cy="mobile-orders-link"
         >
           Orders
@@ -112,8 +112,8 @@
       @if (!authStore.isAuthenticated()) {
         <a
           [routerLink]="['/signin']"
-          routerLinkActive="is-active"
-          class="mobile-menu__link"
+          routerLinkActive="border-[#00A7B5] bg-white/10 text-white"
+          class="block rounded-md border-l-2 border-transparent px-3 py-2 font-display text-sm font-medium text-white/80 transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
           data-cy="mobile-signin-link"
         >
           Sign in
@@ -124,7 +124,7 @@
         <button
           type="button"
           (click)="logout()"
-          class="mobile-menu__button"
+          class="block w-full rounded-md border-l-2 border-transparent px-3 py-2 text-left font-display text-sm font-medium text-white/80 transition-colors hover:border-[#F59E0B]/60 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00A7B5]"
           data-cy="mobile-logout-button"
         >
           Logout
