@@ -46,9 +46,7 @@ export class LoginComponent {
 			this.router.navigateByUrl(this.returnUrl);
 		} catch (error: unknown) {
 			const err = error as {
-				error?:
-					| string
-					| { message?: string; details?: string; error?: string };
+				error?: string | { message?: string; details?: string; error?: string };
 				message?: string;
 			};
 			const responseError =

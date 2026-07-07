@@ -14,10 +14,16 @@ module.exports = {
 			fontFamily: {
 				display: ['"Space Grotesk"', 'Inter', 'ui-sans-serif', 'system-ui'],
 				sans: ['Inter', 'ui-sans-serif', 'system-ui'],
-				mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+				mono: [
+					'"IBM Plex Mono"',
+					'ui-monospace',
+					'SFMono-Regular',
+					'monospace',
+				],
 			},
 			boxShadow: {
-				panel: '0 1px 0 rgba(17, 24, 39, 0.04), 0 12px 30px rgba(17, 24, 39, 0.07)',
+				panel:
+					'0 1px 0 rgba(17, 24, 39, 0.04), 0 12px 30px rgba(17, 24, 39, 0.07)',
 			},
 		},
 	},
